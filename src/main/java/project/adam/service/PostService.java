@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
+import project.adam.entity.Comment;
 import project.adam.entity.Post;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
@@ -44,7 +45,11 @@ public class PostService {
 
     @Transactional
     public void remove(Long postId) {
-        commentRepository.deleteAll(commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow()));
+        List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
+//        commentRepository.deleteAll(commits);
+        for (Comment commit : commits) {
+            commentRepository.delete(commit);
+        }
         postRepository.delete(postRepository.findById(postId).orElseThrow());
     }
 
