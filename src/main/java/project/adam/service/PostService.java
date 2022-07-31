@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
 import project.adam.entity.Post;
+import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -21,6 +22,7 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public Long create(PostCreateRequest postDto) {
@@ -42,6 +44,7 @@ public class PostService {
 
     @Transactional
     public void remove(Long postId) {
+        commentRepository.deleteAll(commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow()));
         postRepository.delete(postRepository.findById(postId).orElseThrow());
     }
 

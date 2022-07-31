@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindResponse;
@@ -21,6 +22,7 @@ class PostServiceTest {
 
     @Autowired MemberService memberService;
     @Autowired PostService postService;
+    @Autowired CommentService commentService;
 
     @Test
     void post_create() {
@@ -112,6 +114,28 @@ class PostServiceTest {
     void post_delete_no_post() {
         assertThatThrownBy(() -> postService.remove(0L))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void post_delete_remove_comments() {
+        //given
+        Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
+        Long post1Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post2", "post 2"));
+
+        for (int i = 0; i < 100; i++) {
+            commentService.create(new CommentCreateRequest(postWriterId, i % 2 == 0 ? post1Id : post2Id, "comment " + i));
+        }
+
+        //when
+        postService.remove(post1Id);
+
+        //then
+        for (Long i = 0L; i < 100L; i += 2L) {
+            Long commentId = i;
+            assertThatThrownBy(() -> commentService.find(commentId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Test
