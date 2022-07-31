@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.comment.CommentCreateRequest;
+import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -123,17 +125,21 @@ class PostServiceTest {
         Long post1Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post1", "post 1"));
         Long post2Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post2", "post 2"));
 
+        List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            commentService.create(new CommentCreateRequest(postWriterId, i % 2 == 0 ? post1Id : post2Id, "comment " + i));
+            Long commentId = commentService.create(new CommentCreateRequest(postWriterId, i % 2 == 0 ? post1Id : post2Id, "comment " + i));
+            if (i % 2 == 0) {
+                post1CommitId.add(commentId);
+                System.out.println("commentId = " + commentId);
+            }
         }
 
         //when
         postService.remove(post1Id);
 
         //then
-        for (Long i = 0L; i < 100L; i += 2L) {
-            Long commentId = i;
-            assertThatThrownBy(() -> commentService.find(commentId))
+        for (Long commitId : post1CommitId) {
+            assertThatThrownBy(() -> commentService.find(commitId))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }

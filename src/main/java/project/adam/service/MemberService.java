@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
+import project.adam.repository.CommentRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
@@ -18,7 +19,8 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final PostService postService;
 
     @Transactional
     public Long join(MemberJoinRequest memberDto) {
@@ -32,7 +34,22 @@ public class MemberService {
 
     @Transactional
     public void withdraw(Long memberId) {
-        postRepository.deleteAll(memberRepository.findById(memberId).orElseThrow().getPosts());
+        removeCommits(memberId);
+        removePosts(memberId);
+        removeMember(memberId);
+    }
+
+    private void removeCommits(Long memberId) {
+        System.out.println("MemberService.removeCommits");
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow()));
+    }
+    private void removePosts(Long memberId) {
+        System.out.println("MemberService.removePosts");
+        memberRepository.findById(memberId).orElseThrow().getPosts()
+                .forEach(post -> postService.remove(post.getId()));
+    }
+    private void removeMember(Long memberId) {
+        System.out.println("MemberService.removeMember");
         memberRepository.delete(memberRepository.findById(memberId).orElseThrow());
     }
 
