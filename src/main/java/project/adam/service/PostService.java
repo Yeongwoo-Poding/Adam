@@ -28,7 +28,7 @@ public class PostService {
     @Transactional
     public Long create(PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findById(postDto.getMemberId()).orElseThrow(),
+                memberRepository.findByUuid(postDto.getWriterId()).orElseThrow(),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
                 postDto.getBody())
@@ -46,10 +46,7 @@ public class PostService {
     @Transactional
     public void remove(Long postId) {
         List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
-//        commentRepository.deleteAll(commits);
-        for (Comment commit : commits) {
-            commentRepository.delete(commit);
-        }
+        commentRepository.deleteAll(commits);
         postRepository.delete(postRepository.findById(postId).orElseThrow());
     }
 
@@ -65,6 +62,12 @@ public class PostService {
 
     public List<PostFindResponse> findAllByWriter(Long memberId) {
         return postRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow()).stream()
+                .map(PostFindResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostFindResponse> findAllByWriter(String memberId) {
+        return postRepository.findAllByWriter(memberRepository.findByUuid(memberId).orElseThrow()).stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());
     }

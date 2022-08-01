@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   datasource:
     url: jdbc:mysql://localhost:8000/adam?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
@@ -16,4 +18,5 @@ spring:
 
 logging:
   level:
+    project.adam.controller: debug
     org.hibernate.SQL: debug

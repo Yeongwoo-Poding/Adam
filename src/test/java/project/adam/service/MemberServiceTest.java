@@ -30,7 +30,7 @@ class MemberServiceTest {
         Long savedId = memberService.join(memberJoinRequest);
 
         //then
-        assertThat(memberService.find(savedId).getUuid()).isEqualTo(memberJoinRequest.getUuid());
+        assertThat(memberService.find(savedId).getUuid()).isEqualTo(memberJoinRequest.getId());
         assertThat(memberService.find(savedId).getNickname()).isEqualTo(memberJoinRequest.getNickname());
     }
 
@@ -56,7 +56,7 @@ class MemberServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? member1Id : member2Id,
+                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
                     "FREE",
                     "post" + i,
                     "post body " + i
@@ -77,13 +77,12 @@ class MemberServiceTest {
         //given
         Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
         Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
-        Long post1Id = postService.create(new PostCreateRequest(member1Id, "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(member2Id, "FREE", "post2", "post 2"));
+        Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getUuid(), "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getUuid(), "FREE", "post2", "post 2"));
 
         for (int i = 0; i < 100; i++) {
-            commentService.create(new CommentCreateRequest(
-                    (i % 2 == 0) ? member1Id : member2Id,
-                    (i % 2 == 0) ? post2Id : post1Id,
+            commentService.create((i % 2 == 0) ? post2Id : post1Id, new CommentCreateRequest(
+                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
                     "comment " + i
             ));
         }

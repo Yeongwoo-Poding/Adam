@@ -31,7 +31,7 @@ class PostServiceTest {
         //given
         Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberId,
+                memberService.find(memberId).getUuid(),
                 "FREE",
                 "title",
                 "body");
@@ -41,7 +41,7 @@ class PostServiceTest {
         PostFindResponse postFindResponse = postService.find(savedId);
 
         //then
-        assertThat(postFindResponse.getWriter().getId()).isEqualTo(memberId);
+        assertThat(postFindResponse.getWriterId()).isEqualTo(memberId);
         assertThat(postFindResponse.getBoardName()).isEqualTo(postCreateRequest.getBoardName().toString());
         assertThat(postFindResponse.getTitle()).isEqualTo(postCreateRequest.getTitle());
         assertThat(postFindResponse.getBody()).isEqualTo(postCreateRequest.getBody());
@@ -50,7 +50,7 @@ class PostServiceTest {
     @Test
     void post_create_no_member() {
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                0L,
+                "NO_MEMBER",
                 "FREE",
                 "title",
                 "body");
@@ -63,7 +63,7 @@ class PostServiceTest {
     void post_create_no_board() {
         Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberId,
+                memberService.find(memberId).getUuid(),
                 "NOBOARD",
                 "title",
                 "body");
@@ -77,7 +77,7 @@ class PostServiceTest {
         //given
         Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberId,
+                memberService.find(memberId).getUuid(),
                 "FREE",
                 "title",
                 "body");
@@ -99,7 +99,7 @@ class PostServiceTest {
         //given
         Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberId,
+                memberService.find(memberId).getUuid(),
                 "FREE",
                 "title",
                 "body");
@@ -122,12 +122,12 @@ class PostServiceTest {
     void post_delete_remove_comments() {
         //given
         Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
-        Long post1Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(postWriterId, "FREE", "post2", "post 2"));
+        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post2", "post 2"));
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            Long commentId = commentService.create(new CommentCreateRequest(postWriterId, i % 2 == 0 ? post1Id : post2Id, "comment " + i));
+            Long commentId = commentService.create(i % 2 == 0 ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getUuid(), "comment " + i));
             if (i % 2 == 0) {
                 post1CommitId.add(commentId);
                 System.out.println("commentId = " + commentId);
@@ -152,7 +152,7 @@ class PostServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? member1Id : member2Id,
+                    (i % 2 == 0) ? "uuid1" : "uuid2",
                     "FREE",
                     "post" + i,
                     "post body " + i
@@ -176,7 +176,7 @@ class PostServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? member1Id : member2Id,
+                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
                     "FREE",
                     "post" + i,
                     "post body " + i

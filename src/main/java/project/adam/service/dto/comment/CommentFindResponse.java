@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 public class CommentFindResponse {
 
+    private Long id;
+
     private Long writerId;
 
     private Long postId;
@@ -24,6 +26,7 @@ public class CommentFindResponse {
     private String body;
 
     public CommentFindResponse(Comment comment) {
+        this.id = comment.getId();
         this.writerId = comment.getWriter().getId();
         this.postId = comment.getPost().getId();
         this.createDate = comment.getCreateDate();
