@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -45,7 +46,7 @@ class MemberServiceTest {
 
         //then
         assertThatThrownBy(() -> memberService.find(savedId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -97,12 +98,12 @@ class MemberServiceTest {
     @Test
     void member_withdraw_not_found() {
         assertThatThrownBy(() -> memberService.withdraw(0L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
     void member_not_found() {
         assertThatThrownBy(() -> memberService.find(0L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 }

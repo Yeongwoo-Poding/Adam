@@ -2,10 +2,15 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.exception.ApiException;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
+
+import static project.adam.exception.ExceptionEnum.VALIDATION_EXCEPTION;
 
 @Slf4j
 @RestController
@@ -16,26 +21,23 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/new")
-    public MemberFindResponse joinMember(@RequestBody MemberJoinRequest memberDto) {
-        log.debug("memberDto.uuid: {}", memberDto.getId());
-        log.debug("memberDto.nickname: {}", memberDto.getNickname());
+    public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto,
+                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ApiException(VALIDATION_EXCEPTION);
+        }
+
         Long savedId = memberService.join(memberDto);
-        log.info("member join uuid={}", memberDto.getId());
         return memberService.find(savedId);
     }
 
     @GetMapping
     public MemberFindResponse findMember(@RequestParam String id) {
-        MemberFindResponse memberFindResponse = memberService.find(id);
-        log.debug("memberFindResponse.uuid: {}", memberFindResponse.getUuid());
-        log.debug("memberFindResponse.nickname: {}", memberFindResponse.getNickname());
-        log.info("member find uuid={}", memberFindResponse.getUuid());
-        return memberFindResponse;
+        return memberService.find(id);
     }
 
     @DeleteMapping
     public void deleteMember(@RequestParam String id) {
         memberService.withdraw(id);
-        log.info("member delete uuid={}", id);
     }
 }
