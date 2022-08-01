@@ -7,6 +7,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 import static project.adam.exception.ExceptionEnum.*;
 
 @RestControllerAdvice
@@ -60,5 +62,15 @@ public class ApiExceptionAdvice {
         );
     }
 
-
+    @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final SQLIntegrityConstraintViolationException e) {
+        return new ResponseEntity<>(
+                new ApiExceptionEntity(
+                        INTEGRITY_EXCEPTION.getErrorType(),
+                        INTEGRITY_EXCEPTION.getMessage()
+                ),
+                INTEGRITY_EXCEPTION.getStatus()
+        );
+    }
 }
