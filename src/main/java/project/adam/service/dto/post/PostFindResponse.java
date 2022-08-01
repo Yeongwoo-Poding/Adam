@@ -32,6 +32,8 @@ public class PostFindResponse {
         this.id = post.getId();
         this.writerId = post.getWriter().getId();
         this.boardName = post.getBoard().toString();
+        this.createDate= post.getCreateDate();
+        this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
     }
