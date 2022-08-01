@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
+import project.adam.exception.ApiException;
 import project.adam.repository.CommentRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
+
+import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,38 +46,42 @@ public class MemberService {
     }
 
     private void removeCommits(Long memberId) {
-        System.out.println("MemberService.removeCommits");
-        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow()));
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))));
     }
     private void removePosts(Long memberId) {
-        System.out.println("MemberService.removePosts");
-        memberRepository.findById(memberId).orElseThrow().getPosts()
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))
+                .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(Long memberId) {
-        System.out.println("MemberService.removeMember");
-        memberRepository.delete(memberRepository.findById(memberId).orElseThrow());
+        memberRepository.delete(memberRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 
     private void removeCommits(String uuid) {
-        System.out.println("MemberService.removeCommits");
-        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid).orElseThrow()));
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))));
     }
     private void removePosts(String uuid) {
-        System.out.println("MemberService.removePosts");
-        memberRepository.findByUuid(uuid).orElseThrow().getPosts()
+        memberRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))
+                .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(String uuid) {
-        System.out.println("MemberService.removeMember");
-        memberRepository.delete(memberRepository.findByUuid(uuid).orElseThrow());
+        memberRepository.delete(memberRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 
     public MemberFindResponse find(Long memberId) {
-        return new MemberFindResponse(memberRepository.findById(memberId).orElseThrow());
+        return new MemberFindResponse(memberRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 
     public MemberFindResponse find(String uuid) {
-        return new MemberFindResponse(memberRepository.findByUuid(uuid).orElseThrow());
+        return new MemberFindResponse(memberRepository.findByUuid(uuid)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 }

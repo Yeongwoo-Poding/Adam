@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
 import project.adam.entity.Comment;
 import project.adam.entity.Post;
+import project.adam.exception.ApiException;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
@@ -15,6 +16,8 @@ import project.adam.service.dto.post.PostUpdateRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +31,8 @@ public class PostService {
     @Transactional
     public Long create(PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findByUuid(postDto.getWriterId()).orElseThrow(),
+                memberRepository.findByUuid(postDto.getWriterId())
+                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
                 postDto.getBody())
@@ -39,19 +43,23 @@ public class PostService {
 
     @Transactional
     public void update(Long postId, PostUpdateRequest postDto) {
-        Post findPost = postRepository.findById(postId).orElseThrow();
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION));
         findPost.update(postDto.getTitle(), postDto.getBody());
     }
 
     @Transactional
     public void remove(Long postId) {
-        List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
+        List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
         commentRepository.deleteAll(commits);
-        postRepository.delete(postRepository.findById(postId).orElseThrow());
+        postRepository.delete(postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 
     public PostFindResponse find(Long postId) {
-        return new PostFindResponse(postRepository.findById(postId).orElseThrow());
+        return new PostFindResponse(postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
     }
 
     public List<PostFindResponse> findAll() {
@@ -61,13 +69,17 @@ public class PostService {
     }
 
     public List<PostFindResponse> findAllByWriter(Long memberId) {
-        return postRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow()).stream()
+        return postRepository.findAllByWriter(memberRepository.findById(memberId)
+                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)))
+                .stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());
     }
 
     public List<PostFindResponse> findAllByWriter(String memberId) {
-        return postRepository.findAllByWriter(memberRepository.findByUuid(memberId).orElseThrow()).stream()
+        return postRepository.findAllByWriter(memberRepository.findByUuid(memberId)
+                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)))
+                .stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());
     }

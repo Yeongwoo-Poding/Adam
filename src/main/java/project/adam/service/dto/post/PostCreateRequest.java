@@ -4,13 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostCreateRequest {
 
+    @NotEmpty
     private String writerId;
+
+    @NotEmpty
     private String boardName;
+
+    @NotEmpty
     private String title;
+
     private String body;
 }

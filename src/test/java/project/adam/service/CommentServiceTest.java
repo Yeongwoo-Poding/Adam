@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
@@ -49,7 +50,7 @@ class CommentServiceTest {
     void comment_create_no_post() {
         Long commentWriterId = memberService.join(new MemberJoinRequest("uuid", "member2"));
         assertThatThrownBy(() -> commentService.create(0L, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "body")))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -57,7 +58,7 @@ class CommentServiceTest {
         Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
         Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
         assertThatThrownBy(() -> commentService.create(postId, new CommentCreateRequest("NO", "body")))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -88,7 +89,7 @@ class CommentServiceTest {
 
         //then
         assertThatThrownBy(() -> commentService.find(commentId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test

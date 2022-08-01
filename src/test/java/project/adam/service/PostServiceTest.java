@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
@@ -56,7 +57,7 @@ class PostServiceTest {
                 "body");
 
         assertThatThrownBy(() -> postService.create(postCreateRequest))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -109,13 +110,13 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(() -> postService.find(savedId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
     void post_delete_no_post() {
         assertThatThrownBy(() -> postService.remove(0L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -140,7 +141,7 @@ class PostServiceTest {
         //then
         for (Long commitId : post1CommitId) {
             assertThatThrownBy(() -> commentService.find(commitId))
-                    .isInstanceOf(NoSuchElementException.class);
+                    .isInstanceOf(ApiException.class);
         }
     }
 

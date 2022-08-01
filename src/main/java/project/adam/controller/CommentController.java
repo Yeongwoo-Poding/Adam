@@ -2,12 +2,18 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentListFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
+
+import static project.adam.exception.ExceptionEnum.*;
 
 @Slf4j
 @RestController
@@ -18,7 +24,13 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/new")
-    public CommentFindResponse createComment(@PathVariable Long postId, @RequestBody CommentCreateRequest commentDto) {
+    public CommentFindResponse createComment(@PathVariable Long postId,
+                                             @Validated @RequestBody CommentCreateRequest commentDto,
+                                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ApiException(VALIDATION_EXCEPTION);
+        }
+
         Long savedId = commentService.create(postId, commentDto);
         return commentService.find(savedId);
     }
@@ -29,7 +41,13 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public void updateComment(@PathVariable Long commentId, @RequestBody CommentUpdateRequest commentDto) {
+    public void updateComment(@PathVariable Long commentId,
+                              @Validated @RequestBody CommentUpdateRequest commentDto,
+                              BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ApiException(VALIDATION_EXCEPTION);
+        }
+
         commentService.update(commentId, commentDto);
     }
 
