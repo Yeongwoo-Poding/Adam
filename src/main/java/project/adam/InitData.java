@@ -1,7 +1,6 @@
 package project.adam;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import project.adam.service.CommentService;
@@ -10,7 +9,6 @@ import project.adam.service.PostService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
-
 import javax.annotation.PostConstruct;
 
 @Profile("local")

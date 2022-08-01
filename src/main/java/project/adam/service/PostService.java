@@ -13,10 +13,8 @@ import project.adam.repository.PostRepository;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
 
 @Service

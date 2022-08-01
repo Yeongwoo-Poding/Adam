@@ -1,6 +1,5 @@
 package project.adam.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
