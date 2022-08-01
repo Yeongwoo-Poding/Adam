@@ -29,8 +29,6 @@ public class CommentFindResponse {
         this.id = comment.getId();
         this.writerId = comment.getWriter().getId();
         this.postId = comment.getPost().getId();
-        this.createDate = comment.getCreateDate();
-        this.lastModifiedDate = comment.getLastModifiedDate();
         this.body = comment.getBody();
     }
 }
