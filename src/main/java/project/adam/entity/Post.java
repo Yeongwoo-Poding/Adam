@@ -3,6 +3,8 @@ package project.adam.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name = "post_id")
@@ -27,10 +29,6 @@ public class Post {
 
     @Enumerated(value = EnumType.STRING)
     private Board board;
-
-    private LocalDateTime createDate;
-
-    private LocalDateTime lastModifiedDate;
 
     private String title;
 
