@@ -5,17 +5,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Comment;
 import project.adam.exception.ApiException;
-import project.adam.exception.ExceptionEnum;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static project.adam.exception.ExceptionEnum.*;
 
 @Service

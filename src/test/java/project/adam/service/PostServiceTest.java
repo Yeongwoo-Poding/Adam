@@ -6,16 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

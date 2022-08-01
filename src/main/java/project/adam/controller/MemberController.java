@@ -9,7 +9,6 @@ import project.adam.exception.ApiException;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
-
 import static project.adam.exception.ExceptionEnum.VALIDATION_EXCEPTION;
 
 @Slf4j

@@ -1,15 +1,8 @@
 package project.adam.service.dto.post;
 
 import lombok.Getter;
-import project.adam.entity.Board;
-import project.adam.entity.Comment;
-import project.adam.entity.Member;
 import project.adam.entity.Post;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class PostFindResponse {

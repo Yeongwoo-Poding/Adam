@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
-
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

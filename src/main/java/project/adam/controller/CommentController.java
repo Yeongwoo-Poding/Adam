@@ -6,13 +6,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.exception.ApiException;
-import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentListFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-
 import static project.adam.exception.ExceptionEnum.*;
 
 @Slf4j

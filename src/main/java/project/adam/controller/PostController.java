@@ -2,7 +2,6 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +12,6 @@ import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
-
-import java.util.List;
-
 import static org.springframework.util.StringUtils.*;
 import static project.adam.exception.ExceptionEnum.VALIDATION_EXCEPTION;
 

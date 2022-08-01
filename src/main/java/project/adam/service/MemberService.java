@@ -9,7 +9,6 @@ import project.adam.repository.CommentRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
-
 import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
 
 @Service
