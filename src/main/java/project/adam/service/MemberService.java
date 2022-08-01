@@ -5,13 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
 import project.adam.repository.CommentRepository;
-import project.adam.repository.PostRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,7 +21,7 @@ public class MemberService {
     @Transactional
     public Long join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
-                memberDto.getUuid(),
+                memberDto.getId(),
                 memberDto.getNickname()
         ));
 
@@ -37,6 +33,13 @@ public class MemberService {
         removeCommits(memberId);
         removePosts(memberId);
         removeMember(memberId);
+    }
+
+    @Transactional
+    public void withdraw(String uuid) {
+        removeCommits(uuid);
+        removePosts(uuid);
+        removeMember(uuid);
     }
 
     private void removeCommits(Long memberId) {
@@ -53,7 +56,25 @@ public class MemberService {
         memberRepository.delete(memberRepository.findById(memberId).orElseThrow());
     }
 
+    private void removeCommits(String uuid) {
+        System.out.println("MemberService.removeCommits");
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid).orElseThrow()));
+    }
+    private void removePosts(String uuid) {
+        System.out.println("MemberService.removePosts");
+        memberRepository.findByUuid(uuid).orElseThrow().getPosts()
+                .forEach(post -> postService.remove(post.getId()));
+    }
+    private void removeMember(String uuid) {
+        System.out.println("MemberService.removeMember");
+        memberRepository.delete(memberRepository.findByUuid(uuid).orElseThrow());
+    }
+
     public MemberFindResponse find(Long memberId) {
         return new MemberFindResponse(memberRepository.findById(memberId).orElseThrow());
+    }
+
+    public MemberFindResponse find(String uuid) {
+        return new MemberFindResponse(memberRepository.findByUuid(uuid).orElseThrow());
     }
 }

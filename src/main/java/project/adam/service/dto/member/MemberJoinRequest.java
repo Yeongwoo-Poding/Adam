@@ -2,18 +2,17 @@ package project.adam.service.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class MemberJoinRequest {
 
     @NotEmpty
-    @UniqueElements
-    private String uuid;
+    private String id;
 
     @NotEmpty
     private String nickname;

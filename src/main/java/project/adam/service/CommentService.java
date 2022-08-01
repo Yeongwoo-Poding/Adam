@@ -24,10 +24,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Long create(CommentCreateRequest commentDto) {
+    public Long create(Long postId, CommentCreateRequest commentDto) {
         Comment savedComment = commentRepository.save(new Comment(
-                memberRepository.findById(commentDto.getWriterId()).orElseThrow(),
-                postRepository.findById(commentDto.getPostId()).orElseThrow(),
+                memberRepository.findByUuid(commentDto.getWriterId()).orElseThrow(),
+                postRepository.findById(postId).orElseThrow(),
                 commentDto.getBody()
         ));
 
