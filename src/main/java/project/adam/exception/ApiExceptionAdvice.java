@@ -73,4 +73,16 @@ public class ApiExceptionAdvice {
                 INTEGRITY_EXCEPTION.getStatus()
         );
     }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final IllegalArgumentException e) {
+        return new ResponseEntity<>(
+                new ApiExceptionEntity(
+                        NO_BOARD_EXCEPTION.getErrorType(),
+                        NO_BOARD_EXCEPTION.getMessage()
+                ),
+                NO_BOARD_EXCEPTION.getStatus()
+        );
+    }
 }
