@@ -14,7 +14,8 @@ public enum ExceptionEnum {
 
     INTEGRITY_EXCEPTION(FORBIDDEN, "INTEGRITY_EXCEPTION", "중복된 KEY가 존재합니다."),
 
-    NO_RESULT_EXCEPTION(CONFLICT, "NO_RESULT_EXCEPTION", "검색 대상이 없습니다.");
+    NO_RESULT_EXCEPTION(CONFLICT, "NO_RESULT_EXCEPTION", "검색 대상이 없습니다."),
+    NO_BOARD_EXCEPTION(CONFLICT, "NO_BOARD_EXCEPTION", "존재하지 않는 게시판입니다.");
 
     private final HttpStatus status;
     private final String errorType;
