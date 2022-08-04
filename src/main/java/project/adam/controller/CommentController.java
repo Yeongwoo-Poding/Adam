@@ -38,7 +38,7 @@ public class CommentController {
         return commentService.find(commentId);
     }
 
-    @PatchMapping("/{commentId}")
+    @PutMapping("/{commentId}")
     public void updateComment(@PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto,
                               BindingResult bindingResult) {
