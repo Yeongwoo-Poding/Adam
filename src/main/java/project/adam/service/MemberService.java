@@ -9,7 +9,7 @@ import project.adam.repository.CommentRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
-import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
+import static project.adam.exception.ExceptionEnum.NO_DATA;
 
 @Service
 @Transactional(readOnly = true)
@@ -46,41 +46,41 @@ public class MemberService {
 
     private void removeCommits(Long memberId) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))));
+                .orElseThrow(() -> new ApiException(NO_DATA))));
     }
     private void removePosts(Long memberId) {
         memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))
+                .orElseThrow(() -> new ApiException(NO_DATA))
                 .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(Long memberId) {
         memberRepository.delete(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 
     private void removeCommits(String uuid) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))));
+                .orElseThrow(() -> new ApiException(NO_DATA))));
     }
     private void removePosts(String uuid) {
         memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION))
+                .orElseThrow(() -> new ApiException(NO_DATA))
                 .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(String uuid) {
         memberRepository.delete(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 
     public MemberFindResponse find(Long memberId) {
         return new MemberFindResponse(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 
     public MemberFindResponse find(String uuid) {
         return new MemberFindResponse(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 }

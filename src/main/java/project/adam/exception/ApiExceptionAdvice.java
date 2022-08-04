@@ -2,6 +2,7 @@ package project.adam.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,7 +20,6 @@ public class ApiExceptionAdvice {
                                                                final ApiException e) {
         return new ResponseEntity<>(
                 new ApiExceptionEntity(
-                        e.getError().getErrorType(),
                         e.getError().getMessage()
                 ),
                 e.getError().getStatus()
@@ -31,10 +31,9 @@ public class ApiExceptionAdvice {
                                                                final MethodArgumentNotValidException e) {
         return new ResponseEntity<>(
                 new ApiExceptionEntity(
-                        VALIDATION_EXCEPTION.getErrorType(),
-                        VALIDATION_EXCEPTION.getMessage()
+                        INVALID_DATA.getMessage()
                 ),
-                VALIDATION_EXCEPTION.getStatus()
+                INVALID_DATA.getStatus()
         );
     }
 
@@ -43,10 +42,9 @@ public class ApiExceptionAdvice {
                                                                final HttpMessageNotReadableException e) {
         return new ResponseEntity<>(
                 new ApiExceptionEntity(
-                        PARSE_EXCEPTION.getErrorType(),
-                        PARSE_EXCEPTION.getMessage()
+                        INVALID_DATA.getMessage()
                 ),
-                PARSE_EXCEPTION.getStatus()
+                INVALID_DATA.getStatus()
         );
     }
 
@@ -55,22 +53,9 @@ public class ApiExceptionAdvice {
                                                                final MissingServletRequestParameterException e) {
         return new ResponseEntity<>(
                 new ApiExceptionEntity(
-                        PARAMETER_EXCEPTION.getErrorType(),
-                        PARAMETER_EXCEPTION.getMessage()
+                        INVALID_DATA.getMessage()
                 ),
-                PARAMETER_EXCEPTION.getStatus()
-        );
-    }
-
-    @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
-    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
-                                                               final SQLIntegrityConstraintViolationException e) {
-        return new ResponseEntity<>(
-                new ApiExceptionEntity(
-                        INTEGRITY_EXCEPTION.getErrorType(),
-                        INTEGRITY_EXCEPTION.getMessage()
-                ),
-                INTEGRITY_EXCEPTION.getStatus()
+                INVALID_DATA.getStatus()
         );
     }
 
@@ -79,10 +64,31 @@ public class ApiExceptionAdvice {
                                                                final IllegalArgumentException e) {
         return new ResponseEntity<>(
                 new ApiExceptionEntity(
-                        NO_BOARD_EXCEPTION.getErrorType(),
-                        NO_BOARD_EXCEPTION.getMessage()
+                        INVALID_DATA.getMessage()
                 ),
-                NO_BOARD_EXCEPTION.getStatus()
+                INVALID_DATA.getStatus()
+        );
+    }
+
+    @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final SQLIntegrityConstraintViolationException e) {
+        return new ResponseEntity<>(
+                new ApiExceptionEntity(
+                        UNIQUE_CONSTRAINT_VIOLATED.getMessage()
+                ),
+                UNIQUE_CONSTRAINT_VIOLATED.getStatus()
+        );
+    }
+
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final HttpRequestMethodNotSupportedException e) {
+        return new ResponseEntity<>(
+                new ApiExceptionEntity(
+                        UNIQUE_CONSTRAINT_VIOLATED.getMessage()
+                ),
+                UNIQUE_CONSTRAINT_VIOLATED.getStatus()
         );
     }
 }

@@ -11,7 +11,8 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentListFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-import static project.adam.exception.ExceptionEnum.*;
+
+import static project.adam.exception.ExceptionEnum.INVALID_DATA;
 
 @Slf4j
 @RestController
@@ -26,7 +27,7 @@ public class CommentController {
                                              @Validated @RequestBody CommentCreateRequest commentDto,
                                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ApiException(VALIDATION_EXCEPTION);
+            throw new ApiException(INVALID_DATA);
         }
 
         Long savedId = commentService.create(postId, commentDto);
@@ -43,7 +44,7 @@ public class CommentController {
                               @Validated @RequestBody CommentUpdateRequest commentDto,
                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ApiException(VALIDATION_EXCEPTION);
+            throw new ApiException(INVALID_DATA);
         }
 
         commentService.update(commentId, commentDto);

@@ -9,7 +9,8 @@ import project.adam.exception.ApiException;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
-import static project.adam.exception.ExceptionEnum.VALIDATION_EXCEPTION;
+
+import static project.adam.exception.ExceptionEnum.INVALID_DATA;
 
 @Slf4j
 @RestController
@@ -23,7 +24,7 @@ public class MemberController {
     public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto,
                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ApiException(VALIDATION_EXCEPTION);
+            throw new ApiException(INVALID_DATA);
         }
 
         Long savedId = memberService.join(memberDto);
