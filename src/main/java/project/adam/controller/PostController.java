@@ -13,7 +13,7 @@ import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import static org.springframework.util.StringUtils.*;
-import static project.adam.exception.ExceptionEnum.VALIDATION_EXCEPTION;
+import static project.adam.exception.ExceptionEnum.INVALID_DATA;
 
 @Slf4j
 @RestController
@@ -28,7 +28,7 @@ public class PostController {
     public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto,
                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ApiException(VALIDATION_EXCEPTION);
+            throw new ApiException(INVALID_DATA);
         }
 
         Long savedId = postService.create(postDto);
@@ -45,7 +45,7 @@ public class PostController {
                            @Validated @RequestBody PostUpdateRequest postDto,
                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ApiException(VALIDATION_EXCEPTION);
+            throw new ApiException(INVALID_DATA);
         }
         
         postService.update(postId, postDto);

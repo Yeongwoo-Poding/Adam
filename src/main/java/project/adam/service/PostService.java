@@ -15,7 +15,7 @@ import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.List;
 import java.util.stream.Collectors;
-import static project.adam.exception.ExceptionEnum.NO_RESULT_EXCEPTION;
+import static project.adam.exception.ExceptionEnum.NO_DATA;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,7 +30,7 @@ public class PostService {
     public Long create(PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
                 memberRepository.findByUuid(postDto.getWriterId())
-                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)),
+                        .orElseThrow(() -> new ApiException(NO_DATA)),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
                 postDto.getBody())
@@ -42,22 +42,22 @@ public class PostService {
     @Transactional
     public void update(Long postId, PostUpdateRequest postDto) {
         Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION));
+                .orElseThrow(() -> new ApiException(NO_DATA));
         findPost.update(postDto.getTitle(), postDto.getBody());
     }
 
     @Transactional
     public void remove(Long postId) {
         List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
         commentRepository.deleteAll(commits);
         postRepository.delete(postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 
     public PostFindResponse find(Long postId) {
         return new PostFindResponse(postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)));
+                .orElseThrow(() -> new ApiException(NO_DATA)));
     }
 
     public List<PostFindResponse> findAll() {
@@ -68,7 +68,7 @@ public class PostService {
 
     public List<PostFindResponse> findAllByWriter(Long memberId) {
         return postRepository.findAllByWriter(memberRepository.findById(memberId)
-                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)))
+                        .orElseThrow(() -> new ApiException(NO_DATA)))
                 .stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());
@@ -76,7 +76,7 @@ public class PostService {
 
     public List<PostFindResponse> findAllByWriter(String memberId) {
         return postRepository.findAllByWriter(memberRepository.findByUuid(memberId)
-                        .orElseThrow(() -> new ApiException(NO_RESULT_EXCEPTION)))
+                        .orElseThrow(() -> new ApiException(NO_DATA)))
                 .stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());
