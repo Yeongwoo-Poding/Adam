@@ -40,7 +40,7 @@ public class PostController {
         return postService.find(postId);
     }
 
-    @PatchMapping("/{postId}")
+    @PutMapping("/{postId}")
     public void updatePost(@PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto,
                            BindingResult bindingResult) {
