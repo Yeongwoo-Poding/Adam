@@ -2,10 +2,8 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.exception.ApiException;
 import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -13,7 +11,6 @@ import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import static org.springframework.util.StringUtils.*;
-import static project.adam.exception.ExceptionEnum.INVALID_DATA;
 
 @Slf4j
 @RestController
@@ -24,13 +21,8 @@ public class PostController {
     private final PostService postService;
     private final MemberService memberService;
 
-    @PostMapping("/new")
-    public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto,
-                                       BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ApiException(INVALID_DATA);
-        }
-
+    @PostMapping
+    public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(postDto);
         return postService.find(savedId);
     }
@@ -42,12 +34,7 @@ public class PostController {
 
     @PutMapping("/{postId}")
     public void updatePost(@PathVariable Long postId,
-                           @Validated @RequestBody PostUpdateRequest postDto,
-                           BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ApiException(INVALID_DATA);
-        }
-        
+                           @Validated @RequestBody PostUpdateRequest postDto) {
         postService.update(postId, postDto);
     }
 

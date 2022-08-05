@@ -2,15 +2,11 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.exception.ApiException;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
-
-import static project.adam.exception.ExceptionEnum.INVALID_DATA;
 
 @Slf4j
 @RestController
@@ -20,13 +16,8 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/new")
-    public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto,
-                                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ApiException(INVALID_DATA);
-        }
-
+    @PostMapping
+    public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
         Long savedId = memberService.join(memberDto);
         return memberService.find(savedId);
     }

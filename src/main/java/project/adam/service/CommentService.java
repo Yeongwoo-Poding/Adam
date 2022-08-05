@@ -28,10 +28,8 @@ public class CommentService {
     @Transactional
     public Long create(Long postId, CommentCreateRequest commentDto) {
         Comment savedComment = commentRepository.save(new Comment(
-                memberRepository.findByUuid(commentDto.getWriterId())
-                        .orElseThrow(() -> new ApiException(NO_DATA)),
-                postRepository.findById(postId)
-                        .orElseThrow(() -> new ApiException(NO_DATA)),
+                memberRepository.findByUuid(commentDto.getWriterId()).orElseThrow(),
+                postRepository.findById(postId).orElseThrow(),
                 commentDto.getBody()
         ));
 
@@ -40,26 +38,22 @@ public class CommentService {
 
     @Transactional
     public void update(Long commentId, CommentUpdateRequest commentDto) {
-        Comment findComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException(NO_DATA));
+        Comment findComment = commentRepository.findById(commentId).orElseThrow();
         findComment.update(commentDto.getBody());
     }
 
     @Transactional
     public void remove(Long commentId) {
-        commentRepository.delete(commentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException(NO_DATA)));
+        commentRepository.delete(commentRepository.findById(commentId).orElseThrow());
     }
 
     public CommentFindResponse find(Long commentId) {
-        Comment findComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException(NO_DATA));
+        Comment findComment = commentRepository.findById(commentId).orElseThrow();
         return new CommentFindResponse(findComment);
     }
 
     public List<CommentFindResponse> findByPost(Long postId) {
-        return commentRepository.findAllByPost(postRepository.findById(postId)
-                        .orElseThrow(() -> new ApiException(NO_DATA)))
+        return commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow())
                 .stream()
                 .map(CommentFindResponse::new)
                 .collect(Collectors.toList());

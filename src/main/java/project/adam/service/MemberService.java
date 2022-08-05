@@ -45,42 +45,34 @@ public class MemberService {
     }
 
     private void removeCommits(Long memberId) {
-        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_DATA))));
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow()));
     }
     private void removePosts(Long memberId) {
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_DATA))
+        memberRepository.findById(memberId).orElseThrow()
                 .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(Long memberId) {
-        memberRepository.delete(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_DATA)));
+        memberRepository.delete(memberRepository.findById(memberId).orElseThrow());
     }
 
     private void removeCommits(String uuid) {
-        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_DATA))));
+        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findByUuid(uuid).orElseThrow()));
     }
     private void removePosts(String uuid) {
-        memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_DATA))
+        memberRepository.findByUuid(uuid).orElseThrow()
                 .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(String uuid) {
-        memberRepository.delete(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_DATA)));
+        memberRepository.delete(memberRepository.findByUuid(uuid).orElseThrow());
     }
 
     public MemberFindResponse find(Long memberId) {
-        return new MemberFindResponse(memberRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(NO_DATA)));
+        return new MemberFindResponse(memberRepository.findById(memberId).orElseThrow());
     }
 
     public MemberFindResponse find(String uuid) {
-        return new MemberFindResponse(memberRepository.findByUuid(uuid)
-                .orElseThrow(() -> new ApiException(NO_DATA)));
+        return new MemberFindResponse(memberRepository.findByUuid(uuid).orElseThrow());
     }
 }
