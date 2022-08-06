@@ -2,7 +2,12 @@ package project.adam.service.dto.post;
 
 import lombok.Getter;
 import project.adam.entity.Post;
+import project.adam.service.dto.comment.CommentFindResponse;
+import project.adam.service.dto.comment.CommentListFindResponse;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class PostFindResponse {
@@ -21,6 +26,8 @@ public class PostFindResponse {
 
     private String body;
 
+    private List<CommentFindResponse> comments;
+
     public PostFindResponse(Post post) {
         this.id = post.getId();
         this.writerId = post.getWriter().getId();
@@ -29,5 +36,8 @@ public class PostFindResponse {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
+        this.comments = post.getComments().stream()
+                            .map(CommentFindResponse::new)
+                            .collect(Collectors.toList());
     }
 }
