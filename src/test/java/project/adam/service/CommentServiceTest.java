@@ -10,6 +10,9 @@ import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
+
+import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -42,7 +45,7 @@ class CommentServiceTest {
     void comment_create_no_post() {
         Long commentWriterId = memberService.join(new MemberJoinRequest("uuid", "member2"));
         assertThatThrownBy(() -> commentService.create(0L, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "body")))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -50,7 +53,7 @@ class CommentServiceTest {
         Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
         Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
         assertThatThrownBy(() -> commentService.create(postId, new CommentCreateRequest("NO", "body")))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -81,7 +84,7 @@ class CommentServiceTest {
 
         //then
         assertThatThrownBy(() -> commentService.find(commentId))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
