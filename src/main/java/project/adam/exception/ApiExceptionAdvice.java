@@ -21,6 +21,13 @@ import static project.adam.exception.ExceptionEnum.*;
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionAdvice {
+    @ExceptionHandler({ApiException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final ApiException e) {
+        log.warn("ApiException");
+        return new ResponseEntity<>(new ApiExceptionEntity(e.getError()), e.getError().getStatus());
+    }
+
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                                                final HttpMessageNotReadableException e) {
