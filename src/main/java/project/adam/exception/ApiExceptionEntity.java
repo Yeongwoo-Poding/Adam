@@ -1,13 +1,18 @@
 package project.adam.exception;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class ApiExceptionEntity {
 
-    private String errorMessage;
+    private String code;
+    private String error;
+    private String message;
 
-    public ApiExceptionEntity(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public ApiExceptionEntity(ExceptionEnum e) {
+        this.code = e.getStatus().value() + " " + e.getStatus().getReasonPhrase();
+        this.error = e.name();
+        this.message = e.getMessage();
     }
 }
