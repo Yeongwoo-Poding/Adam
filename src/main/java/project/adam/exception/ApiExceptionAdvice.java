@@ -21,53 +21,52 @@ import static project.adam.exception.ExceptionEnum.*;
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionAdvice {
-
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                                                final HttpMessageNotReadableException e) {
         log.warn("HttpMessageNotReadableException");
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT), INVALID_JSON_FORMAT.getStatus());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                          final MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException");
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT), INVALID_INPUT.getStatus());
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                                          final MissingServletRequestParameterException e) {
         log.warn("MissingServletRequestParameterException");
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_PARAMETER), INVALID_PARAMETER.getStatus());
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                                          final MethodArgumentTypeMismatchException e) {
         log.warn("HttpMessageNotReadableException");
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT.getMessage()), BAD_REQUEST);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_TYPE), INVALID_TYPE.getStatus());
     }
 
     @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                          final SQLIntegrityConstraintViolationException e) {
         log.warn("SQLIntegrityConstraintViolationException");
-        return new ResponseEntity<>(new ApiExceptionEntity(UNIQUE_CONSTRAINT_VIOLATED.getMessage()), CONFLICT);
+        return new ResponseEntity<>(new ApiExceptionEntity(UNIQUE_CONSTRAINT_VIOLATED), UNIQUE_CONSTRAINT_VIOLATED.getStatus());
     }
 
     @ExceptionHandler({NoSuchElementException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                          final NoSuchElementException e) {
         log.warn("NoSuchElementException");
-        return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA.getMessage()), NOT_FOUND);
+        return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA), NO_DATA.getStatus());
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                          final HttpRequestMethodNotSupportedException e) {
         log.warn("HttpMessageNotReadableException");
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_METHOD.getMessage()), METHOD_NOT_ALLOWED);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_METHOD), INVALID_METHOD.getStatus());
     }
 }
