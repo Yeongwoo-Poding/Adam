@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentFindResponse;
@@ -26,23 +28,39 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentFindResponse findComment(@PathVariable Long commentId) {
-        return commentService.find(commentId);
-    }
-
-    @PutMapping("/{commentId}")
-    public void updateComment(@PathVariable Long commentId,
-                              @Validated @RequestBody CommentUpdateRequest commentDto) {
-        commentService.update(commentId, commentDto);
-    }
-
-    @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable Long commentId) {
-        commentService.remove(commentId);
+    public CommentFindResponse findComment(@PathVariable Long postId, @PathVariable Long commentId) {
+        return validateComment(postId, commentId);
     }
 
     @GetMapping
     public CommentListFindResponse findCommentsByPost(@PathVariable Long postId) {
         return new CommentListFindResponse(commentService.findByPost(postId));
+    }
+
+    @PutMapping("/{commentId}")
+    public void updateComment(@PathVariable Long postId,
+                              @PathVariable Long commentId,
+                              @Validated @RequestBody CommentUpdateRequest commentDto) {
+        validateComment(postId, commentId);
+        commentService.update(commentId, commentDto);
+    }
+
+    @DeleteMapping("/{commentId}")
+    public void deleteComment(@PathVariable Long postId,
+                              @PathVariable Long commentId) {
+        validateComment(postId, commentId);
+        commentService.remove(commentId);
+    }
+
+    private CommentFindResponse validateComment(Long postId, Long commentId) {
+        CommentFindResponse comment = commentService.find(commentId);
+        validate(postId, comment);
+        return comment;
+    }
+
+    private void validate(Long postId, CommentFindResponse comment) {
+        if (!comment.getPostId().equals(postId)) {
+            throw new ApiException(ExceptionEnum.NO_DATA);
+        }
     }
 }

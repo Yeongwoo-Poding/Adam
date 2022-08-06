@@ -32,6 +32,13 @@ public class PostController {
         return postService.find(postId);
     }
 
+    @GetMapping
+    public PostListFindResponse findAll(@RequestParam(required = false) String writerId) {
+        return hasText(writerId) ?
+                new PostListFindResponse(postService.findAllByWriter(writerId)) :
+                new PostListFindResponse(postService.findAll());
+    }
+
     @PutMapping("/{postId}")
     public void updatePost(@PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
@@ -41,12 +48,5 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Long postId) {
         postService.remove(postId);
-    }
-
-    @GetMapping
-    public PostListFindResponse findAll(@RequestParam(required = false) String writerId) {
-        return hasText(writerId) ?
-                new PostListFindResponse(postService.findAllByWriter(writerId)) :
-                new PostListFindResponse(postService.findAll());
     }
 }
