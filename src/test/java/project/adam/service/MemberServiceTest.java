@@ -46,7 +46,7 @@ class MemberServiceTest {
 
         //then
         assertThatThrownBy(() -> memberService.find(savedId))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -98,12 +98,12 @@ class MemberServiceTest {
     @Test
     void member_withdraw_not_found() {
         assertThatThrownBy(() -> memberService.withdraw(0L))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void member_not_found() {
         assertThatThrownBy(() -> memberService.find(0L))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 }

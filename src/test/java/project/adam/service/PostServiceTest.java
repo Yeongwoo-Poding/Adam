@@ -12,6 +12,8 @@ import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -53,7 +55,7 @@ class PostServiceTest {
                 "body");
 
         assertThatThrownBy(() -> postService.create(postCreateRequest))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -106,13 +108,13 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(() -> postService.find(savedId))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void post_delete_no_post() {
         assertThatThrownBy(() -> postService.remove(0L))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -137,7 +139,7 @@ class PostServiceTest {
         //then
         for (Long commitId : post1CommitId) {
             assertThatThrownBy(() -> commentService.find(commitId))
-                    .isInstanceOf(ApiException.class);
+                    .isInstanceOf(NoSuchElementException.class);
         }
     }
 
