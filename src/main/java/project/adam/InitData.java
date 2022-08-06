@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.entity.Privilege;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
 import project.adam.service.PostService;
@@ -36,7 +37,7 @@ public class InitData {
         private final EntityManager em;
 
         public void createDummyData() {
-            Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
+            Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"), Privilege.ADMIN);
             Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
 
             Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getUuid(), "FREE", "post1", "post body 1"));

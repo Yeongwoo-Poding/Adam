@@ -21,11 +21,20 @@ public class Member {
 
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    private Privilege privilege;
+
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
     public Member(String uuid, String nickname) {
         this.uuid = uuid;
         this.nickname = nickname;
+        this.privilege = Privilege.USER;
+    }
+
+    public Member(String uuid, String nickname, Privilege privilege) {
+        this(uuid, nickname);
+        this.privilege = privilege;
     }
 }

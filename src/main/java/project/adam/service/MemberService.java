@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
-import project.adam.exception.ApiException;
+import project.adam.entity.Privilege;
 import project.adam.repository.CommentRepository;
 import project.adam.service.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
-import static project.adam.exception.ExceptionEnum.NO_DATA;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +24,17 @@ public class MemberService {
         Member savedMember = memberRepository.save(new Member(
                 memberDto.getId(),
                 memberDto.getNickname()
+        ));
+
+        return savedMember.getId();
+    }
+
+    @Transactional
+    public Long join(MemberJoinRequest memberDto, Privilege privilege) {
+        Member savedMember = memberRepository.save(new Member(
+                memberDto.getId(),
+                memberDto.getNickname(),
+                privilege
         ));
 
         return savedMember.getId();
