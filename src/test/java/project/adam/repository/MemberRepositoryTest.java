@@ -3,6 +3,9 @@ package project.adam.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Board;
@@ -74,13 +77,15 @@ class MemberRepositoryTest {
             postRepository.save(newPost);
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null));
-        List<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null));
+        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null), allPages);
+        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null), allPages);
 
         //then
-        assertThat(writer1Posts.size()).isEqualTo(50);
-        assertThat(writer2Posts.size()).isEqualTo(50);
+        assertThat(writer1Posts.getContent().size()).isEqualTo(50);
+        assertThat(writer2Posts.getContent().size()).isEqualTo(50);
     }
 
     @Test
@@ -94,9 +99,11 @@ class MemberRepositoryTest {
             postRepository.save(newPost);
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null));
-        List<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null));
+        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null), allPages);
+        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null), allPages);
 
         //then
         assertThat(writer1.getPosts()).containsAll(writer1Posts);

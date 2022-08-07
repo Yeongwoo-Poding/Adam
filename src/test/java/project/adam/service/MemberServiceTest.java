@@ -3,6 +3,7 @@ package project.adam.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.comment.CommentCreateRequest;
@@ -66,11 +67,13 @@ class MemberServiceTest {
             postService.create(postCreateRequest);
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
         memberService.withdraw(member1Id);
 
         //then
-        assertThat(postService.findAll(new PostFindCondition()).size()).isEqualTo(50);
+        assertThat(postService.findAll(new PostFindCondition(), allPages).getContent().size()).isEqualTo(50);
     }
 
     @Test
@@ -90,11 +93,13 @@ class MemberServiceTest {
             ));
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
         memberService.withdraw(member1Id);
 
         //then
-        assertThat(commentService.findByPost(post2Id)).isEmpty();
+        assertThat(commentService.findByPost(post2Id, allPages)).isEmpty();
     }
 
     @Test

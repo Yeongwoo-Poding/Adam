@@ -3,6 +3,7 @@ package project.adam.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Comment;
 import project.adam.service.dto.comment.CommentCreateRequest;
@@ -93,13 +94,15 @@ class CommentServiceTest {
         Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post1", "post 1"));
         Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post2", "post 2"));
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
         for (int i = 0; i < 100; i++) {
             commentService.create((i % 2 == 0) ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getId(), "comment " + i));
         }
 
         //then
-        assertThat(commentService.findByPost(post1Id).size()).isEqualTo(50);
-        assertThat(commentService.findByPost(post2Id).size()).isEqualTo(50);
+        assertThat(commentService.findByPost(post1Id, allPages).getContent().size()).isEqualTo(50);
+        assertThat(commentService.findByPost(post2Id, allPages).getContent().size()).isEqualTo(50);
     }
 }
