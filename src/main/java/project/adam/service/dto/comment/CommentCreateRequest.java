@@ -11,8 +11,5 @@ import javax.validation.constraints.NotEmpty;
 public class CommentCreateRequest {
 
     @NotEmpty
-    private String writerId;
-
-    @NotEmpty
     private String body;
 }

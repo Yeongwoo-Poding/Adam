@@ -40,27 +40,27 @@ public class InitData {
             String member1Id = memberService.join(new MemberJoinRequest("id1", "member1", Privilege.ADMIN));
             String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
-            Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getId(), "FREE", "post1", "post body 1"));
-            Long post2Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getId(), "FREE", "post2", "post body 2"));
-            Long post3Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getId(), "FREE", "post3", "post body 3"));
-            Long post4Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getId(), "FREE", "post3", "post body 4"));
+            Long post1Id = postService.create(member1Id, new PostCreateRequest("FREE", "post1", "post body 1"));
+            Long post2Id = postService.create(member1Id, new PostCreateRequest("FREE", "post2", "post body 2"));
+            Long post3Id = postService.create(member2Id, new PostCreateRequest("FREE", "post3", "post body 3"));
+            Long post4Id = postService.create(member2Id, new PostCreateRequest("FREE", "post3", "post body 4"));
 
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 1"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 2"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 3"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 4"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 5"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 6"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 7"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 8"));
-            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 9"));
-            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 10"));
-            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 11"));
-            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 12"));
-            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 13"));
-            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 14"));
-            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 15"));
-            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 16"));
+            commentService.create(member1Id, post1Id, new CommentCreateRequest("comment body 1"));
+            commentService.create(member2Id, post1Id, new CommentCreateRequest("comment body 2"));
+            commentService.create(member1Id, post2Id, new CommentCreateRequest("comment body 3"));
+            commentService.create(member2Id, post2Id, new CommentCreateRequest("comment body 4"));
+            commentService.create(member1Id, post1Id, new CommentCreateRequest("comment body 5"));
+            commentService.create(member2Id, post1Id, new CommentCreateRequest("comment body 6"));
+            commentService.create(member1Id, post2Id, new CommentCreateRequest("comment body 7"));
+            commentService.create(member2Id, post2Id, new CommentCreateRequest("comment body 8"));
+            commentService.create(member1Id, post3Id, new CommentCreateRequest("comment body 9"));
+            commentService.create(member2Id, post3Id, new CommentCreateRequest("comment body 10"));
+            commentService.create(member1Id, post4Id, new CommentCreateRequest("comment body 11"));
+            commentService.create(member2Id, post4Id, new CommentCreateRequest("comment body 12"));
+            commentService.create(member1Id, post3Id, new CommentCreateRequest("comment body 13"));
+            commentService.create(member2Id, post3Id, new CommentCreateRequest("comment body 14"));
+            commentService.create(member1Id, post4Id, new CommentCreateRequest("comment body 15"));
+            commentService.create(member2Id, post4Id, new CommentCreateRequest("comment body 16"));
 
             em.flush();
             em.clear();

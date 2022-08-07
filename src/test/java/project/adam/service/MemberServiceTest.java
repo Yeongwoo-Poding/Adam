@@ -58,13 +58,12 @@ class MemberServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     "FREE",
                     "post" + i,
                     "post body " + i
             );
 
-            postService.create(postCreateRequest);
+            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
         }
 
         PageRequest allPages = PageRequest.of(0, 100);
@@ -81,16 +80,16 @@ class MemberServiceTest {
         //given
         String member1Id = memberService.join(new MemberJoinRequest("id1", "member1"));
         String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
-        Long post1Id = postService.create(new PostCreateRequest(
-                memberService.find(member1Id).getId(), "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(
-                memberService.find(member2Id).getId(), "FREE", "post2", "post 2"));
+        Long post1Id = postService.create(memberService.find(member1Id).getId(),
+                new PostCreateRequest("FREE", "post1", "post 1"));
+        Long post2Id = postService.create(memberService.find(member2Id).getId(),
+                new PostCreateRequest("FREE", "post2", "post 2"));
 
         for (int i = 0; i < 100; i++) {
-            commentService.create((i % 2 == 0) ? post2Id : post1Id, new CommentCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
-                    "comment " + i
-            ));
+            commentService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
+                    (i % 2 == 0) ? post2Id : post1Id,
+                    new CommentCreateRequest("comment " + i)
+            );
         }
 
         PageRequest allPages = PageRequest.of(0, 100);

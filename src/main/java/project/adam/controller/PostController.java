@@ -8,6 +8,8 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.entity.Post;
+import project.adam.entity.Privilege;
+import project.adam.service.MemberService;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -16,17 +18,22 @@ import project.adam.service.dto.post.PostUpdateRequest;
 
 import java.util.stream.Collectors;
 
+import static project.adam.entity.Privilege.ADMIN;
+import static project.adam.entity.Privilege.USER;
+
 @Slf4j
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 
+    private final MemberService memberService;
     private final PostService postService;
 
     @PostMapping
-    public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto) {
-        Long savedId = postService.create(postDto);
+    public PostFindResponse createPost(@CookieValue("sessionId") String sessionId,
+                                       @Validated @RequestBody PostCreateRequest postDto) {
+        Long savedId = postService.create(sessionId, postDto);
         return new PostFindResponse(postService.find(savedId));
     }
 
@@ -47,13 +54,19 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@PathVariable Long postId,
+    public void updatePost(@CookieValue("sessionId") String sessionId,
+                           @PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
+        Post findPost = postService.find(postId);
+        memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.update(postId, postDto);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Long postId) {
+    public void deletePost(@CookieValue("sessionId") String sessionId,
+                           @PathVariable Long postId) {
+        Post findPost = postService.find(postId);
+        memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.remove(postId);
     }
 }
