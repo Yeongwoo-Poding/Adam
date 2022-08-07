@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
-import project.adam.entity.Privilege;
 import project.adam.repository.CommentRepository;
-import project.adam.service.dto.member.MemberFindResponse;
-import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.repository.MemberRepository;
+import project.adam.service.dto.member.MemberJoinRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,21 +21,18 @@ public class MemberService {
     public Long join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
                 memberDto.getId(),
-                memberDto.getNickname()
+                memberDto.getNickname(),
+                memberDto.getPrivilege()
         ));
-
         return savedMember.getId();
     }
 
-    @Transactional
-    public Long join(MemberJoinRequest memberDto, Privilege privilege) {
-        Member savedMember = memberRepository.save(new Member(
-                memberDto.getId(),
-                memberDto.getNickname(),
-                privilege
-        ));
+    public Member find(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow();
+    }
 
-        return savedMember.getId();
+    public Member find(String uuid) {
+        return memberRepository.findByUuid(uuid).orElseThrow();
     }
 
     @Transactional
@@ -76,13 +71,5 @@ public class MemberService {
     }
     private void removeMember(String uuid) {
         memberRepository.delete(memberRepository.findByUuid(uuid).orElseThrow());
-    }
-
-    public MemberFindResponse find(Long memberId) {
-        return new MemberFindResponse(memberRepository.findById(memberId).orElseThrow());
-    }
-
-    public MemberFindResponse find(String uuid) {
-        return new MemberFindResponse(memberRepository.findByUuid(uuid).orElseThrow());
     }
 }
