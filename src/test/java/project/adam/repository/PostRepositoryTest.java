@@ -3,6 +3,8 @@ package project.adam.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Board;
@@ -50,9 +52,11 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> findAdminPost = postRepository.findAll(new PostFindCondition(ADMIN, null, null));
-        List<Post> findUserPost = postRepository.findAll(new PostFindCondition(USER, null, null));
+        Slice<Post> findAdminPost = postRepository.findAll(new PostFindCondition(ADMIN, null, null), allPages);
+        Slice<Post> findUserPost = postRepository.findAll(new PostFindCondition(USER, null, null), allPages);
 
         //then
         assertThat(findAdminPost).containsExactly(post1, post3);
@@ -70,9 +74,11 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> findAdminPost = postRepository.findAll(new PostFindCondition(null, adminMember.getId(), null));
-        List<Post> findUserPost = postRepository.findAll(new PostFindCondition(null, userMember.getId(), null));
+        Slice<Post> findAdminPost = postRepository.findAll(new PostFindCondition(null, adminMember.getId(), null), allPages);
+        Slice<Post> findUserPost = postRepository.findAll(new PostFindCondition(null, userMember.getId(), null), allPages);
 
         //then
         assertThat(findAdminPost).containsExactly(post1, post3);
@@ -90,9 +96,11 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> findSuccessPost = postRepository.findAll(new PostFindCondition(null, null, "success"));
-        List<Post> findFailPost = postRepository.findAll(new PostFindCondition(null, null, "fail"));
+        Slice<Post> findSuccessPost = postRepository.findAll(new PostFindCondition(null, null, "success"), allPages);
+        Slice<Post> findFailPost = postRepository.findAll(new PostFindCondition(null, null, "fail"), allPages);
 
         //then
         assertThat(findSuccessPost).containsExactly(post1, post2);
@@ -110,8 +118,10 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> findPost = postRepository.findAll(new PostFindCondition(ADMIN, adminMember.getId(), "success"));
+        Slice<Post> findPost = postRepository.findAll(new PostFindCondition(ADMIN, adminMember.getId(), "success"), allPages);
 
         //then
         assertThat(findPost).containsExactly(post1);

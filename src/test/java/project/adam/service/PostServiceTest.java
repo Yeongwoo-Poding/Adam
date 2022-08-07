@@ -3,6 +3,8 @@ package project.adam.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Post;
@@ -10,9 +12,8 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -160,11 +161,13 @@ class PostServiceTest {
             postService.create(postCreateRequest);
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> findPosts = postService.findAll(new PostFindCondition());
+        Slice<Post> findPosts = postService.findAll(new PostFindCondition(), allPages);
 
         //then
-        assertThat(findPosts.size()).isEqualTo(100);
+        assertThat(findPosts.getSize()).isEqualTo(100);
     }
 
     @Test
@@ -184,15 +187,19 @@ class PostServiceTest {
             postService.create(postCreateRequest);
         }
 
+        PageRequest allPages = PageRequest.of(0, 100);
+
         //when
-        List<Post> member1Post = postService.findAll(new PostFindCondition(null, member1Id, null));
-        List<Post> member2Post = postService.findAll(new PostFindCondition(null, member2Id, null));
+        Slice<Post> member1Post = postService.findAll(new PostFindCondition(null, member1Id, null), allPages);
+        Slice<Post> member2Post = postService.findAll(new PostFindCondition(null, member2Id, null), allPages);
 
         //then
-        assertThat(member1Post.size()).isEqualTo(50);
-        assertThat(member2Post.size()).isEqualTo(50);
+        assertThat(member1Post.getContent().size()).isEqualTo(50);
+        assertThat(member2Post.getContent().size()).isEqualTo(50);
 
-        member1Post.retainAll(member2Post);
-        assertThat(member1Post).isEmpty();
+        HashSet<Post> member1PostSet = new HashSet<>(member1Post.getContent());
+        HashSet<Post> member2PostSet = new HashSet<>(member2Post.getContent());
+        member1PostSet.retainAll(member2PostSet);
+        assertThat(member1PostSet).isEmpty();
     }
 }
