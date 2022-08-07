@@ -53,6 +53,14 @@ public class InitData {
             commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 6"));
             commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 7"));
             commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 8"));
+            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 9"));
+            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 10"));
+            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 11"));
+            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 12"));
+            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 13"));
+            commentService.create(post3Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 14"));
+            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 15"));
+            commentService.create(post4Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 16"));
 
             em.flush();
             em.clear();
