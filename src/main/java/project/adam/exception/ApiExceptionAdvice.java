@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -75,5 +76,12 @@ public class ApiExceptionAdvice {
                                          final HttpRequestMethodNotSupportedException e) {
         log.warn("HttpMessageNotReadableException");
         return new ResponseEntity<>(new ApiExceptionEntity(INVALID_METHOD), INVALID_METHOD.getStatus());
+    }
+
+    @ExceptionHandler({MissingRequestCookieException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final MissingRequestCookieException e) {
+        log.warn("MissingRequestCookieException");
+        return new ResponseEntity<>(new ApiExceptionEntity(AUTHENTICATION_FAILED), AUTHENTICATION_FAILED.getStatus());
     }
 }

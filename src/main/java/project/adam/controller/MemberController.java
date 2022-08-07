@@ -4,9 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.entity.Member;
+import project.adam.entity.Privilege;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.service.MemberService;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+import static project.adam.entity.Privilege.*;
+import static project.adam.exception.ExceptionEnum.*;
 
 @Slf4j
 @RestController
@@ -23,12 +33,16 @@ public class MemberController {
     }
 
     @GetMapping
-    public MemberFindResponse findMember(@RequestParam String id) {
+    public MemberFindResponse findMember(@CookieValue("sessionId") String sessionId,
+                                         @RequestParam String id) {
+        memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
         return new MemberFindResponse(memberService.find(id));
     }
 
     @DeleteMapping
-    public void deleteMember(@RequestParam String id) {
+    public void deleteMember(@CookieValue("sessionId") String sessionId,
+                             @RequestParam String id) {
+        memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
         memberService.withdraw(id);
     }
 }

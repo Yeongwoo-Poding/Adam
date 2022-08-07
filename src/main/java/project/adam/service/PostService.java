@@ -26,9 +26,9 @@ public class PostService {
     private final JPAQueryFactory queryFactory;
 
     @Transactional
-    public Long create(PostCreateRequest postDto) {
+    public Long create(String sessionId, PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findById(postDto.getWriterId()).orElseThrow(),
+                memberRepository.findById(sessionId).orElseThrow(),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
                 postDto.getBody()

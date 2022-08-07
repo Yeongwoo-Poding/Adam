@@ -3,9 +3,13 @@ package project.adam.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.adam.exception.ApiException;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static project.adam.exception.ExceptionEnum.AUTHORIZATION_FAILED;
 
 @Entity
 @Getter
@@ -33,5 +37,11 @@ public class Member {
     public Member(String id, String nickname, Privilege privilege) {
         this(id, nickname);
         this.privilege = privilege;
+    }
+
+    public void authorization(Privilege privilege) {
+        if (this.privilege.value < privilege.value) {
+            throw new ApiException(AUTHORIZATION_FAILED);
+        }
     }
 }
