@@ -1,19 +1,17 @@
 package project.adam.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.entity.Board;
-import project.adam.entity.Comment;
-import project.adam.entity.Post;
+import project.adam.service.dto.post.PostFindCondition;
+import project.adam.entity.*;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
-import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +21,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final JPAQueryFactory queryFactory;
 
     @Transactional
     public Long create(PostCreateRequest postDto) {
@@ -49,20 +48,11 @@ public class PostService {
         postRepository.delete(postRepository.findById(postId).orElseThrow());
     }
 
-    public PostFindResponse find(Long postId) {
-        return new PostFindResponse(postRepository.findById(postId).orElseThrow());
+    public Post find(Long postId) {
+        return postRepository.findById(postId).orElseThrow();
     }
 
-    public List<PostFindResponse> findAll() {
-        return postRepository.findAll().stream()
-                .map(PostFindResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    public List<PostFindResponse> findAllByWriter(String writerId) {
-        return postRepository.findAllByWriter(memberRepository.findById(writerId).orElseThrow())
-                .stream()
-                .map(PostFindResponse::new)
-                .collect(Collectors.toList());
+    public List<Post> findAll(PostFindCondition condition) {
+        return postRepository.findAll(condition);
     }
 }
