@@ -4,10 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.service.dto.post.PostFindCondition;
+import project.adam.entity.Post;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +37,13 @@ class PostServiceTest {
         Long savedId = postService.create(postCreateRequest);
 
         //when
-        PostFindResponse postFindResponse = postService.find(savedId);
+        Post post = postService.find(savedId);
 
         //then
-        assertThat(postFindResponse.getWriterId()).isEqualTo(memberId);
-        assertThat(postFindResponse.getBoardName()).isEqualTo(postCreateRequest.getBoardName().toString());
-        assertThat(postFindResponse.getTitle()).isEqualTo(postCreateRequest.getTitle());
-        assertThat(postFindResponse.getBody()).isEqualTo(postCreateRequest.getBody());
+        assertThat(post.getWriter().getId()).isEqualTo(memberId);
+        assertThat(post.getBoard().name()).isEqualTo(postCreateRequest.getBoardName().toString());
+        assertThat(post.getTitle()).isEqualTo(postCreateRequest.getTitle());
+        assertThat(post.getBody()).isEqualTo(postCreateRequest.getBody());
     }
 
     @Test
@@ -85,11 +86,11 @@ class PostServiceTest {
         PostUpdateRequest postUpdateRequest = new PostUpdateRequest("updatedTitle", "updated body");
         postService.update(savedId, postUpdateRequest);
 
-        PostFindResponse findPostResponse = postService.find(savedId);
+        Post findPost = postService.find(savedId);
 
         //then
-        assertThat(findPostResponse.getTitle()).isEqualTo("updatedTitle");
-        assertThat(findPostResponse.getBody()).isEqualTo("updated body");
+        assertThat(findPost.getTitle()).isEqualTo("updatedTitle");
+        assertThat(findPost.getBody()).isEqualTo("updated body");
     }
 
     @Test
@@ -160,10 +161,10 @@ class PostServiceTest {
         }
 
         //when
-        List<PostFindResponse> posts = postService.findAll();
+        List<Post> findPosts = postService.findAll(new PostFindCondition());
 
         //then
-        assertThat(posts.size()).isEqualTo(100);
+        assertThat(findPosts.size()).isEqualTo(100);
     }
 
     @Test
@@ -184,8 +185,8 @@ class PostServiceTest {
         }
 
         //when
-        List<PostFindResponse> member1Post = postService.findAllByWriter(member1Id);
-        List<PostFindResponse> member2Post = postService.findAllByWriter(member2Id);
+        List<Post> member1Post = postService.findAll(new PostFindCondition(null, member1Id, null));
+        List<Post> member2Post = postService.findAll(new PostFindCondition(null, member2Id, null));
 
         //then
         assertThat(member1Post.size()).isEqualTo(50);

@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
-import static org.springframework.util.StringUtils.*;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -22,19 +24,21 @@ public class PostController {
     @PostMapping
     public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(postDto);
-        return postService.find(savedId);
+        return new PostFindResponse(postService.find(savedId));
     }
 
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
-        return postService.find(postId);
+        return new PostFindResponse(postService.find(postId));
     }
 
     @GetMapping
-    public PostListFindResponse findAll(@RequestParam(required = false) String writerId) {
-        return hasText(writerId) ?
-                new PostListFindResponse(postService.findAllByWriter(writerId)) :
-                new PostListFindResponse(postService.findAll());
+    public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition) {
+        return new PostListFindResponse(
+                postService.findAll(condition).stream()
+                        .map(PostFindResponse::new)
+                        .collect(Collectors.toList())
+        );
     }
 
     @PutMapping("/{postId}")

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -69,7 +70,7 @@ class MemberServiceTest {
         memberService.withdraw(member1Id);
 
         //then
-        assertThat(postService.findAll().size()).isEqualTo(50);
+        assertThat(postService.findAll(new PostFindCondition()).size()).isEqualTo(50);
     }
 
     @Test

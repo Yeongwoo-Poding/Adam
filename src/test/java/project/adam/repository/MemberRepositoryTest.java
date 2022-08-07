@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Board;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,8 +75,8 @@ class MemberRepositoryTest {
         }
 
         //when
-        List<Post> writer1Posts = postRepository.findAllByWriter(writer1);
-        List<Post> writer2Posts = postRepository.findAllByWriter(writer2);
+        List<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null));
+        List<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null));
 
         //then
         assertThat(writer1Posts.size()).isEqualTo(50);
@@ -95,8 +95,8 @@ class MemberRepositoryTest {
         }
 
         //when
-        List<Post> writer1Posts = postRepository.findAllByWriter(writer1);
-        List<Post> writer2Posts = postRepository.findAllByWriter(writer2);
+        List<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null));
+        List<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null));
 
         //then
         assertThat(writer1.getPosts()).containsAll(writer1Posts);
