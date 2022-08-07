@@ -31,11 +31,10 @@ class PostServiceTest {
         //given
         String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
 
         //when
         Post post = postService.find(savedId);
@@ -50,12 +49,11 @@ class PostServiceTest {
     @Test
     void post_create_no_member() {
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                "NO_MEMBER",
                 "FREE",
                 "title",
                 "body");
 
-        assertThatThrownBy(() -> postService.create(postCreateRequest))
+        assertThatThrownBy(() -> postService.create("NO_MEMBER", postCreateRequest))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -63,12 +61,11 @@ class PostServiceTest {
     void post_create_no_board() {
         String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getId(),
                 "NOBOARD",
                 "title",
                 "body");
 
-        assertThatThrownBy(() -> postService.create(postCreateRequest))
+        assertThatThrownBy(() -> postService.create(memberService.find(memberId).getId(), postCreateRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -77,11 +74,10 @@ class PostServiceTest {
         //given
         String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
 
         //when
         PostUpdateRequest postUpdateRequest = new PostUpdateRequest("updatedTitle", "updated body");
@@ -99,11 +95,10 @@ class PostServiceTest {
         //given
         String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
         //when
         postService.remove(savedId);
 
@@ -122,12 +117,16 @@ class PostServiceTest {
     void post_delete_remove_comments() {
         //given
         String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
-        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post2", "post 2"));
+        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"));
+        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"));
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            Long commentId = commentService.create(i % 2 == 0 ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getId(), "comment " + i));
+            Long commentId = commentService.create(
+                    memberService.find(postWriterId).getId(),
+                    i % 2 == 0 ? post1Id : post2Id,
+                    new CommentCreateRequest("comment " + i)
+            );
             if (i % 2 == 0) {
                 post1CommitId.add(commentId);
                 System.out.println("commentId = " + commentId);
@@ -152,13 +151,12 @@ class PostServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? "id1" : "id2",
                     "FREE",
                     "post" + i,
                     "post body " + i
             );
 
-            postService.create(postCreateRequest);
+            postService.create((i % 2 == 0) ? "id1" : "id2", postCreateRequest);
         }
 
         PageRequest allPages = PageRequest.of(0, 100);
@@ -178,13 +176,12 @@ class PostServiceTest {
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     "FREE",
                     "post" + i,
                     "post body " + i
             );
 
-            postService.create(postCreateRequest);
+            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
         }
 
         PageRequest allPages = PageRequest.of(0, 100);
