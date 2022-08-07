@@ -2,6 +2,8 @@ package project.adam.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.service.dto.post.PostFindCondition;
@@ -52,7 +54,7 @@ public class PostService {
         return postRepository.findById(postId).orElseThrow();
     }
 
-    public List<Post> findAll(PostFindCondition condition) {
-        return postRepository.findAll(condition);
+    public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
+        return postRepository.findAll(condition, pageable);
     }
 }

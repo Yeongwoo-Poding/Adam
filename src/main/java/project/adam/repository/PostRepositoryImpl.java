@@ -3,6 +3,9 @@ package project.adam.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
@@ -17,9 +20,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> findAll(PostFindCondition condition) {
+    public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
         System.out.println("PostRepositoryImpl.findAll");
-        return queryFactory.query()
+        List<Post> contents = queryFactory.query()
                 .select(post)
                 .from(post)
                 .where(
@@ -27,7 +30,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         writerIdCondition(condition.getWriterId()),
                         titleCondition(condition.getTitleLike())
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
+
+        boolean hasNext = (contents.size() > pageable.getPageSize());
+        if (hasNext) {
+            contents.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 
     private BooleanExpression privilegeCondition(Privilege privilege) {
