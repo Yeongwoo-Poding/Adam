@@ -2,13 +2,16 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.entity.Post;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.controller.dto.post.PostFindResponse;
-import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 
 import java.util.stream.Collectors;
@@ -33,12 +36,14 @@ public class PostController {
     }
 
     @GetMapping
-    public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition) {
-        return new PostListFindResponse(
-                postService.findAll(condition).stream()
+    public Slice<PostFindResponse> findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
+        Slice<Post> result = postService.findAll(condition, pageable);
+        return new SliceImpl<>(
+                result.getContent().stream()
                         .map(PostFindResponse::new)
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList()),
+                result.getPageable(),
+                result.hasNext());
     }
 
     @PutMapping("/{postId}")
