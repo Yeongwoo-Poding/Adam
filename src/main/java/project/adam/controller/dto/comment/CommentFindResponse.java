@@ -9,7 +9,7 @@ public class CommentFindResponse {
 
     private Long id;
 
-    private Long writerId;
+    private String writerId;
 
     private Long postId;
 

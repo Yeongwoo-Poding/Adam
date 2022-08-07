@@ -27,9 +27,9 @@ class PostServiceTest {
     @Test
     void post_create() {
         //given
-        Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
+        String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getUuid(),
+                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
@@ -59,9 +59,9 @@ class PostServiceTest {
 
     @Test
     void post_create_no_board() {
-        Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
+        String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getUuid(),
+                memberService.find(memberId).getId(),
                 "NOBOARD",
                 "title",
                 "body");
@@ -73,9 +73,9 @@ class PostServiceTest {
     @Test
     void post_update() {
         //given
-        Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
+        String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getUuid(),
+                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
@@ -95,9 +95,9 @@ class PostServiceTest {
     @Test
     void post_delete() {
         //given
-        Long memberId = memberService.join(new MemberJoinRequest("uuid", "nickname"));
+        String memberId = memberService.join(new MemberJoinRequest("id", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
-                memberService.find(memberId).getUuid(),
+                memberService.find(memberId).getId(),
                 "FREE",
                 "title",
                 "body");
@@ -119,13 +119,13 @@ class PostServiceTest {
     @Test
     void post_delete_remove_comments() {
         //given
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
-        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post2", "post 2"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
+        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post2", "post 2"));
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            Long commentId = commentService.create(i % 2 == 0 ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getUuid(), "comment " + i));
+            Long commentId = commentService.create(i % 2 == 0 ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getId(), "comment " + i));
             if (i % 2 == 0) {
                 post1CommitId.add(commentId);
                 System.out.println("commentId = " + commentId);
@@ -145,12 +145,12 @@ class PostServiceTest {
     @Test
     void post_find_all() {
         //given
-        Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
+        String member1Id = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? "uuid1" : "uuid2",
+                    (i % 2 == 0) ? "id1" : "id2",
                     "FREE",
                     "post" + i,
                     "post body " + i
@@ -169,12 +169,12 @@ class PostServiceTest {
     @Test
     void post_find_all_by_writer() {
         //given
-        Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
+        String member1Id = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
+                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     "FREE",
                     "post" + i,
                     "post body " + i

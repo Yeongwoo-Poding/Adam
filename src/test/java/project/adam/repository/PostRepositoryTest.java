@@ -19,7 +19,7 @@ class PostRepositoryTest {
     @Test
     void post_save() {
         //given
-        Member member = new Member("uuid", "nickname");
+        Member member = new Member("id", "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "title1", "this is body");
         Post savedPost = postRepository.save(post);
@@ -37,7 +37,7 @@ class PostRepositoryTest {
     @Test
     void post_update() {
         //given
-        Member member = new Member("uuid", "nickname");
+        Member member = new Member("id", "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "beforeTitle", "before body");
         postRepository.save(post);
@@ -53,7 +53,7 @@ class PostRepositoryTest {
     @Test
     void post_delete() {
         //given
-        Member member = new Member("uuid", "nickname");
+        Member member = new Member("id", "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "title1", "this is body");
         Post savedPost = postRepository.save(post);

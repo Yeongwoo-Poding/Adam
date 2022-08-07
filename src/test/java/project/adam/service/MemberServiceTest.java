@@ -24,21 +24,21 @@ class MemberServiceTest {
     @Test
     void member_join() {
         //given
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest("uuid", "nickname");
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest("id", "nickname");
 
         //when
-        Long savedId = memberService.join(memberJoinRequest);
+        String savedId = memberService.join(memberJoinRequest);
 
         //then
-        assertThat(memberService.find(savedId).getUuid()).isEqualTo(memberJoinRequest.getId());
+        assertThat(memberService.find(savedId).getId()).isEqualTo(memberJoinRequest.getId());
         assertThat(memberService.find(savedId).getNickname()).isEqualTo(memberJoinRequest.getNickname());
     }
 
     @Test
     void member_withdraw() {
         //given
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest("uuid", "nickname");
-        Long savedId = memberService.join(memberJoinRequest);
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest("id", "nickname");
+        String savedId = memberService.join(memberJoinRequest);
 
         //when
         memberService.withdraw(savedId);
@@ -51,12 +51,12 @@ class MemberServiceTest {
     @Test
     void member_withdraw_remove_post() {
         //given
-        Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
+        String member1Id = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
+                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     "FREE",
                     "post" + i,
                     "post body " + i
@@ -75,14 +75,16 @@ class MemberServiceTest {
     @Test
     void member_withdraw_remove_comment() {
         //given
-        Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
-        Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getUuid(), "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getUuid(), "FREE", "post2", "post 2"));
+        String member1Id = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
+        Long post1Id = postService.create(new PostCreateRequest(
+                memberService.find(member1Id).getId(), "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(
+                memberService.find(member2Id).getId(), "FREE", "post2", "post 2"));
 
         for (int i = 0; i < 100; i++) {
             commentService.create((i % 2 == 0) ? post2Id : post1Id, new CommentCreateRequest(
-                    (i % 2 == 0) ? memberService.find(member1Id).getUuid() : memberService.find(member2Id).getUuid(),
+                    (i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     "comment " + i
             ));
         }
@@ -96,13 +98,13 @@ class MemberServiceTest {
 
     @Test
     void member_withdraw_not_found() {
-        assertThatThrownBy(() -> memberService.withdraw(0L))
+        assertThatThrownBy(() -> memberService.withdraw("FALSE"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void member_not_found() {
-        assertThatThrownBy(() -> memberService.find(0L))
+        assertThatThrownBy(() -> memberService.find("FALSE"))
                 .isInstanceOf(NoSuchElementException.class);
     }
 }
