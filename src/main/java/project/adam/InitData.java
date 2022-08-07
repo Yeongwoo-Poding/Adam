@@ -37,22 +37,22 @@ public class InitData {
         private final EntityManager em;
 
         public void createDummyData() {
-            Long member1Id = memberService.join(new MemberJoinRequest("uuid1", "member1", Privilege.ADMIN));
-            Long member2Id = memberService.join(new MemberJoinRequest("uuid2", "member2"));
+            String member1Id = memberService.join(new MemberJoinRequest("id1", "member1", Privilege.ADMIN));
+            String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
-            Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getUuid(), "FREE", "post1", "post body 1"));
-            Long post2Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getUuid(), "FREE", "post2", "post body 2"));
-            Long post3Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getUuid(), "FREE", "post3", "post body 3"));
-            Long post4Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getUuid(), "FREE", "post3", "post body 4"));
+            Long post1Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getId(), "FREE", "post1", "post body 1"));
+            Long post2Id = postService.create(new PostCreateRequest(memberService.find(member1Id).getId(), "FREE", "post2", "post body 2"));
+            Long post3Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getId(), "FREE", "post3", "post body 3"));
+            Long post4Id = postService.create(new PostCreateRequest(memberService.find(member2Id).getId(), "FREE", "post3", "post body 4"));
 
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getUuid(), "comment body 1"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getUuid(), "comment body 2"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getUuid(), "comment body 3"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getUuid(), "comment body 4"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getUuid(), "comment body 5"));
-            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getUuid(), "comment body 6"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getUuid(), "comment body 7"));
-            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getUuid(), "comment body 8"));
+            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 1"));
+            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 2"));
+            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 3"));
+            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 4"));
+            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 5"));
+            commentService.create(post1Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 6"));
+            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member1Id).getId(), "comment body 7"));
+            commentService.create(post2Id, new CommentCreateRequest(memberService.find(member2Id).getId(), "comment body 8"));
 
             em.flush();
             em.clear();

@@ -27,7 +27,7 @@ public class PostService {
     @Transactional
     public Long create(PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findByUuid(postDto.getWriterId()).orElseThrow(),
+                memberRepository.findById(postDto.getWriterId()).orElseThrow(),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
                 postDto.getBody()
@@ -59,15 +59,8 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public List<PostFindResponse> findAllByWriter(Long memberId) {
-        return postRepository.findAllByWriter(memberRepository.findById(memberId).orElseThrow())
-                .stream()
-                .map(PostFindResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    public List<PostFindResponse> findAllByWriter(String memberId) {
-        return postRepository.findAllByWriter(memberRepository.findByUuid(memberId).orElseThrow())
+    public List<PostFindResponse> findAllByWriter(String writerId) {
+        return postRepository.findAllByWriter(memberRepository.findById(writerId).orElseThrow())
                 .stream()
                 .map(PostFindResponse::new)
                 .collect(Collectors.toList());

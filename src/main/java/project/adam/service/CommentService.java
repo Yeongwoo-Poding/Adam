@@ -24,7 +24,7 @@ public class CommentService {
     @Transactional
     public Long create(Long postId, CommentCreateRequest commentDto) {
         Comment savedComment = commentRepository.save(new Comment(
-                memberRepository.findByUuid(commentDto.getWriterId()).orElseThrow(),
+                memberRepository.findById(commentDto.getWriterId()).orElseThrow(),
                 postRepository.findById(postId).orElseThrow(),
                 commentDto.getBody()
         ));

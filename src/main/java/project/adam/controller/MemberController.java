@@ -18,7 +18,7 @@ public class MemberController {
 
     @PostMapping
     public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
-        Long savedId = memberService.join(memberDto);
+        String savedId = memberService.join(memberDto);
         return new MemberFindResponse(memberService.find(savedId));
     }
 

@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Comment;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -27,12 +26,12 @@ class CommentServiceTest {
     @Test
     void comment_create() {
         //given
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long commentWriterId = memberService.join(new MemberJoinRequest("uuid2", "member2"));
-        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "title", "new post"));
 
         //when
-        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "new comment"));
+        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getId(), "new comment"));
         Comment comment = commentService.find(commentId);
 
         //then
@@ -43,15 +42,15 @@ class CommentServiceTest {
 
     @Test
     void comment_create_no_post() {
-        Long commentWriterId = memberService.join(new MemberJoinRequest("uuid", "member2"));
-        assertThatThrownBy(() -> commentService.create(0L, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "body")))
+        String commentWriterId = memberService.join(new MemberJoinRequest("id", "member2"));
+        assertThatThrownBy(() -> commentService.create(0L, new CommentCreateRequest(memberService.find(commentWriterId).getId(), "body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void comment_create_no_member() {
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
-        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
+        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "title", "new post"));
         assertThatThrownBy(() -> commentService.create(postId, new CommentCreateRequest("NO", "body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
@@ -59,10 +58,10 @@ class CommentServiceTest {
     @Test
     void comment_update() {
         //given
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long commentWriterId = memberService.join(new MemberJoinRequest("uuid2", "member2"));
-        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
-        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "new comment"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "title", "new post"));
+        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getId(), "new comment"));
 
         //when
         commentService.update(commentId, new CommentUpdateRequest("updated comment"));
@@ -74,10 +73,10 @@ class CommentServiceTest {
     @Test
     void comment_remove() {
         //given
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid1", "member1"));
-        Long commentWriterId = memberService.join(new MemberJoinRequest("uuid2", "member2"));
-        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "title", "new post"));
-        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "new comment"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
+        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        Long postId = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "title", "new post"));
+        Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getId(), "new comment"));
 
         //when
         commentService.remove(commentId);
@@ -90,13 +89,13 @@ class CommentServiceTest {
     @Test
     void comment_find_by_post() {
         //given
-        Long postWriterId = memberService.join(new MemberJoinRequest("uuid", "member1"));
-        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post1", "post 1"));
-        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getUuid(), "FREE", "post2", "post 2"));
+        String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
+        Long post1Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post1", "post 1"));
+        Long post2Id = postService.create(new PostCreateRequest(memberService.find(postWriterId).getId(), "FREE", "post2", "post 2"));
 
         //when
         for (int i = 0; i < 100; i++) {
-            commentService.create((i % 2 == 0) ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getUuid(), "comment " + i));
+            commentService.create((i % 2 == 0) ? post1Id : post2Id, new CommentCreateRequest(memberService.find(postWriterId).getId(), "comment " + i));
         }
 
         //then

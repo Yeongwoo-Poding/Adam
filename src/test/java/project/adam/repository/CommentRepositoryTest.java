@@ -22,9 +22,9 @@ class CommentRepositoryTest {
     @Test
     void comment_save() {
         //given
-        Member postWriter = new Member("uuid", "postWriter");
+        Member postWriter = new Member("id", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("uuid", "commentWriter");
+        Member commentWriter = new Member("id", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
@@ -45,9 +45,9 @@ class CommentRepositoryTest {
     @Test
     void comment_update() {
         //given
-        Member postWriter = new Member("uuid", "postWriter");
+        Member postWriter = new Member("id", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("uuid", "commentWriter");
+        Member commentWriter = new Member("id", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
@@ -66,9 +66,9 @@ class CommentRepositoryTest {
     @Test
     void comment_delete() {
         //given
-        Member postWriter = new Member("uuid", "postWriter");
+        Member postWriter = new Member("id", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("uuid", "commentWriter");
+        Member commentWriter = new Member("id", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");

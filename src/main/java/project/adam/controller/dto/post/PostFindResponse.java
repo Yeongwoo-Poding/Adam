@@ -13,7 +13,7 @@ public class PostFindResponse {
 
     private Long id;
 
-    private Long writerId;
+    private String writerId;
 
     private String boardName;
 

@@ -12,7 +12,7 @@ class PostTest {
     @Test
     void test_update() {
         //given
-        Member member = new Member("uuid", "member");
+        Member member = new Member("id", "member");
         Post post = new Post(member, Board.FREE, "title1", "body1");
 
         //when

@@ -7,12 +7,12 @@ import project.adam.entity.Privilege;
 @Getter
 public class MemberFindResponse {
 
-    private String uuid;
+    private String id;
     private String nickname;
     private Privilege privilege;
 
     public MemberFindResponse(Member member) {
-        this.uuid = member.getUuid();
+        this.id = member.getId();
         this.nickname = member.getNickname();
         this.privilege = member.getPrivilege();
     }

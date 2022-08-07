@@ -13,7 +13,7 @@ class CommentTest {
     @Test
     void test_update() {
         //given
-        Member member = new Member("uuid", "member");
+        Member member = new Member("id", "member");
         Post post = new Post(member, Board.FREE, "title1", "body1");
         Comment comment1 = new Comment(member, post, "comment1");
 
