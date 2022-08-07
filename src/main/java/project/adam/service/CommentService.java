@@ -3,18 +3,14 @@ package project.adam.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import project.adam.entity.Comment;
-import project.adam.exception.ApiException;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
+
 import java.util.List;
-import java.util.stream.Collectors;
-import static project.adam.exception.ExceptionEnum.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,15 +43,11 @@ public class CommentService {
         commentRepository.delete(commentRepository.findById(commentId).orElseThrow());
     }
 
-    public CommentFindResponse find(Long commentId) {
-        Comment findComment = commentRepository.findById(commentId).orElseThrow();
-        return new CommentFindResponse(findComment);
+    public Comment find(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow();
     }
 
-    public List<CommentFindResponse> findByPost(Long postId) {
-        return commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow())
-                .stream()
-                .map(CommentFindResponse::new)
-                .collect(Collectors.toList());
+    public List<Comment> findByPost(Long postId) {
+        return commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
     }
 }

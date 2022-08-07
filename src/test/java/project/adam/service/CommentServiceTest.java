@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.exception.ApiException;
+import project.adam.entity.Comment;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentFindResponse;
+import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -33,12 +33,12 @@ class CommentServiceTest {
 
         //when
         Long commentId = commentService.create(postId, new CommentCreateRequest(memberService.find(commentWriterId).getUuid(), "new comment"));
-        CommentFindResponse commentFindResponse = commentService.find(commentId);
+        Comment comment = commentService.find(commentId);
 
         //then
-        assertThat(commentFindResponse.getWriterId()).isEqualTo(commentWriterId);
-        assertThat(postService.find(commentFindResponse.getPostId()).getWriterId()).isEqualTo(postWriterId);
-        assertThat(commentFindResponse.getPostId()).isEqualTo(postId);
+        assertThat(comment.getWriter().getId()).isEqualTo(commentWriterId);
+        assertThat(comment.getPost().getWriter().getId()).isEqualTo(postWriterId);
+        assertThat(comment.getPost().getId()).isEqualTo(postId);
     }
 
     @Test

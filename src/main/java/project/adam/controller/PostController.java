@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.service.dto.post.PostFindResponse;
-import project.adam.service.dto.post.PostListFindResponse;
+import project.adam.controller.dto.post.PostFindResponse;
+import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import static org.springframework.util.StringUtils.*;
 
@@ -19,7 +18,6 @@ import static org.springframework.util.StringUtils.*;
 public class PostController {
 
     private final PostService postService;
-    private final MemberService memberService;
 
     @PostMapping
     public PostFindResponse createPost(@Validated @RequestBody PostCreateRequest postDto) {

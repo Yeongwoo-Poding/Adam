@@ -6,16 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Board;
 import project.adam.entity.Comment;
 import project.adam.entity.Post;
-import project.adam.exception.ApiException;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
+import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.service.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.List;
 import java.util.stream.Collectors;
-import static project.adam.exception.ExceptionEnum.NO_DATA;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,8 +30,8 @@ public class PostService {
                 memberRepository.findByUuid(postDto.getWriterId()).orElseThrow(),
                 Board.valueOf(postDto.getBoardName()),
                 postDto.getTitle(),
-                postDto.getBody())
-        );
+                postDto.getBody()
+        ));
 
         return savedPost.getId();
     }

@@ -1,4 +1,4 @@
-package project.adam.service.dto.post;
+package project.adam.controller.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

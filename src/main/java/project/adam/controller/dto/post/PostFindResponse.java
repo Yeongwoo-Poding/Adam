@@ -1,9 +1,8 @@
-package project.adam.service.dto.post;
+package project.adam.controller.dto.post;
 
 import lombok.Getter;
 import project.adam.entity.Post;
-import project.adam.service.dto.comment.CommentFindResponse;
-import project.adam.service.dto.comment.CommentListFindResponse;
+import project.adam.controller.dto.comment.CommentFindResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;

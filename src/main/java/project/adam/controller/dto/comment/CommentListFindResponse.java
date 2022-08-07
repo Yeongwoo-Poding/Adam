@@ -1,4 +1,4 @@
-package project.adam.service.dto.comment;
+package project.adam.controller.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
