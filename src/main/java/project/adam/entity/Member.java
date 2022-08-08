@@ -3,6 +3,7 @@ package project.adam.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Persistable;
 import project.adam.exception.ApiException;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import static project.adam.exception.ExceptionEnum.AUTHORIZATION_FAILED;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity implements Persistable<String> {
 
     @Id
     @Column(name = "member_id")
@@ -43,5 +44,10 @@ public class Member {
         if (this.privilege.value < privilege.value) {
             throw new ApiException(AUTHORIZATION_FAILED);
         }
+    }
+
+    @Override
+    public boolean isNew() {
+        return getCreateDate() == null;
     }
 }
