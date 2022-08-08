@@ -8,8 +8,6 @@ import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 
-import javax.persistence.EntityManager;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -23,7 +21,7 @@ public class MemberService {
     public String join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
                 memberDto.getId(),
-                memberDto.getNickname(),
+                memberDto.getName(),
                 memberDto.getPrivilege()
         ));
         return savedMember.getId();
