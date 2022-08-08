@@ -1,6 +1,5 @@
 package project.adam.service.dto.member;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.Privilege;
@@ -15,18 +14,18 @@ public class MemberJoinRequest {
     private String id;
 
     @NotEmpty
-    private String nickname;
+    private String name;
 
     private Privilege privilege = Privilege.USER;
 
-    public MemberJoinRequest(String id, String nickname) {
+    public MemberJoinRequest(String id, String name) {
         this.id = id;
-        this.nickname = nickname;
+        this.name = name;
     }
 
-    public MemberJoinRequest(String id, String nickname, Privilege privilege) {
+    public MemberJoinRequest(String id, String name, Privilege privilege) {
         this.id = id;
-        this.nickname = nickname;
+        this.name = name;
         this.privilege = privilege;
     }
 }

@@ -18,9 +18,5 @@ spring:
 
 logging:
   level:
-    root: info
-      path: /log
-      name: app-dev.log
-
     project.adam.controller: debug
     org.hibernate.SQL: debug
