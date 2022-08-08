@@ -34,6 +34,8 @@ public class PostController {
     public PostFindResponse createPost(@CookieValue("sessionId") String sessionId,
                                        @Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(sessionId, postDto);
+
+        log.info("Create Post {}", savedId);
         return new PostFindResponse(postService.find(savedId));
     }
 
@@ -45,6 +47,8 @@ public class PostController {
     @GetMapping
     public Slice<PostFindResponse> findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
         Slice<Post> result = postService.findAll(condition, pageable);
+
+        log.info("Find Post Page {} (Size: {}), Condition: {}", pageable.getPageNumber(), pageable.getPageSize(), condition.toString());
         return new SliceImpl<>(
                 result.getContent().stream()
                         .map(PostFindResponse::new)
@@ -60,6 +64,8 @@ public class PostController {
         Post findPost = postService.find(postId);
         memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.update(postId, postDto);
+
+        log.info("Update Post {}", postId);
     }
 
     @DeleteMapping("/{postId}")
@@ -68,5 +74,7 @@ public class PostController {
         Post findPost = postService.find(postId);
         memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.remove(postId);
+
+        log.info("Delete Post {}", postId);
     }
 }
