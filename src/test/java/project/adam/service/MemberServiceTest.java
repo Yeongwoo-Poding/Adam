@@ -33,7 +33,7 @@ class MemberServiceTest {
 
         //then
         assertThat(memberService.find(savedId).getId()).isEqualTo(memberJoinRequest.getId());
-        assertThat(memberService.find(savedId).getNickname()).isEqualTo(memberJoinRequest.getName());
+        assertThat(memberService.find(savedId).getName()).isEqualTo(memberJoinRequest.getName());
     }
 
     @Test

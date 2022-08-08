@@ -8,12 +8,12 @@ import project.adam.entity.Privilege;
 public class MemberFindResponse {
 
     private String id;
-    private String nickname;
+    private String name;
     private Privilege privilege;
 
     public MemberFindResponse(Member member) {
         this.id = member.getId();
-        this.nickname = member.getNickname();
+        this.name = member.getName();
         this.privilege = member.getPrivilege();
     }
 }

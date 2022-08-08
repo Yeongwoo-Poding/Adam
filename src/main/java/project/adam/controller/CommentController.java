@@ -34,7 +34,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentFindResponse createComment(@CookieValue("sessionId") String sessionId,
+    public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(sessionId, postId, commentDto);
@@ -44,7 +44,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentFindResponse findComment(@CookieValue(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+    public CommentFindResponse findComment(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
                                            @PathVariable Long postId,
                                            @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
@@ -55,7 +55,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public Slice<CommentFindResponse> findComments(@CookieValue(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+    public Slice<CommentFindResponse> findComments(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
                                                    @PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
 
@@ -69,7 +69,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@CookieValue("sessionId") String sessionId,
+    public void updateComment(@RequestHeader("sessionId") String sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto) {
@@ -83,7 +83,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@CookieValue("sessionId") String sessionId,
+    public void deleteComment(@RequestHeader("sessionId") String sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);

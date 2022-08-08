@@ -35,7 +35,7 @@ public class MemberController {
     }
 
     @GetMapping
-    public MemberFindResponse findMember(@CookieValue("sessionId") String sessionId,
+    public MemberFindResponse findMember(@RequestHeader("sessionId") String sessionId,
                                          @RequestParam String id) {
         memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
 
@@ -44,7 +44,7 @@ public class MemberController {
     }
 
     @DeleteMapping
-    public void deleteMember(@CookieValue("sessionId") String sessionId,
+    public void deleteMember(@RequestHeader("sessionId") String sessionId,
                              @RequestParam String id) {
         memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
         memberService.withdraw(id);

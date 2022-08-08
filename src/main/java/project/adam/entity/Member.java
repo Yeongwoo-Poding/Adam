@@ -21,7 +21,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @Column(name = "member_id")
     private String id;
 
-    private String nickname;
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private Privilege privilege;
@@ -29,14 +29,14 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
-    public Member(String id, String nickname) {
+    public Member(String id, String name) {
         this.id = id;
-        this.nickname = nickname;
+        this.name = name;
         this.privilege = Privilege.USER;
     }
 
-    public Member(String id, String nickname, Privilege privilege) {
-        this(id, nickname);
+    public Member(String id, String name, Privilege privilege) {
+        this(id, name);
         this.privilege = privilege;
     }
 

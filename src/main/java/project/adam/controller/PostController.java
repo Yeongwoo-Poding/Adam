@@ -31,7 +31,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public PostFindResponse createPost(@CookieValue("sessionId") String sessionId,
+    public PostFindResponse createPost(@RequestHeader("sessionId") String sessionId,
                                        @Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(sessionId, postDto);
 
@@ -58,7 +58,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@CookieValue("sessionId") String sessionId,
+    public void updatePost(@RequestHeader("sessionId") String sessionId,
                            @PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
         Post findPost = postService.find(postId);
@@ -69,7 +69,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@CookieValue("sessionId") String sessionId,
+    public void deletePost(@RequestHeader("sessionId") String sessionId,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);
         memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
