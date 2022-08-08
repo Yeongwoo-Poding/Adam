@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.entity.Comment;
 import project.adam.entity.Member;
-import project.adam.entity.Privilege;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
@@ -18,6 +17,8 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import static project.adam.entity.Privilege.ADMIN;
@@ -37,18 +38,28 @@ public class CommentController {
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(sessionId, postId, commentDto);
+
+        log.info("Create Comment {} at Post {}", savedId, postId);
         return new CommentFindResponse(commentService.find(savedId));
     }
 
     @GetMapping("/{commentId}")
-    public CommentFindResponse findComment(@PathVariable Long postId, @PathVariable Long commentId) {
+    public CommentFindResponse findComment(@CookieValue(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+                                           @PathVariable Long postId,
+                                           @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
-        return validateComment(postId, findComment);
+        validate(postId, findComment);
+
+        log.info("Find Comment {} at Post {}", commentId, postId);
+        return new CommentFindResponse(findComment);
     }
 
     @GetMapping
-    public Slice<CommentFindResponse> findCommentsByPost(@PathVariable Long postId, Pageable pageable) {
+    public Slice<CommentFindResponse> findComments(@CookieValue(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+                                                   @PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
+
+        log.info("Find Comments Page {} (Size: {}) at Post {}", pageable.getPageNumber(), pageable.getPageSize(), postId);
         return new SliceImpl<>(
                 result.getContent().stream()
                         .map(CommentFindResponse::new)
@@ -65,8 +76,10 @@ public class CommentController {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.find(sessionId);
         loginMember.authorization(findComment.getWriter().getId().equals(sessionId) ? USER : ADMIN);
-        validateComment(postId, findComment);
+        validate(postId, findComment);
         commentService.update(commentId, commentDto);
+
+        log.info("Update Comment {} at Post {}", commentId, postId);
     }
 
     @DeleteMapping("/{commentId}")
@@ -76,13 +89,10 @@ public class CommentController {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.find(sessionId);
         loginMember.authorization(findComment.getWriter().getId().equals(sessionId) ? USER : ADMIN);
-        validateComment(postId, findComment);
+        validate(postId, findComment);
         commentService.remove(commentId);
-    }
 
-    private CommentFindResponse validateComment(Long postId, Comment comment) {
-        validate(postId, comment);
-        return new CommentFindResponse(comment);
+        log.info("Delete Comment {} at Post {}", commentId, postId);
     }
 
     private void validate(Long postId, Comment comment) {

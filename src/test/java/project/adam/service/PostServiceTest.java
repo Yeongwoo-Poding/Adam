@@ -129,7 +129,6 @@ class PostServiceTest {
             );
             if (i % 2 == 0) {
                 post1CommitId.add(commentId);
-                System.out.println("commentId = " + commentId);
             }
         }
 

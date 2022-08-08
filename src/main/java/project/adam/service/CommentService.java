@@ -48,10 +48,6 @@ public class CommentService {
     public Comment find(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow();
     }
-//
-//    public List<Comment> findByPost(Long postId) {
-//        return commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
-//    }
 
     public Slice<Comment> findByPost(Long postId, Pageable pageable) {
         return commentRepository.findSliceByPost(postRepository.findById(postId).orElseThrow(), pageable);

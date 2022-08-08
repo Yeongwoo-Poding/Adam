@@ -21,7 +21,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     @Override
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
-        System.out.println("PostRepositoryImpl.findAll");
         List<Post> contents = queryFactory.query()
                 .select(post)
                 .from(post)
@@ -47,8 +46,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     private BooleanExpression writerIdCondition(String id) {
-        System.out.println("id = " + id);
-        System.out.println("post.writer.id = " + post.writer.id);
         return id == null ? null : post.writer.id.eq(id);
     }
 

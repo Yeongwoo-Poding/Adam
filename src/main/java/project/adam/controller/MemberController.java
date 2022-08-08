@@ -29,6 +29,8 @@ public class MemberController {
     @PostMapping
     public MemberFindResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
         String savedId = memberService.join(memberDto);
+
+        log.info("Join Member {}", savedId);
         return new MemberFindResponse(memberService.find(savedId));
     }
 
@@ -36,6 +38,8 @@ public class MemberController {
     public MemberFindResponse findMember(@CookieValue("sessionId") String sessionId,
                                          @RequestParam String id) {
         memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
+
+        log.info("Find Member {}", id);
         return new MemberFindResponse(memberService.find(id));
     }
 
@@ -44,5 +48,7 @@ public class MemberController {
                              @RequestParam String id) {
         memberService.find(sessionId).authorization(sessionId.equals(id) ? USER : ADMIN);
         memberService.withdraw(id);
+
+        log.info("Delete Member {}", id);
     }
 }

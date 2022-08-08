@@ -1,9 +1,6 @@
 package project.adam.service.dto.post;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project.adam.entity.Privilege;
 
 @Getter @Setter
@@ -13,4 +10,9 @@ public class PostFindCondition {
     private Privilege privilege;
     private String writerId;
     private String titleLike;
+
+    @Override
+    public String toString() {
+        return "privilege = " + privilege + ", writerId = " + writerId + ", titleLike = " + titleLike;
+    }
 }
