@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Member;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
+
+import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,6 +33,17 @@ public class MemberService {
 
     public Member find(String id) {
         return memberRepository.findById(id).orElseThrow();
+    }
+
+    public Member findBySessionId(String sessionId) {
+        return memberRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
+    }
+
+    @Transactional
+    public String login(String memberId) {
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
+        return findMember.login();
     }
 
     @Transactional
