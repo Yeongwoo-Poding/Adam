@@ -10,6 +10,13 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class CommentCreateRequest {
 
+    private Long parentId;
+
     @NotEmpty
     private String body;
+
+    public CommentCreateRequest(String body) {
+        this.parentId = null;
+        this.body = body;
+    }
 }
