@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.entity.Member;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
 import project.adam.service.MemberService;
@@ -33,7 +34,7 @@ public class PostController {
     @PostMapping
     public PostFindResponse createPost(@RequestHeader("sessionId") String sessionId,
                                        @Validated @RequestBody PostCreateRequest postDto) {
-        Long savedId = postService.create(sessionId, postDto);
+        Long savedId = postService.create(memberService.findBySessionId(sessionId).getId(), postDto);
 
         log.info("Create Post {}", savedId);
         return new PostFindResponse(postService.find(savedId));
@@ -62,7 +63,8 @@ public class PostController {
                            @PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
         Post findPost = postService.find(postId);
-        memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
+        Member findMember = memberService.findBySessionId(sessionId);
+        findMember.authorization(findMember.getId().equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.update(postId, postDto);
 
         log.info("Update Post {}", postId);
@@ -72,7 +74,8 @@ public class PostController {
     public void deletePost(@RequestHeader("sessionId") String sessionId,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);
-        memberService.find(sessionId).authorization(sessionId.equals(findPost.getWriter().getId()) ? USER : ADMIN);
+        Member findMember = memberService.findBySessionId(sessionId);
+        findMember.authorization(findMember.getId().equals(findPost.getWriter().getId()) ? USER : ADMIN);
         postService.remove(postId);
 
         log.info("Delete Post {}", postId);

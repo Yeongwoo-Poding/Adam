@@ -9,6 +9,7 @@ import project.adam.exception.ApiException;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static project.adam.exception.ExceptionEnum.AUTHORIZATION_FAILED;
 
@@ -29,6 +30,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
+    private String sessionId = null;
+
     public Member(String id, String name) {
         this.id = id;
         this.name = name;
@@ -44,6 +47,11 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         if (this.privilege.value < privilege.value) {
             throw new ApiException(AUTHORIZATION_FAILED);
         }
+    }
+
+    public String login() {
+        this.sessionId = UUID.randomUUID().toString();
+        return sessionId;
     }
 
     @Override

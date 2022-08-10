@@ -37,7 +37,7 @@ public class CommentController {
     public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(sessionId, postId, commentDto);
+        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentDto);
 
         log.info("Create Comment {} at Post {}", savedId, postId);
         return new CommentFindResponse(commentService.find(savedId));
@@ -74,8 +74,8 @@ public class CommentController {
                               @PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.find(sessionId);
-        loginMember.authorization(findComment.getWriter().getId().equals(sessionId) ? USER : ADMIN);
+        Member loginMember = memberService.findBySessionId(sessionId);
+        loginMember.authorization(findComment.getWriter().getId().equals(loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.update(commentId, commentDto);
 
@@ -87,8 +87,8 @@ public class CommentController {
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.find(sessionId);
-        loginMember.authorization(findComment.getWriter().getId().equals(sessionId) ? USER : ADMIN);
+        Member loginMember = memberService.findBySessionId(sessionId);
+        loginMember.authorization(findComment.getWriter().getId().equals(loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.remove(commentId);
 
