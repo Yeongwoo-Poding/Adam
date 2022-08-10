@@ -28,6 +28,7 @@ public class CommentService {
         Comment savedComment = commentRepository.save(new Comment(
                 memberRepository.findById(writerId).orElseThrow(),
                 postRepository.findById(postId).orElseThrow(),
+                commentDto.getParentId() == null ? null : commentRepository.findById(commentDto.getParentId()).orElseThrow(),
                 commentDto.getBody()
         ));
 
@@ -50,6 +51,6 @@ public class CommentService {
     }
 
     public Slice<Comment> findByPost(Long postId, Pageable pageable) {
-        return commentRepository.findSliceByPost(postRepository.findById(postId).orElseThrow(), pageable);
+        return commentRepository.findRootCommentByPost(postRepository.findById(postId).orElseThrow(), pageable);
     }
 }

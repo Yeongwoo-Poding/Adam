@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,13 +24,20 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Comment> children = new ArrayList<>();
+
     private String body;
 
-    public Comment(Member writer, Post post, String body) {
+    public Comment(Member writer, Post post, Comment parent, String body) {
         this.writer = writer;
         this.post = post;
         this.body = body;
-        post.getComments().add(this);
+        this.parent = parent;
     }
 
     public void update(String body) {

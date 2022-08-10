@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.entity.Comment;
+import project.adam.entity.Post;
 import project.adam.entity.Privilege;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
@@ -14,6 +16,9 @@ import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Profile("local")
 @Component
@@ -44,30 +49,51 @@ public class InitData {
             String member1Id = memberService.join(new MemberJoinRequest("id1", "member1", Privilege.ADMIN));
             String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
 
-            Long post1Id = postService.create(member1Id, new PostCreateRequest("FREE", "post1", "post body 1"));
-            Long post2Id = postService.create(member1Id, new PostCreateRequest("FREE", "post2", "post body 2"));
-            Long post3Id = postService.create(member2Id, new PostCreateRequest("FREE", "post3", "post body 3"));
-            Long post4Id = postService.create(member2Id, new PostCreateRequest("FREE", "post3", "post body 4"));
-
-            commentService.create(member1Id, post1Id, new CommentCreateRequest("comment body 1"));
-            commentService.create(member2Id, post1Id, new CommentCreateRequest("comment body 2"));
-            commentService.create(member1Id, post2Id, new CommentCreateRequest("comment body 3"));
-            commentService.create(member2Id, post2Id, new CommentCreateRequest("comment body 4"));
-            commentService.create(member1Id, post1Id, new CommentCreateRequest("comment body 5"));
-            commentService.create(member2Id, post1Id, new CommentCreateRequest("comment body 6"));
-            commentService.create(member1Id, post2Id, new CommentCreateRequest("comment body 7"));
-            commentService.create(member2Id, post2Id, new CommentCreateRequest("comment body 8"));
-            commentService.create(member1Id, post3Id, new CommentCreateRequest("comment body 9"));
-            commentService.create(member2Id, post3Id, new CommentCreateRequest("comment body 10"));
-            commentService.create(member1Id, post4Id, new CommentCreateRequest("comment body 11"));
-            commentService.create(member2Id, post4Id, new CommentCreateRequest("comment body 12"));
-            commentService.create(member1Id, post3Id, new CommentCreateRequest("comment body 13"));
-            commentService.create(member2Id, post3Id, new CommentCreateRequest("comment body 14"));
-            commentService.create(member1Id, post4Id, new CommentCreateRequest("comment body 15"));
-            commentService.create(member2Id, post4Id, new CommentCreateRequest("comment body 16"));
+            List<Long> postsId = createPosts(member1Id, member2Id);
+            List<Long> commentsId = createComments(member1Id, member2Id, postsId);
+            List<Long> replysId = createReplys(member1Id, member2Id, postsId, commentsId);
 
             em.flush();
             em.clear();
+
+            Post post1 = postService.find(postsId.get(0));
+            List<Comment> post1Comments = post1.getComments();
+        }
+
+        private List<Long> createPosts(String member1Id, String member2Id) {
+            List<Long> postsId = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                postsId.add(postService.create(
+                        i / 2 >= 1 ? member1Id : member2Id,
+                        new PostCreateRequest("FREE", "post" + i, "post body" + i)
+                ));
+            }
+            return postsId;
+        }
+
+        private List<Long> createComments(String member1Id, String member2Id, List<Long> postsId) {
+            List<Long> commentsId = new ArrayList<>();
+            for (int i = 0; i < 16; i++) {
+                commentsId.add(commentService.create(
+                        i % 2 == 0 ? member1Id : member2Id,
+                        postsId.get(i / 4),
+                        new CommentCreateRequest("comment body " + i)
+                ));
+            }
+
+            return commentsId;
+        }
+
+        private List<Long> createReplys(String member1Id, String member2Id, List<Long> postsId, List<Long> commentsId) {
+            List<Long> replysId = new ArrayList<>();
+            for (int i = 0; i < 32; i++) {
+                replysId.add(commentService.create(
+                        i % 2 == 0 ? member1Id : member2Id,
+                        postsId.get(i / 8),
+                        new CommentCreateRequest(commentsId.get(i / 2), "reply " + i)));
+            }
+
+            return replysId;
         }
     }
 }
