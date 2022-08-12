@@ -24,11 +24,11 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Long create(String writerId, Long postId, CommentCreateRequest commentDto) {
+    public Long create(String writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
         Comment savedComment = commentRepository.save(new Comment(
                 memberRepository.findById(writerId).orElseThrow(),
                 postRepository.findById(postId).orElseThrow(),
-                commentDto.getParentId() == null ? null : commentRepository.findById(commentDto.getParentId()).orElseThrow(),
+                parentCommentId == null ? null : commentRepository.findById(parentCommentId).orElseThrow(),
                 commentDto.getBody()
         ));
 
