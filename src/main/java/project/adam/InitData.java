@@ -77,6 +77,7 @@ public class InitData {
                 commentsId.add(commentService.create(
                         i % 2 == 0 ? member1Id : member2Id,
                         postsId.get(i / 4),
+                        null,
                         new CommentCreateRequest("comment body " + i)
                 ));
             }
@@ -90,7 +91,8 @@ public class InitData {
                 replysId.add(commentService.create(
                         i % 2 == 0 ? member1Id : member2Id,
                         postsId.get(i / 8),
-                        new CommentCreateRequest(commentsId.get(i / 2), "reply " + i)));
+                        commentsId.get(i / 2),
+                        new CommentCreateRequest("reply " + i)));
             }
 
             return replysId;

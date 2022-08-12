@@ -37,7 +37,18 @@ public class CommentController {
     public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentDto);
+        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
+
+        log.info("Create Comment {} at Post {}", savedId, postId);
+        return new CommentFindResponse(commentService.find(savedId));
+    }
+
+    @PostMapping("/{commentId}")
+    public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
+                                             @PathVariable Long postId,
+                                             @PathVariable Long commentId,
+                                             @Validated @RequestBody CommentCreateRequest commentDto) {
+        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentId, commentDto);
 
         log.info("Create Comment {} at Post {}", savedId, postId);
         return new CommentFindResponse(commentService.find(savedId));
