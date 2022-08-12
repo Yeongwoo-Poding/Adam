@@ -30,10 +30,11 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public void joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
+    public MemberLoginResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
         String savedId = memberService.join(memberDto);
 
         log.info("Join Member {}", savedId);
+        return loginMember(savedId);
     }
 
     @GetMapping("/{memberId}")
