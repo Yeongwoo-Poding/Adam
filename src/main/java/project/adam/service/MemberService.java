@@ -10,6 +10,8 @@ import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 
+import java.util.UUID;
+
 import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
 
 @Service
@@ -22,46 +24,47 @@ public class MemberService {
     private final PostService postService;
 
     @Transactional
-    public String join(MemberJoinRequest memberDto) {
+    public UUID join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
                 memberDto.getId(),
                 memberDto.getName(),
                 memberDto.getPrivilege()
         ));
-        return savedMember.getId();
+
+        return savedMember.getSessionId();
     }
 
-    public Member find(String id) {
+    public Member find(UUID id) {
         return memberRepository.findById(id).orElseThrow();
     }
 
-    public Member findBySessionId(String sessionId) {
+    public Member findBySessionId(UUID sessionId) {
         return memberRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
     }
 
     @Transactional
-    public String login(String memberId) {
+    public UUID login(UUID memberId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow();
         return findMember.login();
     }
 
     @Transactional
-    public void withdraw(String id) {
+    public void withdraw(UUID id) {
         removeCommits(id);
         removePosts(id);
         removeMember(id);
     }
 
-    private void removeCommits(String id) {
+    private void removeCommits(UUID id) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(id).orElseThrow()));
     }
-    private void removePosts(String id) {
+    private void removePosts(UUID id) {
         memberRepository.findById(id).orElseThrow()
                 .getPosts()
                 .forEach(post -> postService.remove(post.getId()));
     }
-    private void removeMember(String id) {
+    private void removeMember(UUID id) {
         memberRepository.delete(memberRepository.findById(id).orElseThrow());
     }
 }

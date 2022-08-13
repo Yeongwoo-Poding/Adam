@@ -11,6 +11,7 @@ import project.adam.entity.Post;
 import project.adam.entity.Privilege;
 
 import java.util.List;
+import java.util.UUID;
 
 import static project.adam.entity.QPost.post;
 
@@ -45,7 +46,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return privilege == null ? null : post.writer.privilege.eq(privilege);
     }
 
-    private BooleanExpression writerIdCondition(String id) {
+    private BooleanExpression writerIdCondition(UUID id) {
         return id == null ? null : post.writer.id.eq(id);
     }
 

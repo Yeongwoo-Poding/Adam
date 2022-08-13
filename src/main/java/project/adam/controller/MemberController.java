@@ -4,22 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.service.dto.member.MemberLoginResponse;
 import project.adam.entity.Member;
-import project.adam.entity.Privilege;
-import project.adam.exception.ApiException;
-import project.adam.exception.ExceptionEnum;
 import project.adam.service.MemberService;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.Objects;
+import java.util.UUID;
 
 import static project.adam.entity.Privilege.*;
-import static project.adam.exception.ExceptionEnum.*;
 
 @Slf4j
 @RestController
@@ -31,15 +25,15 @@ public class MemberController {
 
     @PostMapping
     public MemberLoginResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
-        String savedId = memberService.join(memberDto);
+        UUID sessionId = memberService.join(memberDto);
 
-        log.info("Join Member {}", savedId);
-        return loginMember(savedId);
+        log.info("Join Member sessionId={}", sessionId);
+        return new MemberLoginResponse(sessionId);
     }
 
     @GetMapping("/{memberId}")
-    public MemberFindResponse findMember(@RequestHeader("sessionId") String sessionId,
-                                         @PathVariable String memberId) {
+    public MemberFindResponse findMember(@RequestHeader("sessionId") UUID sessionId,
+                                         @PathVariable UUID memberId) {
         Member findMember = memberService.findBySessionId(sessionId);
         findMember.authorization(Objects.equals(findMember.getId(), memberId) ? USER : ADMIN);
 
@@ -48,14 +42,14 @@ public class MemberController {
     }
 
     @PatchMapping("/{memberId}")
-    public MemberLoginResponse loginMember(@PathVariable String memberId) {
-        String sessionId = memberService.login(memberId);
+    public MemberLoginResponse loginMember(@PathVariable UUID memberId) {
+        UUID sessionId = memberService.login(memberId);
         return new MemberLoginResponse(sessionId);
     }
 
     @DeleteMapping("/{memberId}")
-    public void deleteMember(@RequestHeader("sessionId") String sessionId,
-                             @PathVariable String memberId) {
+    public void deleteMember(@RequestHeader("sessionId") UUID sessionId,
+                             @PathVariable UUID memberId) {
         Member findMember = memberService.findBySessionId(sessionId);
         findMember.authorization(Objects.equals(findMember.getId(), memberId) ? USER : ADMIN);
         memberService.withdraw(memberId);

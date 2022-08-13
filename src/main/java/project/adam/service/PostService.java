@@ -14,6 +14,7 @@ import project.adam.repository.PostRepository;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,7 +27,7 @@ public class PostService {
     private final JPAQueryFactory queryFactory;
 
     @Transactional
-    public Long create(String sessionId, PostCreateRequest postDto) {
+    public Long create(UUID sessionId, PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
                 memberRepository.findById(sessionId).orElseThrow(),
                 Board.valueOf(postDto.getBoardName()),

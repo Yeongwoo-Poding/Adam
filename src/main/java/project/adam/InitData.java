@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Profile("local")
@@ -46,8 +47,10 @@ public class InitData {
         public void createDummyData() {
 
             log.info("Create dummy data");
-            String member1Id = memberService.join(new MemberJoinRequest("id1", "member1", Privilege.ADMIN));
-            String member2Id = memberService.join(new MemberJoinRequest("id2", "member2"));
+            UUID member1Id = UUID.randomUUID();
+            UUID member2Id = UUID.randomUUID();
+            UUID member1SessionId = memberService.join(new MemberJoinRequest(member1Id, "member1", Privilege.ADMIN));
+            UUID member2SessionId = memberService.join(new MemberJoinRequest(member2Id, "member2"));
 
             List<Long> postsId = createPosts(member1Id, member2Id);
             List<Long> commentsId = createComments(member1Id, member2Id, postsId);
@@ -60,7 +63,7 @@ public class InitData {
             List<Comment> post1Comments = post1.getComments();
         }
 
-        private List<Long> createPosts(String member1Id, String member2Id) {
+        private List<Long> createPosts(UUID member1Id, UUID member2Id) {
             List<Long> postsId = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 postsId.add(postService.create(
@@ -71,7 +74,7 @@ public class InitData {
             return postsId;
         }
 
-        private List<Long> createComments(String member1Id, String member2Id, List<Long> postsId) {
+        private List<Long> createComments(UUID member1Id, UUID member2Id, List<Long> postsId) {
             List<Long> commentsId = new ArrayList<>();
             for (int i = 0; i < 16; i++) {
                 commentsId.add(commentService.create(
@@ -85,7 +88,7 @@ public class InitData {
             return commentsId;
         }
 
-        private List<Long> createReplys(String member1Id, String member2Id, List<Long> postsId, List<Long> commentsId) {
+        private List<Long> createReplys(UUID member1Id, UUID member2Id, List<Long> postsId, List<Long> commentsId) {
             List<Long> replysId = new ArrayList<>();
             for (int i = 0; i < 32; i++) {
                 replysId.add(commentService.create(

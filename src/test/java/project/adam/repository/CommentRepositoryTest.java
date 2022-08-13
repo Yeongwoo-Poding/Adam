@@ -9,6 +9,8 @@ import project.adam.entity.Comment;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -22,15 +24,15 @@ class CommentRepositoryTest {
     @Test
     void comment_save() {
         //given
-        Member postWriter = new Member("id", "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("id", "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, "comment");
+        Comment comment = new Comment(commentWriter, post, null, "comment");
         commentRepository.save(comment);
 
         //when
@@ -45,15 +47,15 @@ class CommentRepositoryTest {
     @Test
     void comment_update() {
         //given
-        Member postWriter = new Member("id", "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("id", "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, "comment");
+        Comment comment = new Comment(commentWriter, post, null, "comment");
         commentRepository.save(comment);
 
         //when
@@ -66,15 +68,15 @@ class CommentRepositoryTest {
     @Test
     void comment_delete() {
         //given
-        Member postWriter = new Member("id", "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member("id", "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, "comment");
+        Comment comment = new Comment(commentWriter, post, null, "comment");
         commentRepository.save(comment);
 
         //when

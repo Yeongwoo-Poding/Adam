@@ -6,6 +6,7 @@ import project.adam.controller.dto.comment.CommentFindResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
@@ -13,7 +14,7 @@ public class PostFindResponse {
 
     private Long id;
 
-    private String writerId;
+    private UUID writerId;
 
     private String boardName;
 

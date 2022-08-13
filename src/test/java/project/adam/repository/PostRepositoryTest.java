@@ -12,6 +12,7 @@ import project.adam.entity.Member;
 import project.adam.entity.Post;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static project.adam.entity.Privilege.*;
@@ -26,7 +27,7 @@ class PostRepositoryTest {
     @Test
     void post_save() {
         //given
-        Member member = new Member("id", "nickname");
+        Member member = new Member(UUID.randomUUID(), "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "title1", "this is body");
         Post savedPost = postRepository.save(post);
@@ -44,8 +45,8 @@ class PostRepositoryTest {
     @Test
     void post_condition_privilege() {
         //given
-        Member adminMember = memberRepository.save(new Member("admin", "adminMember", ADMIN));
-        Member userMember = memberRepository.save(new Member("user", "userMember", USER));
+        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", ADMIN));
+        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", USER));
 
         Post post1 = postRepository.save(new Post(adminMember, Board.FREE, "Post 1 success", "body 1"));
         Post post2 = postRepository.save(new Post(userMember, Board.FREE, "Post 2 success", "body 2"));
@@ -66,8 +67,8 @@ class PostRepositoryTest {
     @Test
     void post_condition_writerId() {
         //given
-        Member adminMember = memberRepository.save(new Member("admin", "adminMember", ADMIN));
-        Member userMember = memberRepository.save(new Member("user", "userMember", USER));
+        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", ADMIN));
+        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", USER));
 
         Post post1 = postRepository.save(new Post(adminMember, Board.FREE, "Post 1 success", "body 1"));
         Post post2 = postRepository.save(new Post(userMember, Board.FREE, "Post 2 success", "body 2"));
@@ -88,8 +89,8 @@ class PostRepositoryTest {
     @Test
     void post_condition_titleLike() {
         //given
-        Member adminMember = memberRepository.save(new Member("admin", "adminMember", ADMIN));
-        Member userMember = memberRepository.save(new Member("user", "userMember", USER));
+        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", ADMIN));
+        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", USER));
 
         Post post1 = postRepository.save(new Post(adminMember, Board.FREE, "Post 1 success", "body 1"));
         Post post2 = postRepository.save(new Post(userMember, Board.FREE, "Post 2 success", "body 2"));
@@ -110,8 +111,8 @@ class PostRepositoryTest {
     @Test
     void post_condition() {
         //given
-        Member adminMember = memberRepository.save(new Member("admin", "adminMember", ADMIN));
-        Member userMember = memberRepository.save(new Member("user", "userMember", USER));
+        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", ADMIN));
+        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", USER));
 
         Post post1 = postRepository.save(new Post(adminMember, Board.FREE, "Post 1 success", "body 1"));
         Post post2 = postRepository.save(new Post(userMember, Board.FREE, "Post 2 success", "body 2"));
@@ -130,7 +131,7 @@ class PostRepositoryTest {
     @Test
     void post_update() {
         //given
-        Member member = new Member("id", "nickname");
+        Member member = new Member(UUID.randomUUID(), "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "beforeTitle", "before body");
         postRepository.save(post);
@@ -146,7 +147,7 @@ class PostRepositoryTest {
     @Test
     void post_delete() {
         //given
-        Member member = new Member("id", "nickname");
+        Member member = new Member(UUID.randomUUID(), "nickname");
         memberRepository.save(member);
         Post post = new Post(member, Board.FREE, "title1", "this is body");
         Post savedPost = postRepository.save(post);

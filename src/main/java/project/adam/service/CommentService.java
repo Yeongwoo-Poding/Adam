@@ -13,6 +13,7 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,7 +25,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Long create(String writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
+    public Long create(UUID writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
         Comment savedComment = commentRepository.save(new Comment(
                 memberRepository.findById(writerId).orElseThrow(),
                 postRepository.findById(postId).orElseThrow(),
