@@ -51,20 +51,19 @@ public class MemberService {
 
     @Transactional
     public void withdraw(UUID id) {
-        removeCommits(id);
-        removePosts(id);
-        removeMember(id);
+        Member deleteMember = memberRepository.findBySessionId(id).orElseThrow();
+        removeCommits(deleteMember);
+        removePosts(deleteMember);
+        removeMember(deleteMember);
     }
 
-    private void removeCommits(UUID id) {
-        commentRepository.deleteAll(commentRepository.findAllByWriter(memberRepository.findById(id).orElseThrow()));
+    private void removeCommits(Member member) {
+        commentRepository.deleteAll(commentRepository.findAllByWriter(member));
     }
-    private void removePosts(UUID id) {
-        memberRepository.findById(id).orElseThrow()
-                .getPosts()
-                .forEach(post -> postService.remove(post.getId()));
+    private void removePosts(Member member) {
+        member.getPosts().forEach(post -> postService.remove(post.getId()));
     }
-    private void removeMember(UUID id) {
-        memberRepository.delete(memberRepository.findById(id).orElseThrow());
+    private void removeMember(Member member) {
+        memberRepository.delete(member);
     }
 }
