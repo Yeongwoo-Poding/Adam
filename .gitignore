@@ -154,5 +154,6 @@ $RECYCLE.BIN/
 
 # intellij
 .idea
+src/main/resource/application.yml
 
 # End of https://www.gitignore.io/api/git,java,maven,windows,eclipse
