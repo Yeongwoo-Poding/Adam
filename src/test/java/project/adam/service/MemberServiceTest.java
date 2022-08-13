@@ -43,10 +43,10 @@ class MemberServiceTest {
         //given
         UUID memberId = UUID.randomUUID();
         MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
-        UUID savedId = memberService.join(memberJoinRequest);
+        UUID sessionId = memberService.join(memberJoinRequest);
 
         //when
-        memberService.withdraw(memberId);
+        memberService.withdraw(sessionId);
 
         //then
         assertThatThrownBy(() -> memberService.find(memberId))
@@ -57,9 +57,9 @@ class MemberServiceTest {
     void member_withdraw_remove_post() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
+        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
@@ -74,7 +74,7 @@ class MemberServiceTest {
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
-        memberService.withdraw(member1Id);
+        memberService.withdraw(session1Id);
 
         //then
         assertThat(postService.findAll(new PostFindCondition(), allPages).getContent().size()).isEqualTo(50);
@@ -84,9 +84,9 @@ class MemberServiceTest {
     void member_withdraw_remove_comment() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
+        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
         Long post1Id = postService.create(memberService.find(member1Id).getId(),
                 new PostCreateRequest("FREE", "post1", "post 1"));
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
@@ -103,7 +103,7 @@ class MemberServiceTest {
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
-        memberService.withdraw(member1Id);
+        memberService.withdraw(session1Id);
 
         //then
         assertThat(commentService.findByPost(post2Id, allPages)).isEmpty();
