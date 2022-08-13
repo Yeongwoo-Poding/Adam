@@ -81,8 +81,8 @@ class MemberRepositoryTest {
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
-        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null), allPages);
-        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null), allPages);
+        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(writer1.getId(), null), allPages);
+        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(writer2.getId(), null), allPages);
 
         //then
         assertThat(writer1Posts.getContent().size()).isEqualTo(50);
@@ -103,8 +103,8 @@ class MemberRepositoryTest {
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
-        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(null, writer1.getId(), null), allPages);
-        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(null, writer2.getId(), null), allPages);
+        Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(writer1.getId(), null), allPages);
+        Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(writer2.getId(), null), allPages);
 
         //then
         assertThat(writer1.getPosts()).containsAll(writer1Posts);

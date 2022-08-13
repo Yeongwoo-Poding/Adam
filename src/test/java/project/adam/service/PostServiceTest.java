@@ -196,8 +196,8 @@ class PostServiceTest {
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
-        Slice<Post> member1Post = postService.findAll(new PostFindCondition(null, member1Id, null), allPages);
-        Slice<Post> member2Post = postService.findAll(new PostFindCondition(null, member2Id, null), allPages);
+        Slice<Post> member1Post = postService.findAll(new PostFindCondition(member1Id, null), allPages);
+        Slice<Post> member2Post = postService.findAll(new PostFindCondition(member2Id, null), allPages);
 
         //then
         assertThat(member1Post.getContent().size()).isEqualTo(50);

@@ -26,7 +26,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .select(post)
                 .from(post)
                 .where(
-                        privilegeCondition(condition.getPrivilege()),
                         writerIdCondition(condition.getWriterId()),
                         titleCondition(condition.getTitleLike())
                 )
