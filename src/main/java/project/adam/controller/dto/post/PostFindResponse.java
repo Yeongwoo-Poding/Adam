@@ -16,7 +16,7 @@ public class PostFindResponse {
 
     private UUID writerId;
 
-    private String boardName;
+    private String board;
 
     private LocalDateTime createDate;
 
@@ -31,7 +31,7 @@ public class PostFindResponse {
     public PostFindResponse(Post post) {
         this.id = post.getId();
         this.writerId = post.getWriter().getId();
-        this.boardName = post.getBoard().toString();
+        this.board = post.getBoard().toString();
         this.createDate= post.getCreateDate();
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();

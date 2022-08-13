@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 public class PostCreateRequest {
 
     @NotEmpty
-    private String boardName;
+    private String board;
 
     @NotEmpty
     private String title;

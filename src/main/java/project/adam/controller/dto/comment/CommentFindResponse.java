@@ -17,7 +17,7 @@ public class CommentFindResponse {
 
     private Long postId;
 
-    private List<CommentFindResponse> children = new ArrayList<>();
+    private List<CommentFindResponse> reply = new ArrayList<>();
 
     private LocalDateTime createDate;
 
@@ -29,7 +29,7 @@ public class CommentFindResponse {
         this.id = comment.getId();
         this.writerId = comment.getWriter().getId();
         this.postId = comment.getPost().getId();
-        this.children = comment.getChildren().stream().map(CommentFindResponse::new).collect(Collectors.toList());
+        this.reply = comment.getReply().stream().map(CommentFindResponse::new).collect(Collectors.toList());
         this.createDate = comment.getCreateDate();
         this.lastModifiedDate = comment.getLastModifiedDate();
         this.body = comment.getBody();
