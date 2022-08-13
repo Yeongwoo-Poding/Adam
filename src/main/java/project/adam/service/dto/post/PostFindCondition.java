@@ -10,10 +10,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PostFindCondition {
     private UUID writerId;
-    private String titleLike;
+    private String title;
 
     @Override
     public String toString() {
-        return "writerId = " + writerId + ", titleLike = " + titleLike;
+        return "writerId = " + writerId + ", title = " + title;
     }
 }
