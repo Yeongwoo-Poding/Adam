@@ -9,12 +9,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostFindCondition {
-    private Privilege privilege;
     private UUID writerId;
     private String titleLike;
 
     @Override
     public String toString() {
-        return "privilege = " + privilege + ", writerId = " + writerId + ", titleLike = " + titleLike;
+        return "writerId = " + writerId + ", titleLike = " + titleLike;
     }
 }
