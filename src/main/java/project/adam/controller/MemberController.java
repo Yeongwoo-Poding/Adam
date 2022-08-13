@@ -9,6 +9,7 @@ import project.adam.entity.Member;
 import project.adam.service.MemberService;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
+import project.adam.service.dto.member.MemberLoginRequest;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -31,29 +32,26 @@ public class MemberController {
         return new MemberLoginResponse(sessionId);
     }
 
-    @GetMapping("/{memberId}")
-    public MemberFindResponse findMember(@RequestHeader("sessionId") UUID sessionId,
-                                         @PathVariable UUID memberId) {
+    @GetMapping
+    public MemberFindResponse findMember(@RequestHeader UUID sessionId) {
         Member findMember = memberService.findBySessionId(sessionId);
-        findMember.authorization(Objects.equals(findMember.getId(), memberId) ? USER : ADMIN);
 
-        log.info("Find Member {}", memberId);
-        return new MemberFindResponse(memberService.find(memberId));
+        log.info("Find Member {}", findMember);
+        return new MemberFindResponse(findMember);
     }
 
-    @PatchMapping("/{memberId}")
-    public MemberLoginResponse loginMember(@PathVariable UUID memberId) {
-        UUID sessionId = memberService.login(memberId);
+    @PatchMapping
+    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
+        UUID sessionId = memberService.login(UUID.fromString(memberDto.getId()));
+
+        log.info("Login Member sessionId={}", sessionId);
         return new MemberLoginResponse(sessionId);
     }
 
-    @DeleteMapping("/{memberId}")
-    public void deleteMember(@RequestHeader("sessionId") UUID sessionId,
-                             @PathVariable UUID memberId) {
-        Member findMember = memberService.findBySessionId(sessionId);
-        findMember.authorization(Objects.equals(findMember.getId(), memberId) ? USER : ADMIN);
-        memberService.withdraw(memberId);
+    @DeleteMapping
+    public void deleteMember(@RequestHeader UUID sessionId) {
+        memberService.withdraw(sessionId);
 
-        log.info("Delete Member {}", memberId);
+        log.info("Delete Member {}", sessionId);
     }
 }

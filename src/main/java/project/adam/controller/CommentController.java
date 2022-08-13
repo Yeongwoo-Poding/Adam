@@ -19,6 +19,7 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentFindResponse createComment(@RequestHeader("sessionId") UUID sessionId,
+    public CommentFindResponse createComment(@RequestHeader UUID sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
@@ -45,7 +46,7 @@ public class CommentController {
     }
 
     @PostMapping("/{commentId}")
-    public CommentFindResponse createComment(@RequestHeader("sessionId") UUID sessionId,
+    public CommentFindResponse createComment(@RequestHeader UUID sessionId,
                                              @PathVariable Long postId,
                                              @PathVariable Long commentId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
@@ -56,8 +57,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentFindResponse findComment(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") UUID sessionId,
-                                           @PathVariable Long postId,
+    public CommentFindResponse findComment(@PathVariable Long postId,
                                            @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
         validate(postId, findComment);
@@ -67,8 +67,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public Slice<CommentFindResponse> findComments(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") UUID sessionId,
-                                                   @PathVariable Long postId, Pageable pageable) {
+    public Slice<CommentFindResponse> findComments(@PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
 
         log.info("Find Comments Page {} (Size: {}) at Post {}", pageable.getPageNumber(), pageable.getPageSize(), postId);
@@ -81,13 +80,13 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@RequestHeader("sessionId") UUID sessionId,
+    public void updateComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto) {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.findBySessionId(sessionId);
-        loginMember.authorization(findComment.getWriter().getId().equals(loginMember.getId()) ? USER : ADMIN);
+        loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.update(commentId, commentDto);
 
@@ -95,12 +94,12 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@RequestHeader("sessionId") UUID sessionId,
+    public void deleteComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.findBySessionId(sessionId);
-        loginMember.authorization(findComment.getWriter().getId().equals(loginMember.getId()) ? USER : ADMIN);
+        loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.remove(commentId);
 
