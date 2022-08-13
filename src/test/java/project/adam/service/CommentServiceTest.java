@@ -11,7 +11,9 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 
+import javax.persistence.EntityManager;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,12 +29,14 @@ class CommentServiceTest {
     @Test
     void comment_create() {
         //given
-        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
-        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        UUID postWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        UUID commentWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
 
         //when
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, new CommentCreateRequest("new comment"));
+        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
         Comment comment = commentService.find(commentId);
 
         //then
@@ -43,26 +47,29 @@ class CommentServiceTest {
 
     @Test
     void comment_create_no_post() {
-        String commentWriterId = memberService.join(new MemberJoinRequest("id", "member2"));
-        assertThatThrownBy(() -> commentService.create(memberService.find(commentWriterId).getId(), 0L, new CommentCreateRequest("body")))
+        UUID commentWriterId = memberService.join(new MemberJoinRequest(UUID.randomUUID(), "member2"));
+        assertThatThrownBy(() -> commentService.create(memberService.find(commentWriterId).getId(), 0L, null, new CommentCreateRequest("body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void comment_create_no_member() {
-        String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
+        UUID postWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
-        assertThatThrownBy(() -> commentService.create("NO", postId, new CommentCreateRequest("body")))
+        assertThatThrownBy(() -> commentService.create(UUID.randomUUID(), postId, null, new CommentCreateRequest("body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void comment_update() {
         //given
-        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
-        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        UUID postWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        UUID commentWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, new CommentCreateRequest("new comment"));
+        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
         commentService.update(commentId, new CommentUpdateRequest("updated comment"));
@@ -74,10 +81,12 @@ class CommentServiceTest {
     @Test
     void comment_remove() {
         //given
-        String postWriterId = memberService.join(new MemberJoinRequest("id1", "member1"));
-        String commentWriterId = memberService.join(new MemberJoinRequest("id2", "member2"));
+        UUID postWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        UUID commentWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, new CommentCreateRequest("new comment"));
+        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
         commentService.remove(commentId);
@@ -90,15 +99,16 @@ class CommentServiceTest {
     @Test
     void comment_find_by_post() {
         //given
-        String postWriterId = memberService.join(new MemberJoinRequest("id", "member1"));
-        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"));
-        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"));
+        UUID postWriterId = UUID.randomUUID();
+        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"));
+        Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"));
 
         PageRequest allPages = PageRequest.of(0, 100);
 
         //when
         for (int i = 0; i < 100; i++) {
-            commentService.create(memberService.find(postWriterId).getId(), (i % 2 == 0) ? post1Id : post2Id, new CommentCreateRequest("comment " + i));
+            commentService.create(postWriterId, (i % 2 == 0) ? post1Id : post2Id, null, new CommentCreateRequest("comment " + i));
         }
 
         //then

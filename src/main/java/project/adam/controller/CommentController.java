@@ -19,6 +19,7 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static project.adam.entity.Privilege.ADMIN;
@@ -34,7 +35,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
+    public CommentFindResponse createComment(@RequestHeader("sessionId") UUID sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
@@ -44,7 +45,7 @@ public class CommentController {
     }
 
     @PostMapping("/{commentId}")
-    public CommentFindResponse createComment(@RequestHeader("sessionId") String sessionId,
+    public CommentFindResponse createComment(@RequestHeader("sessionId") UUID sessionId,
                                              @PathVariable Long postId,
                                              @PathVariable Long commentId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
@@ -55,7 +56,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentFindResponse findComment(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+    public CommentFindResponse findComment(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") UUID sessionId,
                                            @PathVariable Long postId,
                                            @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
@@ -66,7 +67,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public Slice<CommentFindResponse> findComments(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") String sessionId,
+    public Slice<CommentFindResponse> findComments(@RequestHeader(value = "sessionId", required = false, defaultValue = "NO SESSION") UUID sessionId,
                                                    @PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
 
@@ -80,7 +81,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@RequestHeader("sessionId") String sessionId,
+    public void updateComment(@RequestHeader("sessionId") UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto) {
@@ -94,7 +95,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@RequestHeader("sessionId") String sessionId,
+    public void deleteComment(@RequestHeader("sessionId") UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);

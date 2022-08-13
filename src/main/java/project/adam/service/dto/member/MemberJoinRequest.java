@@ -5,25 +5,25 @@ import lombok.NoArgsConstructor;
 import project.adam.entity.Privilege;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
 public class MemberJoinRequest {
 
-    @NotEmpty
-    private String id;
+    private UUID id;
 
     @NotEmpty
     private String name;
 
     private Privilege privilege = Privilege.USER;
 
-    public MemberJoinRequest(String id, String name) {
+    public MemberJoinRequest(UUID id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public MemberJoinRequest(String id, String name, Privilege privilege) {
+    public MemberJoinRequest(UUID id, String name, Privilege privilege) {
         this.id = id;
         this.name = name;
         this.privilege = privilege;

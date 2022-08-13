@@ -17,6 +17,7 @@ import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.service.dto.post.PostUpdateRequest;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static project.adam.entity.Privilege.ADMIN;
@@ -32,7 +33,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public PostFindResponse createPost(@RequestHeader("sessionId") String sessionId,
+    public PostFindResponse createPost(@RequestHeader("sessionId") UUID sessionId,
                                        @Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(memberService.findBySessionId(sessionId).getId(), postDto);
 
@@ -59,7 +60,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@RequestHeader("sessionId") String sessionId,
+    public void updatePost(@RequestHeader("sessionId") UUID sessionId,
                            @PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
         Post findPost = postService.find(postId);
@@ -71,7 +72,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@RequestHeader("sessionId") String sessionId,
+    public void deletePost(@RequestHeader("sessionId") UUID sessionId,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);
         Member findMember = memberService.findBySessionId(sessionId);

@@ -4,10 +4,12 @@ import lombok.Getter;
 import project.adam.entity.Member;
 import project.adam.entity.Privilege;
 
+import java.util.UUID;
+
 @Getter
 public class MemberFindResponse {
 
-    private String id;
+    private UUID id;
     private String name;
     private Privilege privilege;
 

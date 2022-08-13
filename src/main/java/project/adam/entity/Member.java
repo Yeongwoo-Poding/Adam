@@ -3,6 +3,7 @@ package project.adam.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
 import project.adam.exception.ApiException;
 
@@ -16,11 +17,11 @@ import static project.adam.exception.ExceptionEnum.AUTHORIZATION_FAILED;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseTimeEntity implements Persistable<String> {
+public class Member extends BaseTimeEntity implements Persistable<UUID> {
 
     @Id
-    @Column(name = "member_id")
-    private String id;
+    @Column(name = "member_id", length = 16)
+    private UUID id;
 
     private String name;
 
@@ -30,17 +31,20 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
-    private String sessionId = null;
+    @Column(length = 16)
+    private UUID sessionId = null;
 
-    public Member(String id, String name) {
+    public Member(UUID id, String name) {
         this.id = id;
         this.name = name;
         this.privilege = Privilege.USER;
+        this.sessionId = UUID.randomUUID();
     }
 
-    public Member(String id, String name, Privilege privilege) {
+    public Member(UUID id, String name, Privilege privilege) {
         this(id, name);
         this.privilege = privilege;
+        this.sessionId = UUID.randomUUID();
     }
 
     public void authorization(Privilege privilege) {
@@ -49,8 +53,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         }
     }
 
-    public String login() {
-        this.sessionId = UUID.randomUUID().toString();
+    public UUID login() {
+        this.sessionId = UUID.randomUUID();
         return sessionId;
     }
 

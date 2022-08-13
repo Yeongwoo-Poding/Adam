@@ -3,6 +3,9 @@ package project.adam.entity;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -12,7 +15,7 @@ class PostTest {
     @Test
     void test_update() {
         //given
-        Member member = new Member("id", "member");
+        Member member = new Member(UUID.randomUUID(), "member");
         Post post = new Post(member, Board.FREE, "title1", "body1");
 
         //when
