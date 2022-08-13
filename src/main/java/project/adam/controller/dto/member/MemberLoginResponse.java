@@ -1,4 +1,4 @@
-package project.adam.service.dto.member;
+package project.adam.controller.dto.member;
 
 import lombok.Getter;
 import project.adam.entity.Member;

@@ -11,7 +11,6 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 
-import javax.persistence.EntityManager;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -30,9 +29,9 @@ class CommentServiceTest {
     void comment_create() {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
+        memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
 
         //when
@@ -47,7 +46,7 @@ class CommentServiceTest {
 
     @Test
     void comment_create_no_post() {
-        UUID commentWriterId = memberService.join(new MemberJoinRequest(UUID.randomUUID(), "member2"));
+        UUID commentWriterId = memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "member2"));
         assertThatThrownBy(() -> commentService.create(memberService.find(commentWriterId).getId(), 0L, null, new CommentCreateRequest("body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
@@ -55,7 +54,7 @@ class CommentServiceTest {
     @Test
     void comment_create_no_member() {
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
         assertThatThrownBy(() -> commentService.create(UUID.randomUUID(), postId, null, new CommentCreateRequest("body")))
                 .isInstanceOf(NoSuchElementException.class);
@@ -65,9 +64,9 @@ class CommentServiceTest {
     void comment_update() {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
+        memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
         Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
@@ -82,9 +81,9 @@ class CommentServiceTest {
     void comment_remove() {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(commentWriterId, "member2"));
+        memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"));
         Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
@@ -100,7 +99,7 @@ class CommentServiceTest {
     void comment_find_by_post() {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"));
         Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"));
 

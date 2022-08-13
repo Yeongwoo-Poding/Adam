@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.entity.Member;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
@@ -29,13 +28,13 @@ class MemberServiceTest {
     void member_join() {
         //given
         UUID memberId = UUID.randomUUID();
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId, "nickname");
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
 
         //when
         UUID savedId = memberService.join(memberJoinRequest);
 
         //then
-        assertThat(memberService.find(memberId).getId()).isEqualTo(memberJoinRequest.getId());
+        assertThat(memberService.find(memberId).getId().toString()).isEqualTo(memberJoinRequest.getId());
         assertThat(memberService.find(memberId).getName()).isEqualTo(memberJoinRequest.getName());
     }
 
@@ -43,7 +42,7 @@ class MemberServiceTest {
     void member_withdraw() {
         //given
         UUID memberId = UUID.randomUUID();
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId, "nickname");
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
         UUID savedId = memberService.join(memberJoinRequest);
 
         //when
@@ -58,9 +57,9 @@ class MemberServiceTest {
     void member_withdraw_remove_post() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id, "member1"));
+        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id, "member2"));
+        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
@@ -85,9 +84,9 @@ class MemberServiceTest {
     void member_withdraw_remove_comment() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id, "member1"));
+        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id, "member2"));
+        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
         Long post1Id = postService.create(memberService.find(member1Id).getId(),
                 new PostCreateRequest("FREE", "post1", "post 1"));
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
