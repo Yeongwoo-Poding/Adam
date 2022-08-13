@@ -30,7 +30,7 @@ public class PostService {
     public Long create(UUID sessionId, PostCreateRequest postDto) {
         Post savedPost = postRepository.save(new Post(
                 memberRepository.findById(sessionId).orElseThrow(),
-                Board.valueOf(postDto.getBoardName()),
+                Board.valueOf(postDto.getBoard()),
                 postDto.getTitle(),
                 postDto.getBody()
         ));

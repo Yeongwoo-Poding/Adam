@@ -42,7 +42,7 @@ class PostServiceTest {
 
         //then
         assertThat(post.getWriter().getId()).isEqualTo(memberId);
-        assertThat(post.getBoard().name()).isEqualTo(postCreateRequest.getBoardName());
+        assertThat(post.getBoard().name()).isEqualTo(postCreateRequest.getBoard());
         assertThat(post.getTitle()).isEqualTo(postCreateRequest.getTitle());
         assertThat(post.getBody()).isEqualTo(postCreateRequest.getBody());
     }

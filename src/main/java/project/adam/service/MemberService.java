@@ -39,8 +39,7 @@ public class MemberService {
     }
 
     public Member findBySessionId(UUID sessionId) {
-        return memberRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
+        return memberRepository.findBySessionId(sessionId).orElseThrow();
     }
 
     @Transactional
