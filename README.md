@@ -1,7 +1,7 @@
 # [Adam]
 
 ## Overview
-- [API Document](https://documenter.getpostman.com/view/21984646/VUjSG3zV)
+- [API Document](https://galactic-comet-602850.postman.co/documentation/21984646-ac46bc57-11f2-4814-ade5-5136105d8d17/publish?workspaceId=2af2560d-c3e0-4659-81d7-f758dc8bc77c)
 
 ## Feature
 - Member
