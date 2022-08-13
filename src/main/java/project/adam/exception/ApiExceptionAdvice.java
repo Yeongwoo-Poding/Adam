@@ -3,6 +3,7 @@ package project.adam.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
@@ -33,6 +34,13 @@ public class ApiExceptionAdvice {
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
                                                                final HttpMessageNotReadableException e) {
         log.warn("HttpMessageNotReadableException", e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT), INVALID_JSON_FORMAT.getStatus());
+    }
+
+    @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final HttpMediaTypeNotSupportedException e) {
+        log.warn("HttpMediaTypeNotSupportedException", e);
         return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT), INVALID_JSON_FORMAT.getStatus());
     }
 
