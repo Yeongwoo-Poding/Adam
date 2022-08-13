@@ -30,7 +30,7 @@ class PostServiceTest {
     void post_create() {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId, "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -61,7 +61,7 @@ class PostServiceTest {
     @Test
     void post_create_no_board() {
         UUID memberId = UUID.randomUUID();
-        UUID sessionId = memberService.join(new MemberJoinRequest(memberId, "nickname"));
+        UUID sessionId = memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "NOBOARD",
                 "title",
@@ -75,7 +75,7 @@ class PostServiceTest {
     void post_update() {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId, "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -97,7 +97,7 @@ class PostServiceTest {
     void post_delete() {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId, "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -121,7 +121,7 @@ class PostServiceTest {
     void post_delete_remove_comments() {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId, "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"));
         Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"));
 
@@ -152,9 +152,9 @@ class PostServiceTest {
     void post_find_all() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id, "member1"));
+        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id, "member2"));
+        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
@@ -179,9 +179,9 @@ class PostServiceTest {
     void post_find_all_by_writer() {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id, "member1"));
+        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id, "member2"));
+        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
         for (int i = 0; i < 100; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(

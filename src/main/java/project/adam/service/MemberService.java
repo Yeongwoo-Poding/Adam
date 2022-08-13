@@ -26,7 +26,7 @@ public class MemberService {
     @Transactional
     public UUID join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
-                memberDto.getId(),
+                UUID.fromString(memberDto.getId()),
                 memberDto.getName(),
                 memberDto.getPrivilege()
         ));

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.service.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.member.MemberLoginResponse;
 import project.adam.entity.Member;
 import project.adam.service.MemberService;
 import project.adam.controller.dto.member.MemberFindResponse;
