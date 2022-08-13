@@ -1,10 +1,32 @@
-# [Appname]
+# [Adam]
 
 ## Overview
+- [API Document](https://documenter.getpostman.com/view/21984646/VUjSG3zV)
 
 ## Feature
+- Member
+    - Join
+    - Login
+    - Find
+    - Withdraw
+- Post
+    - Create
+    - Find
+    - Find All
+    - Update
+    - Delete
+- Comment
+    - Create Comment
+    - Craete Reply
+    - Find
+    - Find All
+    - Update
+    - Delete
 
-## Structure
+## Skills
+- Cloud: AWS EC2
+- Web Framework: Spring Boot
+- DB: MySQL
 
 ## Convention
 
