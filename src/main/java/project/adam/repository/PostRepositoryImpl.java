@@ -27,7 +27,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .from(post)
                 .where(
                         writerIdCondition(condition.getWriterId()),
-                        titleCondition(condition.gettitle())
+                        titleCondition(condition.getTitle())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
