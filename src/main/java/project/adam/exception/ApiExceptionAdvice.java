@@ -92,4 +92,11 @@ public class ApiExceptionAdvice {
         log.warn("MissingRequestCookieException", e);
         return new ResponseEntity<>(new ApiExceptionEntity(AUTHENTICATION_FAILED), AUTHENTICATION_FAILED.getStatus());
     }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final IllegalArgumentException e) {
+        log.warn("IllegalArgumentException", e);
+        return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA), AUTHENTICATION_FAILED.getStatus());
+    }
 }
