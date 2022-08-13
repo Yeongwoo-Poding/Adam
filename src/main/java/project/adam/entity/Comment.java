@@ -28,8 +28,8 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    @OneToMany(mappedBy = "parent")
-    private List<Comment> children = new ArrayList<>();
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
+    private List<Comment> reply = new ArrayList<>();
 
     private String body;
 
