@@ -14,7 +14,7 @@ public class CommentListContent {
     private Long commentId;
     private UUID writerId;
     private Long postId;
-    private List<CommentFindResponse> replies = new ArrayList<>();
+    private List<CommentListContent> replies = new ArrayList<>();
     private LocalDateTime createDate;
     private LocalDateTime lastModifiedDate;
     private String body;
@@ -24,7 +24,7 @@ public class CommentListContent {
         this.writerId = comment.getWriter().getId();
         this.postId = comment.getPost().getId();
         this.replies = comment.getReplies().stream()
-                .map(CommentFindResponse::new)
+                .map(CommentListContent::new)
                 .collect(Collectors.toList());
         this.createDate = comment.getCreateDate();
         this.lastModifiedDate = comment.getLastModifiedDate();
