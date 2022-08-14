@@ -9,6 +9,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostFindCondition {
+
     private UUID writerId;
     private String title;
 

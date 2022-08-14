@@ -29,7 +29,7 @@ public class Comment extends BaseTimeEntity {
     private Comment parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
-    private List<Comment> reply = new ArrayList<>();
+    private List<Comment> replies = new ArrayList<>();
 
     private String body;
 

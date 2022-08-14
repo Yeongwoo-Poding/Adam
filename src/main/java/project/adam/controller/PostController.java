@@ -7,6 +7,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.controller.dto.post.PostCreateResponse;
+import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
@@ -34,12 +36,12 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public PostFindResponse createPost(@RequestHeader UUID sessionId,
+    public PostCreateResponse createPost(@RequestHeader UUID sessionId,
                                        @Validated @RequestBody PostCreateRequest postDto) {
         Long savedId = postService.create(memberService.findBySessionId(sessionId).getId(), postDto);
 
         log.info("Create Post {}", savedId);
-        return new PostFindResponse(postService.find(savedId));
+        return new PostCreateResponse(postService.find(savedId));
     }
 
     @GetMapping("/{postId}")
@@ -48,16 +50,11 @@ public class PostController {
     }
 
     @GetMapping
-    public Slice<PostFindResponse> findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
+    public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
         Slice<Post> result = postService.findAll(condition, pageable);
 
         log.info("Find Post Page {} (Size: {}), Condition: {}", pageable.getPageNumber(), pageable.getPageSize(), condition.toString());
-        return new SliceImpl<>(
-                result.getContent().stream()
-                        .map(PostFindResponse::new)
-                        .collect(Collectors.toList()),
-                result.getPageable(),
-                result.hasNext());
+        return new PostListFindResponse(result);
     }
 
     @PutMapping("/{postId}")

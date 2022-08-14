@@ -54,7 +54,7 @@ public class InitData {
 
             List<Long> postsId = createPosts(member1Id, member2Id);
             List<Long> commentsId = createComments(member1Id, member2Id, postsId);
-            List<Long> replysId = createReplys(member1Id, member2Id, postsId, commentsId);
+            List<Long> repliesId = createReplies(member1Id, member2Id, postsId, commentsId);
 
             em.flush();
             em.clear();
@@ -88,17 +88,17 @@ public class InitData {
             return commentsId;
         }
 
-        private List<Long> createReplys(UUID member1Id, UUID member2Id, List<Long> postsId, List<Long> commentsId) {
-            List<Long> replysId = new ArrayList<>();
+        private List<Long> createReplies(UUID member1Id, UUID member2Id, List<Long> postsId, List<Long> commentsId) {
+            List<Long> repliesId = new ArrayList<>();
             for (int i = 0; i < 32; i++) {
-                replysId.add(commentService.create(
+                repliesId.add(commentService.create(
                         i % 2 == 0 ? member1Id : member2Id,
                         postsId.get(i / 8),
                         commentsId.get(i / 2),
-                        new CommentCreateRequest("reply " + i)));
+                        new CommentCreateRequest("replies " + i)));
             }
 
-            return replysId;
+            return repliesId;
         }
     }
 }

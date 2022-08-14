@@ -13,20 +13,12 @@ import java.util.stream.Collectors;
 public class PostFindResponse {
 
     private Long id;
-
     private UUID writerId;
-
     private String board;
-
     private LocalDateTime createDate;
-
     private LocalDateTime lastModifiedDate;
-
     private String title;
-
     private String body;
-
-    private List<CommentFindResponse> comments;
 
     public PostFindResponse(Post post) {
         this.id = post.getId();
@@ -36,8 +28,5 @@ public class PostFindResponse {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
-        this.comments = post.getRootComment().stream()
-                            .map(CommentFindResponse::new)
-                            .collect(Collectors.toList());
     }
 }
