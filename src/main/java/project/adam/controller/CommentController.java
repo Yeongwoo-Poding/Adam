@@ -7,6 +7,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.adam.controller.dto.comment.CommentCreateResponse;
+import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.entity.Comment;
 import project.adam.entity.Member;
 import project.adam.exception.ApiException;
@@ -46,14 +48,14 @@ public class CommentController {
     }
 
     @PostMapping("/{commentId}")
-    public CommentFindResponse createComment(@RequestHeader UUID sessionId,
-                                             @PathVariable Long postId,
-                                             @PathVariable Long commentId,
-                                             @Validated @RequestBody CommentCreateRequest commentDto) {
+    public CommentCreateResponse createComment(@RequestHeader UUID sessionId,
+                                               @PathVariable Long postId,
+                                               @PathVariable Long commentId,
+                                               @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentId, commentDto);
 
         log.info("Create Comment {} at Post {}", savedId, postId);
-        return new CommentFindResponse(commentService.find(savedId));
+        return new CommentCreateResponse(commentService.find(savedId));
     }
 
     @GetMapping("/{commentId}")
@@ -67,16 +69,11 @@ public class CommentController {
     }
 
     @GetMapping
-    public Slice<CommentFindResponse> findComments(@PathVariable Long postId, Pageable pageable) {
+    public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
 
         log.info("Find Comments Page {} (Size: {}) at Post {}", pageable.getPageNumber(), pageable.getPageSize(), postId);
-        return new SliceImpl<>(
-                result.getContent().stream()
-                        .map(CommentFindResponse::new)
-                        .collect(Collectors.toList()),
-                result.getPageable(),
-                result.hasNext());
+        return new CommentListFindResponse(result);
     }
 
     @PutMapping("/{commentId}")

@@ -2,28 +2,24 @@ package project.adam.controller.dto.comment;
 
 import lombok.Getter;
 import project.adam.entity.Comment;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Getter
-public class CommentFindResponse {
+public class CommentCreateResponse {
 
-    private Long id;
+    private Long commentId;
     private UUID writerId;
     private Long postId;
     private LocalDateTime createDate;
-    private LocalDateTime lastModifiedDate;
     private String body;
 
-    public CommentFindResponse(Comment comment) {
-        this.id = comment.getId();
+    public CommentCreateResponse(Comment comment) {
+        this.commentId = comment.getId();
         this.writerId = comment.getWriter().getId();
         this.postId = comment.getPost().getId();
         this.createDate = comment.getCreateDate();
-        this.lastModifiedDate = comment.getLastModifiedDate();
         this.body = comment.getBody();
     }
 }

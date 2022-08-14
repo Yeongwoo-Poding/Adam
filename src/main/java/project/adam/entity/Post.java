@@ -43,8 +43,4 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.body = body;
     }
-
-    public List<Comment> getRootComment() {
-        return comments.stream().filter(comment -> comment.getParent() == null).collect(Collectors.toList());
-    }
 }

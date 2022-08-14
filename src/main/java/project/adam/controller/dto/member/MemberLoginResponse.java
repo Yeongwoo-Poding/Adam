@@ -7,6 +7,7 @@ import java.util.UUID;
 
 @Getter
 public class MemberLoginResponse {
+
     UUID sessionId;
 
     public MemberLoginResponse(UUID sessionId) {

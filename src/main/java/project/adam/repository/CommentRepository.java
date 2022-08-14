@@ -16,6 +16,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByWriter(Member writer);
 
-    @Query("select c from Comment c left join fetch c.reply where c.post = :post and c.parent is null")
+    @Query("select c from Comment c left join fetch c.replies where c.post = :post and c.parent is null")
     Slice<Comment> findRootCommentByPost(Post post, Pageable pageable);
 }
