@@ -36,7 +36,7 @@ public class PostFindResponse {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
-        this.comments = post.getComments().stream()
+        this.comments = post.getRootComment().stream()
                             .map(CommentFindResponse::new)
                             .collect(Collectors.toList());
     }

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -41,5 +42,9 @@ public class Post extends BaseTimeEntity {
     public void update(String title, String body) {
         this.title = title;
         this.body = body;
+    }
+
+    public List<Comment> getRootComment() {
+        return comments.stream().filter(comment -> comment.getParent() == null).collect(Collectors.toList());
     }
 }
