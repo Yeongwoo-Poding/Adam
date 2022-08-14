@@ -2,6 +2,7 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.member.MemberLoginResponse;
@@ -14,6 +15,7 @@ import project.adam.service.dto.member.MemberLoginRequest;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.*;
 import static project.adam.entity.Privilege.*;
 
 @Slf4j
@@ -32,6 +34,14 @@ public class MemberController {
         return new MemberLoginResponse(sessionId);
     }
 
+    @PostMapping("/session")
+    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
+        UUID sessionId = memberService.login(UUID.fromString(memberDto.getId()));
+
+        log.info("Login Member sessionId={}", sessionId);
+        return new MemberLoginResponse(sessionId);
+    }
+
     @GetMapping
     public MemberFindResponse findMember(@RequestHeader UUID sessionId) {
         Member findMember = memberService.findBySessionId(sessionId);
@@ -40,15 +50,8 @@ public class MemberController {
         return new MemberFindResponse(findMember);
     }
 
-    @PatchMapping
-    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
-        UUID sessionId = memberService.login(UUID.fromString(memberDto.getId()));
-
-        log.info("Login Member sessionId={}", sessionId);
-        return new MemberLoginResponse(sessionId);
-    }
-
     @DeleteMapping
+    @ResponseStatus(NO_CONTENT)
     public void deleteMember(@RequestHeader UUID sessionId) {
         memberService.withdraw(sessionId);
 
