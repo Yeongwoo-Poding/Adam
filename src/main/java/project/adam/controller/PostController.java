@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.post.PostCreateResponse;
@@ -23,6 +24,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static project.adam.entity.Privilege.ADMIN;
 import static project.adam.entity.Privilege.USER;
 
@@ -58,6 +60,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
+    @ResponseStatus(NO_CONTENT)
     public void updatePost(@RequestHeader UUID sessionId,
                            @PathVariable Long postId,
                            @Validated @RequestBody PostUpdateRequest postDto) {
@@ -70,6 +73,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
+    @ResponseStatus(NO_CONTENT)
     public void deletePost(@RequestHeader UUID sessionId,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);

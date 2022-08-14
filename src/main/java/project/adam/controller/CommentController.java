@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.comment.CommentCreateResponse;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static project.adam.entity.Privilege.ADMIN;
 import static project.adam.entity.Privilege.USER;
 
@@ -77,6 +79,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
+    @ResponseStatus(NO_CONTENT)
     public void updateComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
@@ -91,6 +94,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
+    @ResponseStatus(NO_CONTENT)
     public void deleteComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
