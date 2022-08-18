@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Profile("local")
+@Profile({"local", "dev"})
 @Component
 @RequiredArgsConstructor
 public class InitData {
