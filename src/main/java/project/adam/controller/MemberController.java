@@ -18,7 +18,6 @@ import java.util.UUID;
 import static org.springframework.http.HttpStatus.*;
 import static project.adam.entity.Privilege.*;
 
-@Slf4j
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
@@ -29,24 +28,18 @@ public class MemberController {
     @PostMapping
     public MemberLoginResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
         UUID sessionId = memberService.join(memberDto);
-
-        log.info("Join Member sessionId={}", sessionId);
         return new MemberLoginResponse(sessionId);
     }
 
     @PostMapping("/session")
     public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
         UUID sessionId = memberService.login(UUID.fromString(memberDto.getId()));
-
-        log.info("Login Member sessionId={}", sessionId);
         return new MemberLoginResponse(sessionId);
     }
 
     @GetMapping
     public MemberFindResponse findMember(@RequestHeader UUID sessionId) {
         Member findMember = memberService.findBySessionId(sessionId);
-
-        log.info("Find Member {}", findMember);
         return new MemberFindResponse(findMember);
     }
 
@@ -54,7 +47,5 @@ public class MemberController {
     @ResponseStatus(NO_CONTENT)
     public void deleteMember(@RequestHeader UUID sessionId) {
         memberService.withdraw(sessionId);
-
-        log.info("Delete Member {}", sessionId);
     }
 }
