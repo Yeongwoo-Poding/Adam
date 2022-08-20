@@ -7,6 +7,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -98,5 +99,12 @@ public class ApiExceptionAdvice {
                                                                final IllegalArgumentException e) {
         log.warn("IllegalArgumentException", e);
         return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA), AUTHENTICATION_FAILED.getStatus());
+    }
+
+    @ExceptionHandler({MissingRequestHeaderException.class})
+    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request,
+                                                               final MissingRequestHeaderException e) {
+        log.warn("MissingRequestHeaderException", e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_HEADER), AUTHENTICATION_FAILED.getStatus());
     }
 }
