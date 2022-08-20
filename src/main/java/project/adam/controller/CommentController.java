@@ -44,8 +44,6 @@ public class CommentController {
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
-
-        log.info("Create Comment {} at Post {}", savedId, postId);
         return new CommentFindResponse(commentService.find(savedId));
     }
 
@@ -55,8 +53,6 @@ public class CommentController {
                                                @PathVariable Long commentId,
                                                @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentId, commentDto);
-
-        log.info("Create Comment {} at Post {}", savedId, postId);
         return new CommentCreateResponse(commentService.find(savedId));
     }
 
@@ -65,16 +61,12 @@ public class CommentController {
                                            @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
         validate(postId, findComment);
-
-        log.info("Find Comment {} at Post {}", commentId, postId);
         return new CommentFindResponse(findComment);
     }
 
     @GetMapping
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
         Slice<Comment> result = commentService.findByPost(postId, pageable);
-
-        log.info("Find Comments Page {} (Size: {}) at Post {}", pageable.getPageNumber(), pageable.getPageSize(), postId);
         return new CommentListFindResponse(result);
     }
 
@@ -89,8 +81,6 @@ public class CommentController {
         loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.update(commentId, commentDto);
-
-        log.info("Update Comment {} at Post {}", commentId, postId);
     }
 
     @DeleteMapping("/{commentId}")
@@ -103,8 +93,6 @@ public class CommentController {
         loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.remove(commentId);
-
-        log.info("Delete Comment {} at Post {}", commentId, postId);
     }
 
     private void validate(Long postId, Comment comment) {
