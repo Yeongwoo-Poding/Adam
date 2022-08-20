@@ -13,6 +13,7 @@ public enum ExceptionEnum {
     INVALID_JSON_FORMAT(BAD_REQUEST, "입력값이 JSON 형식이 아닙니다."),
     INVALID_INPUT(BAD_REQUEST, "혀용되지 않은 입력값입니다."),
     INVALID_TYPE(BAD_REQUEST, "입력값의 형식이 맞지 않습니다."),
+    INVALID_HEADER(BAD_REQUEST, "Header에 필요한 데이터가 전달되지 않았습니다."),
 
     AUTHENTICATION_FAILED(UNAUTHORIZED, "로그인되지 않았습니다."),
 
