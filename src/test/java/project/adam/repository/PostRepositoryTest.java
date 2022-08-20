@@ -53,7 +53,7 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> findAdminPost = postRepository.findAll(new PostFindCondition(adminMember.getId(), null), allPages);
@@ -75,7 +75,7 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> findSuccessPost = postRepository.findAll(new PostFindCondition(null, "success"), allPages);
@@ -97,7 +97,7 @@ class PostRepositoryTest {
         Post post3 = postRepository.save(new Post(adminMember, Board.FREE, "Post 3 fail", "body 3"));
         Post post4 = postRepository.save(new Post(userMember, Board.FREE, "Post 4 fail", "body 4"));
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> findPost = postRepository.findAll(new PostFindCondition(adminMember.getId(), "success"), allPages);
