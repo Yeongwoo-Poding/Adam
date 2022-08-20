@@ -73,20 +73,20 @@ class MemberRepositoryTest {
         Member writer1 = memberRepository.save(new Member(UUID.randomUUID(), "writer1"));
         Member writer2 = memberRepository.save(new Member(UUID.randomUUID(), "writer2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Post newPost = new Post((i % 2 == 0) ? writer1 : writer2, Board.FREE, "post " + i, i + "th post body");
             postRepository.save(newPost);
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(writer1.getId(), null), allPages);
         Slice<Post> writer2Posts = postRepository.findAll(new PostFindCondition(writer2.getId(), null), allPages);
 
         //then
-        assertThat(writer1Posts.getContent().size()).isEqualTo(50);
-        assertThat(writer2Posts.getContent().size()).isEqualTo(50);
+        assertThat(writer1Posts.getContent().size()).isEqualTo(5);
+        assertThat(writer2Posts.getContent().size()).isEqualTo(5);
     }
 
     @Test
@@ -95,12 +95,12 @@ class MemberRepositoryTest {
         Member writer1 = memberRepository.save(new Member(UUID.randomUUID(), "writer1"));
         Member writer2 = memberRepository.save(new Member(UUID.randomUUID(), "writer2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Post newPost = new Post((i % 2 == 0) ? writer1 : writer2, Board.FREE, "post " + i, i + "th post body");
             postRepository.save(newPost);
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> writer1Posts = postRepository.findAll(new PostFindCondition(writer1.getId(), null), allPages);

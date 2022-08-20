@@ -61,7 +61,7 @@ class MemberServiceTest {
         UUID member2Id = UUID.randomUUID();
         UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
                     "FREE",
                     "post" + i,
@@ -71,13 +71,13 @@ class MemberServiceTest {
             postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         memberService.withdraw(session1Id);
 
         //then
-        assertThat(postService.findAll(new PostFindCondition(), allPages).getContent().size()).isEqualTo(50);
+        assertThat(postService.findAll(new PostFindCondition(), allPages).getContent().size()).isEqualTo(5);
     }
 
     @Test
@@ -92,7 +92,7 @@ class MemberServiceTest {
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
                 new PostCreateRequest("FREE", "post2", "post 2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             commentService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     (i % 2 == 0) ? post2Id : post1Id,
                     null,
@@ -100,7 +100,7 @@ class MemberServiceTest {
             );
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         memberService.withdraw(session1Id);

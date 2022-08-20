@@ -103,15 +103,15 @@ class CommentServiceTest {
         Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"));
         Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"));
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             commentService.create(postWriterId, (i % 2 == 0) ? post1Id : post2Id, null, new CommentCreateRequest("comment " + i));
         }
 
         //then
-        assertThat(commentService.findByPost(post1Id, allPages).getContent().size()).isEqualTo(50);
-        assertThat(commentService.findByPost(post2Id, allPages).getContent().size()).isEqualTo(50);
+        assertThat(commentService.findByPost(post1Id, allPages).getContent().size()).isEqualTo(5);
+        assertThat(commentService.findByPost(post2Id, allPages).getContent().size()).isEqualTo(5);
     }
 }

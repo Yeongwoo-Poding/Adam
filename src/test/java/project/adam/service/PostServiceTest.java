@@ -126,7 +126,7 @@ class PostServiceTest {
         Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"));
 
         List<Long> post1CommitId = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Long commentId = commentService.create(
                     memberService.find(postWriterId).getId(),
                     i % 2 == 0 ? post1Id : post2Id,
@@ -156,7 +156,7 @@ class PostServiceTest {
         UUID member2Id = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
                     "FREE",
                     "post" + i,
@@ -166,13 +166,13 @@ class PostServiceTest {
             postService.create((i % 2 == 0) ? member1Id : member2Id, postCreateRequest);
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> findPosts = postService.findAll(new PostFindCondition(), allPages);
 
         //then
-        assertThat(findPosts.getSize()).isEqualTo(100);
+        assertThat(findPosts.getSize()).isEqualTo(10);
     }
 
     @Test
@@ -183,7 +183,7 @@ class PostServiceTest {
         UUID member2Id = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
                     "FREE",
                     "post" + i,
@@ -193,15 +193,15 @@ class PostServiceTest {
             postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
         }
 
-        PageRequest allPages = PageRequest.of(0, 100);
+        PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         Slice<Post> member1Post = postService.findAll(new PostFindCondition(member1Id, null), allPages);
         Slice<Post> member2Post = postService.findAll(new PostFindCondition(member2Id, null), allPages);
 
         //then
-        assertThat(member1Post.getContent().size()).isEqualTo(50);
-        assertThat(member2Post.getContent().size()).isEqualTo(50);
+        assertThat(member1Post.getContent().size()).isEqualTo(5);
+        assertThat(member2Post.getContent().size()).isEqualTo(5);
 
         HashSet<Post> member1PostSet = new HashSet<>(member1Post.getContent());
         HashSet<Post> member2PostSet = new HashSet<>(member2Post.getContent());
