@@ -85,14 +85,10 @@ public class MemberService {
         file.transferTo(newFile);
     }
 
-    private void removeExistingImage(Member member) {
-        String existingImage = member.getImageName();
-        if (existingImage != null) {
-            File image = new File(imagePath + existingImage);
-            if (!image.delete()) {
-                log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
-            }
-        }
+    @Transactional
+    public void removeImage(Member member) {
+        removeExistingImage(member);
+        member.setImageName(null);
     }
 
     private String getExtension(MultipartFile file) {
@@ -125,9 +121,13 @@ public class MemberService {
         return new File(imagePath + imageName).exists();
     }
 
-    @Transactional
-    public void removeImage(Member member) {
-        removeExistingImage(member);
-        member.setImageName(null);
+    private void removeExistingImage(Member member) {
+        String existingImage = member.getImageName();
+        if (existingImage != null) {
+            File image = new File(imagePath + existingImage);
+            if (!image.delete()) {
+                log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
+            }
+        }
     }
 }
