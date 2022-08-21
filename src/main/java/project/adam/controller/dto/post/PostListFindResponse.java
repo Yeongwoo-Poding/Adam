@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 @Getter
 public class PostListFindResponse {
 
-    private List<PostFindResponse> contents = new ArrayList<>();
+    private List<PostListContent> contents = new ArrayList<>();
     private Paging paging;
     private int size;
     private boolean hasNext;
 
     public PostListFindResponse(Slice<Post> postSlice) {
         this.contents = postSlice.getContent().stream()
-                .map(PostFindResponse::new)
+                .map(PostListContent::new)
                 .collect(Collectors.toList());
         this.paging = new Paging(postSlice.getPageable());
         this.size = postSlice.getNumberOfElements();

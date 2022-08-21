@@ -75,14 +75,6 @@ public class PostService {
         createImages(images, findPost);
     }
 
-    private void createImages(MultipartFile[] images, Post findPost) throws IOException {
-        if (images != null) {
-            for (MultipartFile image : images) {
-                createImage(findPost, image);
-            }
-        }
-    }
-
     @Transactional
     public void remove(Long postId) {
         List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
@@ -94,18 +86,20 @@ public class PostService {
         postRepository.delete(findPost);
     }
 
-    private void removeImages(Post findPost) {
-        for (String imageName : findPost.getImageNames()) {
-            removeImage(imageName);
-        }
-    }
-
     public Post find(Long postId) {
         return postRepository.findById(postId).orElseThrow();
     }
 
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
         return postRepository.findAll(condition, pageable);
+    }
+
+    private void createImages(MultipartFile[] images, Post findPost) throws IOException {
+        if (images != null) {
+            for (MultipartFile image : images) {
+                createImage(findPost, image);
+            }
+        }
     }
 
     private void createImage(Post savedPost, MultipartFile image) throws IOException {
@@ -117,10 +111,19 @@ public class PostService {
         log.info("[{}.createImage()] Add image {}", getClass(), postImage.getName());
     }
 
+    private void removeImages(Post findPost) {
+        for (String imageName : findPost.getImageNames()) {
+            System.out.println("imageName = " + imageName);
+            removeImage(imageName);
+        }
+    }
+
     private void removeImage(String imageName) {
+        log.info("imageName = {}", imageName);
         File file = new File(imageName);
         if (!file.delete()) {
             log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
         }
+        postRepository.removeImage(imageName);
     }
 }
