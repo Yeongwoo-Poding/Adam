@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.Comment;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
@@ -19,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.EntityManager;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +33,7 @@ public class InitData {
     private final DevClass dev;
 
     @PostConstruct
-    public void post() {
+    public void post() throws IOException {
         dev.createDummyData();
     }
 
@@ -54,7 +56,7 @@ public class InitData {
         @Value("${file.dir}")
         File imageFilePath;
 
-        public void createDummyData() {
+        public void createDummyData() throws IOException {
 
             log.info("Create dummy data");
             UUID member1Id = UUID.randomUUID();
@@ -73,12 +75,13 @@ public class InitData {
             List<Comment> post1Comments = post1.getComments();
         }
 
-        private List<Long> createPosts(UUID member1Id, UUID member2Id) {
+        private List<Long> createPosts(UUID member1Id, UUID member2Id) throws IOException {
             List<Long> postsId = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 postsId.add(postService.create(
                         i / 2 >= 1 ? member1Id : member2Id,
-                        new PostCreateRequest("FREE", "post" + i, "post body" + i)
+                        new PostCreateRequest("FREE", "post" + i, "post body" + i),
+                        new MultipartFile[]{}
                 ));
             }
             return postsId;

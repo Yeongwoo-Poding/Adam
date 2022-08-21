@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Post;
 import project.adam.service.dto.comment.CommentCreateRequest;
@@ -13,6 +14,7 @@ import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +29,7 @@ class PostServiceTest {
     @Autowired CommentService commentService;
 
     @Test
-    void post_create() {
+    void post_create() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
@@ -35,7 +37,7 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
 
         //when
         Post post = postService.find(savedId);
@@ -54,7 +56,7 @@ class PostServiceTest {
                 "title",
                 "body");
 
-        assertThatThrownBy(() -> postService.create(UUID.randomUUID(), postCreateRequest))
+        assertThatThrownBy(() -> postService.create(UUID.randomUUID(), postCreateRequest, new MultipartFile[]{}))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -67,12 +69,12 @@ class PostServiceTest {
                 "title",
                 "body");
 
-        assertThatThrownBy(() -> postService.create(memberService.find(memberId).getId(), postCreateRequest))
+        assertThatThrownBy(() -> postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{}))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void post_update() {
+    void post_update() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
@@ -80,11 +82,11 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
 
         //when
         PostUpdateRequest postUpdateRequest = new PostUpdateRequest("updatedTitle", "updated body");
-        postService.update(savedId, postUpdateRequest);
+        postService.update(savedId, postUpdateRequest, new MultipartFile[]{});
 
         Post findPost = postService.find(savedId);
 
@@ -94,7 +96,7 @@ class PostServiceTest {
     }
 
     @Test
-    void post_delete() {
+    void post_delete() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
@@ -102,7 +104,7 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest);
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
         //when
         postService.remove(savedId);
 
@@ -118,12 +120,12 @@ class PostServiceTest {
     }
 
     @Test
-    void post_delete_remove_comments() {
+    void post_delete_remove_comments() throws IOException {
         //given
         UUID postWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
-        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"));
-        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"));
+        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
+        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -149,7 +151,7 @@ class PostServiceTest {
     }
 
     @Test
-    void post_find_all() {
+    void post_find_all() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
@@ -163,7 +165,7 @@ class PostServiceTest {
                     "post body " + i
             );
 
-            postService.create((i % 2 == 0) ? member1Id : member2Id, postCreateRequest);
+            postService.create((i % 2 == 0) ? member1Id : member2Id, postCreateRequest, new MultipartFile[]{});
         }
 
         PageRequest allPages = PageRequest.of(0, 10);
@@ -176,7 +178,7 @@ class PostServiceTest {
     }
 
     @Test
-    void post_find_all_by_writer() {
+    void post_find_all_by_writer() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
@@ -190,7 +192,7 @@ class PostServiceTest {
                     "post body " + i
             );
 
-            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
+            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest, new MultipartFile[]{});
         }
 
         PageRequest allPages = PageRequest.of(0, 10);

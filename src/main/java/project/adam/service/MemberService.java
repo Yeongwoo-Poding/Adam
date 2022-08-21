@@ -70,6 +70,7 @@ public class MemberService {
         member.getPosts().forEach(post -> postService.remove(post.getId()));
     }
     private void removeMember(Member member) {
+        removeExistingImage(member);
         memberRepository.delete(member);
     }
 
@@ -106,7 +107,6 @@ public class MemberService {
         } else if (contentType.equals("image/jpeg")) {
             fileExtension = ".jpeg";
         } else {
-            System.out.println("[ImageTest] 이미지 헤더 없음");
             throw new ApiException(ExceptionEnum.INVALID_HEADER);
         }
         return fileExtension;

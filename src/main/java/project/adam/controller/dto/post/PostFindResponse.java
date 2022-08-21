@@ -2,9 +2,10 @@ package project.adam.controller.dto.post;
 
 import lombok.Getter;
 import project.adam.entity.Post;
-import project.adam.controller.dto.comment.CommentFindResponse;
+import project.adam.entity.PostImage;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class PostFindResponse {
     private LocalDateTime lastModifiedDate;
     private String title;
     private String body;
+    private List<String> imagePaths = new ArrayList<>();
 
     public PostFindResponse(Post post) {
         this.id = post.getId();
@@ -28,5 +30,8 @@ public class PostFindResponse {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
+        this.imagePaths = post.getImages().stream()
+                            .map(PostImage::getName)
+                            .collect(Collectors.toList());
     }
 }
