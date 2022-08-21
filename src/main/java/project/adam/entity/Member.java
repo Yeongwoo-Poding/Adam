@@ -3,7 +3,6 @@ package project.adam.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.springframework.data.domain.Persistable;
 import project.adam.exception.ApiException;
 
@@ -24,6 +23,8 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     private UUID id;
 
     private String name;
+
+    private String imageName;
 
     @Enumerated(EnumType.STRING)
     private Privilege privilege;
@@ -56,6 +57,10 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     public UUID login() {
         this.sessionId = UUID.randomUUID();
         return sessionId;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     @Override

@@ -1,8 +1,11 @@
 package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -10,10 +13,11 @@ import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
-import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
-
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -22,6 +26,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final PostService postService;
+
+    @Value("${file.dir}")
+    private String imagePath;
 
     @Transactional
     public UUID join(MemberJoinRequest memberDto) {
@@ -64,5 +71,63 @@ public class MemberService {
     }
     private void removeMember(Member member) {
         memberRepository.delete(member);
+    }
+
+    @Transactional
+    public void updateImage(Member member, MultipartFile file) throws IOException {
+        removeExistingImage(member);
+
+        String imageName = UUID.randomUUID() + getExtension(file);
+        member.setImageName(imageName);
+
+        File newFile = new File(imagePath + imageName);
+        file.transferTo(newFile);
+    }
+
+    private void removeExistingImage(Member member) {
+        String existingImage = member.getImageName();
+        if (existingImage != null) {
+            File image = new File(imagePath + existingImage);
+            if (!image.delete()) {
+                log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
+            }
+        }
+    }
+
+    private String getExtension(MultipartFile file) {
+        String contentType = file.getContentType();
+        String fileExtension;
+        if (contentType == null) {
+            throw new ApiException(ExceptionEnum.INVALID_HEADER);
+        }
+
+        if (contentType.equals("image/png")) {
+            fileExtension = ".png";
+        } else if (contentType.equals("image/jpeg")) {
+            fileExtension = ".jpeg";
+        } else {
+            System.out.println("[ImageTest] 이미지 헤더 없음");
+            throw new ApiException(ExceptionEnum.INVALID_HEADER);
+        }
+        return fileExtension;
+    }
+
+    public String getImagePath(Member member) {
+        return imagePath + member.getImageName();
+    }
+
+    public boolean hasImage(Member member) {
+        String imageName = member.getImageName();
+        if (imageName == null) {
+            return false;
+        }
+
+        return new File(imagePath + imageName).exists();
+    }
+
+    @Transactional
+    public void removeImage(Member member) {
+        removeExistingImage(member);
+        member.setImageName(null);
     }
 }

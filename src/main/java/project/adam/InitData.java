@@ -2,6 +2,7 @@ package project.adam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,34 +16,43 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityManager;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Profile({"local", "dev"})
 @Component
 @RequiredArgsConstructor
 public class InitData {
 
-    private final Init init;
+    private final DevClass dev;
 
     @PostConstruct
     public void post() {
-        init.createDummyData();
+        dev.createDummyData();
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        dev.deleteImageFiles();
     }
 
     @Slf4j
     @Component
     @RequiredArgsConstructor
     @Transactional
-    static class Init {
+    static class DevClass {
 
         private final MemberService memberService;
         private final PostService postService;
         private final CommentService commentService;
         private final EntityManager em;
+
+        @Value("${file.dir}")
+        File imageFilePath;
 
         public void createDummyData() {
 
@@ -99,6 +109,21 @@ public class InitData {
             }
 
             return repliesId;
+        }
+
+        public void deleteImageFiles() {
+            if (!imageFilePath.exists()) {
+                log.warn("[Deinit] 이미지 파일 경로가 없습니다.");
+                return;
+            }
+
+            File[] files = imageFilePath.listFiles();
+            for (File file : files) {
+                String deleteFileName = file.getName();
+                if (file.delete()) {
+                    log.info("[Deinit] 파일 삭제 {}", deleteFileName);
+                }
+            }
         }
     }
 }
