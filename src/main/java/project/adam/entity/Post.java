@@ -31,6 +31,9 @@ public class Post extends BaseTimeEntity {
 
     private String body;
 
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
+    private List<PostImage> images = new ArrayList<>();
+
     public Post(Member writer, Board board, String title, String body) {
         this.writer = writer;
         this.board = board;
@@ -42,5 +45,9 @@ public class Post extends BaseTimeEntity {
     public void update(String title, String body) {
         this.title = title;
         this.body = body;
+    }
+
+    public List<String> getImageNames() {
+        return images.stream().map(PostImage::getName).collect(Collectors.toList());
     }
 }

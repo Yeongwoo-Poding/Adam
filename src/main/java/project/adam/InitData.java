@@ -2,9 +2,11 @@ package project.adam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.Comment;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
@@ -15,36 +17,46 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.EntityManager;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Profile({"local", "dev"})
 @Component
 @RequiredArgsConstructor
 public class InitData {
 
-    private final Init init;
+    private final DevClass dev;
 
     @PostConstruct
-    public void post() {
-        init.createDummyData();
+    public void post() throws IOException {
+        dev.createDummyData();
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        dev.deleteImageFiles();
     }
 
     @Slf4j
     @Component
     @RequiredArgsConstructor
     @Transactional
-    static class Init {
+    static class DevClass {
 
         private final MemberService memberService;
         private final PostService postService;
         private final CommentService commentService;
         private final EntityManager em;
 
-        public void createDummyData() {
+        @Value("${file.dir}")
+        File imageFilePath;
+
+        public void createDummyData() throws IOException {
 
             log.info("Create dummy data");
             UUID member1Id = UUID.randomUUID();
@@ -63,12 +75,13 @@ public class InitData {
             List<Comment> post1Comments = post1.getComments();
         }
 
-        private List<Long> createPosts(UUID member1Id, UUID member2Id) {
+        private List<Long> createPosts(UUID member1Id, UUID member2Id) throws IOException {
             List<Long> postsId = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
                 postsId.add(postService.create(
                         i / 2 >= 1 ? member1Id : member2Id,
-                        new PostCreateRequest("FREE", "post" + i, "post body" + i)
+                        new PostCreateRequest("FREE", "post" + i, "post body" + i),
+                        new MultipartFile[]{}
                 ));
             }
             return postsId;
@@ -99,6 +112,21 @@ public class InitData {
             }
 
             return repliesId;
+        }
+
+        public void deleteImageFiles() {
+            if (!imageFilePath.exists()) {
+                log.warn("[Deinit] 이미지 파일 경로가 없습니다.");
+                return;
+            }
+
+            File[] files = imageFilePath.listFiles();
+            for (File file : files) {
+                String deleteFileName = file.getName();
+                if (file.delete()) {
+                    log.info("[Deinit] 파일 삭제 {}", deleteFileName);
+                }
+            }
         }
     }
 }

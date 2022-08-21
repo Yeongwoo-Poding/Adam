@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -54,7 +56,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void member_withdraw_remove_post() {
+    void member_withdraw_remove_post() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
         UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
@@ -68,7 +70,7 @@ class MemberServiceTest {
                     "post body " + i
             );
 
-            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest);
+            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest, new MultipartFile[]{});
         }
 
         PageRequest allPages = PageRequest.of(0, 10);
@@ -81,16 +83,16 @@ class MemberServiceTest {
     }
 
     @Test
-    void member_withdraw_remove_comment() {
+    void member_withdraw_remove_comment() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
         UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
         UUID member2Id = UUID.randomUUID();
         UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
         Long post1Id = postService.create(memberService.find(member1Id).getId(),
-                new PostCreateRequest("FREE", "post1", "post 1"));
+                new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
-                new PostCreateRequest("FREE", "post2", "post 2"));
+                new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
 
         for (int i = 0; i < 10; i++) {
             commentService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
