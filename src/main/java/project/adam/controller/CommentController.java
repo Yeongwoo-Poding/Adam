@@ -34,11 +34,11 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentFindResponse createComment(@RequestHeader UUID sessionId,
+    public CommentCreateResponse createComment(@RequestHeader UUID sessionId,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
         Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
-        return new CommentFindResponse(commentService.find(savedId));
+        return new CommentCreateResponse(commentService.find(savedId));
     }
 
     @PostMapping("/{commentId}")
