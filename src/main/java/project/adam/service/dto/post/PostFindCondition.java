@@ -1,7 +1,9 @@
 package project.adam.service.dto.post;
 
-import lombok.*;
-import project.adam.entity.Privilege;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 

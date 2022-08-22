@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Post;
 import project.adam.entity.Privilege;
+import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.List;
 import java.util.UUID;

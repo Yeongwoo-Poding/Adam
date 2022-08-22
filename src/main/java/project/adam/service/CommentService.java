@@ -12,7 +12,6 @@ import project.adam.repository.PostRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

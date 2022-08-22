@@ -6,7 +6,6 @@ import project.adam.entity.Privilege;
 import project.adam.validator.UUIDPattern;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor

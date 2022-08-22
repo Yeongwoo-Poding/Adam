@@ -1,7 +1,6 @@
 package project.adam.controller.dto.post;
 
 import lombok.Getter;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import project.adam.controller.dto.Paging;
 import project.adam.entity.Post;

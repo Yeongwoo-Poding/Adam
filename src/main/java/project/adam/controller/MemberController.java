@@ -4,20 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.controller.dto.member.MemberImageResponse;
 import project.adam.controller.dto.member.MemberLoginResponse;
 import project.adam.entity.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.service.MemberService;
-import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 
 import java.io.IOException;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/members")
@@ -45,13 +44,11 @@ public class MemberController {
     }
 
     @DeleteMapping
-    @ResponseStatus(NO_CONTENT)
     public void deleteMember(@RequestHeader UUID sessionId) {
         memberService.withdraw(sessionId);
     }
 
     @PostMapping("/image")
-    @ResponseStatus(NO_CONTENT)
     public void saveImage(@RequestHeader UUID sessionId, @RequestPart MultipartFile image) throws IOException {
         Member findMember = memberService.findBySessionId(sessionId);
 

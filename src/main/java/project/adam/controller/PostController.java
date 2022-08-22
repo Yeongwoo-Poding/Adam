@@ -4,30 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.post.PostCreateResponse;
+import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
-import project.adam.entity.Privilege;
 import project.adam.service.MemberService;
-import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.controller.dto.post.PostFindResponse;
+import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostUpdateRequest;
 
 import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static project.adam.entity.Privilege.ADMIN;
 import static project.adam.entity.Privilege.USER;
 
@@ -60,7 +55,6 @@ public class PostController {
     }
 
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @ResponseStatus(NO_CONTENT)
     public void updatePost(@RequestHeader UUID sessionId,
                            @PathVariable Long postId,
                            @Validated @RequestPart("data") PostUpdateRequest postDto,
@@ -72,7 +66,6 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    @ResponseStatus(NO_CONTENT)
     public void deletePost(@RequestHeader UUID sessionId,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);

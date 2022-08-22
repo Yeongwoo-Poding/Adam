@@ -4,13 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.service.dto.post.PostFindCondition;
 import project.adam.entity.Board;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
+import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.List;
 import java.util.UUID;

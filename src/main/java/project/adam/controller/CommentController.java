@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.comment.CommentCreateResponse;
+import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.entity.Comment;
 import project.adam.entity.Member;
@@ -17,16 +16,11 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static project.adam.entity.Privilege.ADMIN;
 import static project.adam.entity.Privilege.USER;
 
@@ -71,7 +65,6 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    @ResponseStatus(NO_CONTENT)
     public void updateComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
@@ -84,7 +77,6 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    @ResponseStatus(NO_CONTENT)
     public void deleteComment(@RequestHeader UUID sessionId,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
