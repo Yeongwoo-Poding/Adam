@@ -63,8 +63,8 @@ public class InitData {
             log.info("Create dummy data");
             UUID member1Id = UUID.randomUUID();
             UUID member2Id = UUID.randomUUID();
-            UUID member1SessionId = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1", Privilege.ADMIN));
-            UUID member2SessionId = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+            UUID member1Token = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1", Privilege.ADMIN));
+            UUID member2Token = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
 
             List<Long> postsId = createPosts(member1Id, member2Id);
             List<Long> commentsId = createComments(member1Id, member2Id, postsId);

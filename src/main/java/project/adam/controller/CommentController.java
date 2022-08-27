@@ -34,19 +34,19 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public CommentCreateResponse createComment(@RequestHeader UUID sessionId,
+    public CommentCreateResponse createComment(@RequestHeader UUID token,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, null, commentDto);
+        Long savedId = commentService.create(memberService.findByToken(token).getId(), postId, null, commentDto);
         return new CommentCreateResponse(commentService.find(savedId));
     }
 
     @PostMapping("/{commentId}")
-    public CommentCreateResponse createComment(@RequestHeader UUID sessionId,
+    public CommentCreateResponse createComment(@RequestHeader UUID token,
                                                @PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(memberService.findBySessionId(sessionId).getId(), postId, commentId, commentDto);
+        Long savedId = commentService.create(memberService.findByToken(token).getId(), postId, commentId, commentDto);
         return new CommentCreateResponse(commentService.find(savedId));
     }
 
@@ -65,23 +65,23 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@RequestHeader UUID sessionId,
+    public void updateComment(@RequestHeader UUID token,
                               @PathVariable Long postId,
                               @PathVariable Long commentId,
                               @Validated @RequestBody CommentUpdateRequest commentDto) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findBySessionId(sessionId);
+        Member loginMember = memberService.findByToken(token);
         loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.update(commentId, commentDto);
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@RequestHeader UUID sessionId,
+    public void deleteComment(@RequestHeader UUID token,
                               @PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findBySessionId(sessionId);
+        Member loginMember = memberService.findByToken(token);
         loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.remove(commentId);

@@ -33,19 +33,19 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     private List<Post> posts = new ArrayList<>();
 
     @Column(length = 16)
-    private UUID sessionId = null;
+    private UUID token = null;
 
     public Member(UUID id, String name) {
         this.id = id;
         this.name = name;
         this.privilege = Privilege.USER;
-        this.sessionId = UUID.randomUUID();
+        this.token = UUID.randomUUID();
     }
 
     public Member(UUID id, String name, Privilege privilege) {
         this(id, name);
         this.privilege = privilege;
-        this.sessionId = UUID.randomUUID();
+        this.token = UUID.randomUUID();
     }
 
     public void authorization(Privilege privilege) {
@@ -55,8 +55,8 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     }
 
     public UUID login() {
-        this.sessionId = UUID.randomUUID();
-        return sessionId;
+        this.token = UUID.randomUUID();
+        return token;
     }
 
     public void setImageName(String imageName) {

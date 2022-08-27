@@ -45,10 +45,10 @@ class MemberServiceTest {
         //given
         UUID memberId = UUID.randomUUID();
         MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
-        UUID sessionId = memberService.join(memberJoinRequest);
+        UUID token = memberService.join(memberJoinRequest);
 
         //when
-        memberService.withdraw(sessionId);
+        memberService.withdraw(token);
 
         //then
         assertThatThrownBy(() -> memberService.find(memberId))
