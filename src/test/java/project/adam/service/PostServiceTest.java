@@ -144,8 +144,8 @@ class PostServiceTest {
         postService.remove(post1Id);
 
         //then
-        for (Long commitId : post1CommitId) {
-            assertThatThrownBy(() -> commentService.find(commitId))
+        for (Long commentId : post1CommitId) {
+            assertThatThrownBy(() -> commentService.find(commentId))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
