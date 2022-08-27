@@ -40,9 +40,9 @@ public class PostService {
     private String imagePath;
 
     @Transactional
-    public Long create(UUID sessionId, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
+    public Long create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findById(sessionId).orElseThrow(),
+                memberRepository.findById(token).orElseThrow(),
                 Board.valueOf(postDto.getBoard()),
                 postDto.getTitle(),
                 postDto.getBody()

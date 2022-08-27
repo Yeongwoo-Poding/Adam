@@ -36,10 +36,10 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public PostCreateResponse createPost(@RequestHeader UUID sessionId,
+    public PostCreateResponse createPost(@RequestHeader UUID token,
                                          @Validated @RequestPart("data") PostCreateRequest postDto,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
-        Long savedId = postService.create(memberService.findBySessionId(sessionId).getId(), postDto, images);
+        Long savedId = postService.create(memberService.findByToken(token).getId(), postDto, images);
         return new PostCreateResponse(postService.find(savedId));
     }
 
@@ -55,21 +55,21 @@ public class PostController {
     }
 
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void updatePost(@RequestHeader UUID sessionId,
+    public void updatePost(@RequestHeader UUID token,
                            @PathVariable Long postId,
                            @Validated @RequestPart("data") PostUpdateRequest postDto,
                            @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Post findPost = postService.find(postId);
-        Member findMember = memberService.findBySessionId(sessionId);
+        Member findMember = memberService.findByToken(token);
         findMember.authorization(Objects.equals(findMember.getId(), findPost.getWriter().getId()) ? USER : ADMIN);
         postService.update(postId, postDto, images);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@RequestHeader UUID sessionId,
+    public void deletePost(@RequestHeader UUID token,
                            @PathVariable Long postId) {
         Post findPost = postService.find(postId);
-        Member findMember = memberService.findBySessionId(sessionId);
+        Member findMember = memberService.findByToken(token);
         findMember.authorization(Objects.equals(findMember.getId(), findPost.getWriter().getId()) ? USER : ADMIN);
         postService.remove(postId);
     }

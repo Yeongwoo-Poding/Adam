@@ -63,7 +63,7 @@ class PostServiceTest {
     @Test
     void post_create_no_board() {
         UUID memberId = UUID.randomUUID();
-        UUID sessionId = memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
+        UUID token = memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "NOBOARD",
                 "title",

@@ -8,13 +8,13 @@ import java.util.UUID;
 @Getter
 public class MemberLoginResponse {
 
-    UUID sessionId;
+    UUID token;
 
-    public MemberLoginResponse(UUID sessionId) {
-        this.sessionId = sessionId;
+    public MemberLoginResponse(UUID token) {
+        this.token = token;
     }
 
     public MemberLoginResponse(Member member) {
-        this.sessionId = member.getSessionId();
+        this.token = member.getToken();
     }
 }

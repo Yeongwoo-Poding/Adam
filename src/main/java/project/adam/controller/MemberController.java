@@ -27,30 +27,30 @@ public class MemberController {
 
     @PostMapping
     public MemberLoginResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
-        UUID sessionId = memberService.join(memberDto);
-        return new MemberLoginResponse(sessionId);
+        UUID token = memberService.join(memberDto);
+        return new MemberLoginResponse(token);
     }
 
     @PostMapping("/session")
     public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
-        UUID sessionId = memberService.login(UUID.fromString(memberDto.getId()));
-        return new MemberLoginResponse(sessionId);
+        UUID token = memberService.login(UUID.fromString(memberDto.getId()));
+        return new MemberLoginResponse(token);
     }
 
     @GetMapping
-    public MemberFindResponse findMember(@RequestHeader UUID sessionId) {
-        Member findMember = memberService.findBySessionId(sessionId);
+    public MemberFindResponse findMember(@RequestHeader UUID token) {
+        Member findMember = memberService.findByToken(token);
         return new MemberFindResponse(findMember);
     }
 
     @DeleteMapping
-    public void deleteMember(@RequestHeader UUID sessionId) {
-        memberService.withdraw(sessionId);
+    public void deleteMember(@RequestHeader UUID token) {
+        memberService.withdraw(token);
     }
 
     @PostMapping("/image")
-    public void saveImage(@RequestHeader UUID sessionId, @RequestPart MultipartFile image) throws IOException {
-        Member findMember = memberService.findBySessionId(sessionId);
+    public void saveImage(@RequestHeader UUID token, @RequestPart MultipartFile image) throws IOException {
+        Member findMember = memberService.findByToken(token);
 
         if (image == null) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
@@ -60,13 +60,13 @@ public class MemberController {
     }
 
     @GetMapping("/image")
-    public MemberImageResponse getImagePath(@RequestHeader UUID sessionId) {
-        Member findMember = memberService.findBySessionId(sessionId);
+    public MemberImageResponse getImagePath(@RequestHeader UUID token) {
+        Member findMember = memberService.findByToken(token);
         return new MemberImageResponse(memberService.hasImage(findMember), memberService.getImagePath(findMember));
     }
 
     @DeleteMapping("/image")
-    public void removeImage(@RequestHeader UUID sessionId) {
-        memberService.removeImage(memberService.findBySessionId(sessionId));
+    public void removeImage(@RequestHeader UUID token) {
+        memberService.removeImage(memberService.findByToken(token));
     }
 }

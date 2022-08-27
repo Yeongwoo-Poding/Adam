@@ -38,15 +38,15 @@ public class MemberService {
                 memberDto.getPrivilege()
         ));
 
-        return savedMember.getSessionId();
+        return savedMember.getToken();
     }
 
     public Member find(UUID id) {
         return memberRepository.findById(id).orElseThrow();
     }
 
-    public Member findBySessionId(UUID sessionId) {
-        return memberRepository.findBySessionId(sessionId).orElseThrow();
+    public Member findByToken(UUID token) {
+        return memberRepository.findByToken(token).orElseThrow();
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class MemberService {
 
     @Transactional
     public void withdraw(UUID id) {
-        Member deleteMember = memberRepository.findBySessionId(id).orElseThrow();
+        Member deleteMember = memberRepository.findByToken(id).orElseThrow();
         removeCommits(deleteMember);
         removePosts(deleteMember);
         removeMember(deleteMember);

@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberRepository extends JpaRepository<Member, UUID> {
-    Optional<Member> findBySessionId(UUID sessionId);
+    Optional<Member> findByToken(UUID token);
 }
