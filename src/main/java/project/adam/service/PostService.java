@@ -80,8 +80,8 @@ public class PostService {
 
     @Transactional
     public void remove(Long postId) {
-        List<Comment> commits = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
-        commentRepository.deleteAll(commits);
+        List<Comment> comments = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
+        commentRepository.deleteAll(comments);
 
         Post findPost = postRepository.findById(postId).orElseThrow();
 
@@ -116,7 +116,6 @@ public class PostService {
 
     private void removeImages(Post findPost) {
         for (String imageName : findPost.getImageNames()) {
-            System.out.println("imageName = " + imageName);
             removeImage(imageName);
         }
     }
@@ -127,6 +126,5 @@ public class PostService {
         if (!file.delete()) {
             log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
         }
-        postRepository.removeImage(imageName);
     }
 }

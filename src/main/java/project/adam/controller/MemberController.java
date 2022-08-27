@@ -52,7 +52,7 @@ public class MemberController {
     public void saveImage(@RequestHeader UUID token, @RequestPart MultipartFile image) throws IOException {
         Member findMember = memberService.findByToken(token);
 
-        if (image == null) {
+        if (image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
 
