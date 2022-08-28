@@ -86,12 +86,6 @@ public class PostService {
 
         Post findPost = postRepository.findById(postId).orElseThrow();
 
-//        removeImages(findPost);
-//
-//        for (PostImage postImage : findPost.getImages()) {
-//            System.out.println("postImage.getName() = " + postImage.getName());
-//        }
-
         removeImageFiles(findPost);
         postRepository.delete(findPost);
     }
