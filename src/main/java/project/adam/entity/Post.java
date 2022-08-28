@@ -47,8 +47,4 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.body = body;
     }
-
-    public List<String> getImageNames() {
-        return images.stream().map(PostImage::getName).collect(Collectors.toList());
-    }
 }

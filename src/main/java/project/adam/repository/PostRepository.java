@@ -6,4 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import project.adam.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+
+    @Modifying
+    @Query("delete from PostImage pi where pi.id = :imageId")
+    void findImageById(Long imageId);
 }

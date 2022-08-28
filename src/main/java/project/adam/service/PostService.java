@@ -115,16 +115,18 @@ public class PostService {
     }
 
     private void removeImages(Post findPost) {
-        for (String imageName : findPost.getImageNames()) {
-            removeImage(imageName);
+        for (PostImage image : findPost.getImages()) {
+            removeImage(image.getId(), image.getName());
         }
     }
 
-    private void removeImage(String imageName) {
+    private void removeImage(Long imageId, String imageName) {
         log.info("imageName = {}", imageName);
         File file = new File(imageName);
         if (!file.delete()) {
             log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
         }
+
+        postRepository.findImageById(imageId);
     }
 }
