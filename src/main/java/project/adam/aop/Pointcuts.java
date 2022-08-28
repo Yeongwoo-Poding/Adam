@@ -6,13 +6,16 @@ public class Pointcuts {
     @Pointcut("execution(* project.adam..*(..))")
     private void allObject() {}
 
+    @Pointcut("execution(* project.adam.service..*(..))")
+    private void serviceObject() {}
+
     @Pointcut("execution(* project.adam.aop..*(..))")
     private void aopObject() {}
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestHeader)")
     private void sessionObject() {}
 
-    @Pointcut("allObject() && !aopObject()")
+    @Pointcut("serviceObject() && !aopObject()")
     public void logTarget() {}
 
     @Pointcut("execution(* project.adam.controller..*(..))")
