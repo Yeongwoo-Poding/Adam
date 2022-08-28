@@ -74,7 +74,8 @@ public class PostService {
         Post findPost = postRepository.findById(postId).orElseThrow();
         findPost.update(postDto.getTitle(), postDto.getBody());
 
-        removeImages(findPost);
+        removeImageFiles(findPost);
+        removeImagePaths(findPost);
         createImages(images, findPost);
     }
 
@@ -85,7 +86,13 @@ public class PostService {
 
         Post findPost = postRepository.findById(postId).orElseThrow();
 
-        removeImages(findPost);
+//        removeImages(findPost);
+//
+//        for (PostImage postImage : findPost.getImages()) {
+//            System.out.println("postImage.getName() = " + postImage.getName());
+//        }
+
+        removeImageFiles(findPost);
         postRepository.delete(findPost);
     }
 
@@ -114,19 +121,28 @@ public class PostService {
         log.info("[{}.createImage()] Add image {}", getClass(), postImage.getName());
     }
 
-    private void removeImages(Post findPost) {
+    private void removeImageFiles(Post findPost) {
         for (PostImage image : findPost.getImages()) {
-            removeImage(image.getId(), image.getName());
+            removeImageFile(image.getName());
         }
     }
 
-    private void removeImage(Long imageId, String imageName) {
+    private void removeImagePaths(Post findPost) {
+        for (PostImage image : findPost.getImages()) {
+            removeImagePath(image.getId());
+        }
+    }
+
+    private void removeImageFile(String imageName) {
         log.info("imageName = {}", imageName);
         File file = new File(imageName);
         if (!file.delete()) {
             log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
         }
+    }
 
-        postRepository.findImageById(imageId);
+    private void removeImagePath(Long imageId) {
+        log.info("imageId = {}", imageId);
+        postRepository.deleteImageById(imageId);
     }
 }
