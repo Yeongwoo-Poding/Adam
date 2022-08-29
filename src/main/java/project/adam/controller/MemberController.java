@@ -56,13 +56,13 @@ public class MemberController {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
 
-        memberService.updateImage(findMember, image);
+        memberService.saveImage(findMember, image);
     }
 
     @GetMapping("/image")
-    public MemberImageResponse getImagePath(@RequestHeader UUID token) {
+    public MemberImageResponse getImageName(@RequestHeader UUID token) {
         Member findMember = memberService.findByToken(token);
-        return new MemberImageResponse(memberService.hasImage(findMember), memberService.getImagePath(findMember));
+        return new MemberImageResponse(memberService.hasImage(findMember), memberService.getImageName(findMember));
     }
 
     @DeleteMapping("/image")

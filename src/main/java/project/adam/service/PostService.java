@@ -111,8 +111,8 @@ public class PostService {
 
     private void createImage(Post savedPost, MultipartFile image) throws IOException {
         String extension = getExtension(image);
-        String imageName = imagePath + UUID.randomUUID() + extension;
-        File newImage = new File(imageName);
+        String imageName = UUID.randomUUID() + extension;
+        File newImage = new File(imagePath + imageName);
         image.transferTo(newImage);
         PostImage postImage = new PostImage(savedPost, imageName);
         log.info("[{}.createImage()] Add image {}", getClass(), postImage.getName());
@@ -132,7 +132,7 @@ public class PostService {
 
     private void removeImageFile(String imageName) {
         log.info("imageName = {}", imageName);
-        File file = new File(imageName);
+        File file = new File(imagePath + imageName);
         if (!file.delete()) {
             log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
         }

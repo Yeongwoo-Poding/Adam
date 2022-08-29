@@ -8,10 +8,10 @@ import lombok.Getter;
 public class MemberImageResponse {
 
     private boolean hasImage;
-    private String imagePath;
+    private String imageName;
 
-    public MemberImageResponse(boolean hasImage, String path) {
+    public MemberImageResponse(boolean hasImage, String imageName) {
         this.hasImage = hasImage;
-        this.imagePath = hasImage ? path : null;
+        this.imageName = hasImage ? imageName : null;
     }
 }

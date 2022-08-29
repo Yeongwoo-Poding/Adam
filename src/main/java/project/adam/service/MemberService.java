@@ -75,7 +75,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateImage(Member member, MultipartFile file) throws IOException {
+    public void saveImage(Member member, MultipartFile file) throws IOException {
         removeExistingImage(member);
 
         String imageName = UUID.randomUUID() + getExtension(file);
@@ -94,6 +94,7 @@ public class MemberService {
     private String getExtension(MultipartFile file) {
         String contentType = file.getContentType();
         String fileExtension;
+        System.out.println("contentType = " + contentType);
         if (contentType == null) {
             throw new ApiException(ExceptionEnum.INVALID_HEADER);
         }
@@ -108,8 +109,8 @@ public class MemberService {
         return fileExtension;
     }
 
-    public String getImagePath(Member member) {
-        return imagePath + member.getImageName();
+    public String getImageName(Member member) {
+        return member.getImageName();
     }
 
     public boolean hasImage(Member member) {
