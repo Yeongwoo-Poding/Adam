@@ -54,7 +54,7 @@ public class Post extends BaseTimeEntity {
         this.views++;
     }
 
-    public String getThumbnailPath() {
+    public String getThumbnailName() {
         return images.isEmpty() ? null : images.get(0).getName();
     }
 }
