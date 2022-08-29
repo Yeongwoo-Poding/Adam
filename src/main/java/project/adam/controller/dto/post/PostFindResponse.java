@@ -22,7 +22,7 @@ public class PostFindResponse {
     private String body;
     private int views;
     private int commentCount;
-    private List<String> imagePaths = new ArrayList<>();
+    private List<String> imageNames = new ArrayList<>();
 
     public PostFindResponse(Post post) {
         this.id = post.getId();
@@ -34,7 +34,7 @@ public class PostFindResponse {
         this.body = post.getBody();
         this.views = post.getViews();
         this.commentCount = post.getComments().size();
-        this.imagePaths = post.getImages().stream()
+        this.imageNames = post.getImages().stream()
                             .map(PostImage::getName)
                             .collect(Collectors.toList());
     }
