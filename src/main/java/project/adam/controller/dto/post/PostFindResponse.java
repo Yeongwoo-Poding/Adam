@@ -20,6 +20,8 @@ public class PostFindResponse {
     private LocalDateTime lastModifiedDate;
     private String title;
     private String body;
+    private int views;
+    private int commentCount;
     private List<String> imagePaths = new ArrayList<>();
 
     public PostFindResponse(Post post) {
@@ -30,6 +32,8 @@ public class PostFindResponse {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
+        this.views = post.getViews();
+        this.commentCount = post.getComments().size();
         this.imagePaths = post.getImages().stream()
                             .map(PostImage::getName)
                             .collect(Collectors.toList());

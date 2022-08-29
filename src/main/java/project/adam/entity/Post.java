@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -32,6 +31,8 @@ public class Post extends BaseTimeEntity {
 
     private String body;
 
+    private int views;
+
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
     private List<PostImage> images = new ArrayList<>();
 
@@ -40,11 +41,16 @@ public class Post extends BaseTimeEntity {
         this.board = board;
         this.title = title;
         this.body = body;
+        this.views = 0;
         writer.getPosts().add(this);
     }
     
     public void update(String title, String body) {
         this.title = title;
         this.body = body;
+    }
+
+    public void view() {
+        this.views++;
     }
 }

@@ -90,9 +90,9 @@ class MemberServiceTest {
         UUID member2Id = UUID.randomUUID();
         UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
         Long post1Id = postService.create(memberService.find(member1Id).getId(),
-                new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
+                new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
-                new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
+                new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{}).getId();
 
         for (int i = 0; i < 10; i++) {
             commentService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),

@@ -15,6 +15,8 @@ public class PostListContent {
     private LocalDateTime lastModifiedDate;
     private String title;
     private String body;
+    private int views;
+    private int commentCount;
 
     public PostListContent(Post post) {
         this.id = post.getId();
@@ -24,5 +26,7 @@ public class PostListContent {
         this.lastModifiedDate = post.getLastModifiedDate();
         this.title = post.getTitle();
         this.body = post.getBody();
+        this.views = post.getViews();
+        this.commentCount = post.getComments().size();
     }
 }
