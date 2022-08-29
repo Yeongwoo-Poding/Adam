@@ -94,7 +94,6 @@ public class MemberService {
     private String getExtension(MultipartFile file) {
         String contentType = file.getContentType();
         String fileExtension;
-        System.out.println("contentType = " + contentType);
         if (contentType == null) {
             throw new ApiException(ExceptionEnum.INVALID_HEADER);
         }
