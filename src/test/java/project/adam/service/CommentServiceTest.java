@@ -34,7 +34,7 @@ class CommentServiceTest {
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
-        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{});
+        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
 
         //when
         Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
@@ -57,7 +57,7 @@ class CommentServiceTest {
     void comment_create_no_member() throws IOException {
         UUID postWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
-        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{});
+        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
         assertThatThrownBy(() -> commentService.create(UUID.randomUUID(), postId, null, new CommentCreateRequest("body")))
                 .isInstanceOf(NoSuchElementException.class);
     }
@@ -69,7 +69,7 @@ class CommentServiceTest {
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
-        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{});
+        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
         Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
@@ -86,7 +86,7 @@ class CommentServiceTest {
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
         UUID commentWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
-        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{});
+        Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
         Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
@@ -102,8 +102,8 @@ class CommentServiceTest {
         //given
         UUID postWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
-        Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
-        Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
+        Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
+        Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{}).getId();
 
         PageRequest allPages = PageRequest.of(0, 10);
 

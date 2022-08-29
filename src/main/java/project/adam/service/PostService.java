@@ -40,7 +40,7 @@ public class PostService {
     private String imagePath;
 
     @Transactional
-    public Long create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
+    public Post create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
         Post savedPost = postRepository.save(new Post(
                 memberRepository.findById(token).orElseThrow(),
                 Board.valueOf(postDto.getBoard()),
@@ -49,7 +49,7 @@ public class PostService {
         ));
 
         createImages(images, savedPost);
-        return savedPost.getId();
+        return savedPost;
     }
 
     private String getExtension(MultipartFile file) {
@@ -90,8 +90,11 @@ public class PostService {
         postRepository.delete(findPost);
     }
 
+    @Transactional
     public Post find(Long postId) {
-        return postRepository.findById(postId).orElseThrow();
+        Post findPost = postRepository.findById(postId).orElseThrow();
+        findPost.view();
+        return findPost;
     }
 
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {

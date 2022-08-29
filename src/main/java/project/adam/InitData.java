@@ -72,9 +72,6 @@ public class InitData {
 
             em.flush();
             em.clear();
-
-            Post post1 = postService.find(postsId.get(0));
-            List<Comment> post1Comments = post1.getComments();
         }
 
         private List<Long> createPosts(UUID member1Id, UUID member2Id) throws IOException {
@@ -83,8 +80,8 @@ public class InitData {
                 postsId.add(postService.create(
                         i / 2 >= 1 ? member1Id : member2Id,
                         new PostCreateRequest("FREE", "post" + i, "post body" + i),
-                        new MultipartFile[]{}
-                ));
+                        new MultipartFile[]{}).getId()
+                );
             }
             return postsId;
         }

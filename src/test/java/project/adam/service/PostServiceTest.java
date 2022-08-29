@@ -37,7 +37,7 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{}).getId();
 
         //when
         Post post = postService.find(savedId);
@@ -82,7 +82,7 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{}).getId();
 
         //when
         PostUpdateRequest postUpdateRequest = new PostUpdateRequest("updatedTitle", "updated body");
@@ -104,7 +104,7 @@ class PostServiceTest {
                 "FREE",
                 "title",
                 "body");
-        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{});
+        Long savedId = postService.create(memberService.find(memberId).getId(), postCreateRequest, new MultipartFile[]{}).getId();
         //when
         postService.remove(savedId);
 
@@ -124,8 +124,8 @@ class PostServiceTest {
         //given
         UUID postWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
-        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
-        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
+        Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
+        Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{}).getId();
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

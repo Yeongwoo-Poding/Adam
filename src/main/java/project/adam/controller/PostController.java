@@ -39,8 +39,8 @@ public class PostController {
     public PostCreateResponse createPost(@RequestHeader UUID token,
                                          @Validated @RequestPart("data") PostCreateRequest postDto,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
-        Long savedId = postService.create(memberService.findByToken(token).getId(), postDto, images);
-        return new PostCreateResponse(postService.find(savedId));
+        Post savedPost = postService.create(memberService.findByToken(token).getId(), postDto, images);
+        return new PostCreateResponse(savedPost);
     }
 
     @GetMapping("/{postId}")
