@@ -1,5 +1,6 @@
 package project.adam.controller.dto.post;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import project.adam.entity.Post;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostListContent {
     private Long id;
     private UUID writerId;
@@ -17,6 +19,7 @@ public class PostListContent {
     private String body;
     private int views;
     private int commentCount;
+    private String thumbnailPath;
 
     public PostListContent(Post post) {
         this.id = post.getId();
@@ -28,5 +31,6 @@ public class PostListContent {
         this.body = post.getBody();
         this.views = post.getViews();
         this.commentCount = post.getComments().size();
+        this.thumbnailPath = post.getThumbnailPath();
     }
 }
