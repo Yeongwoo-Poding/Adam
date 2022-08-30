@@ -50,7 +50,7 @@ public class Post extends BaseTimeEntity {
         this.body = body;
     }
 
-    public void view() {
+    public void increaseView() {
         this.views++;
     }
 

@@ -11,6 +11,7 @@ import project.adam.entity.Privilege;
 import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static project.adam.entity.QPost.post;
@@ -52,4 +53,19 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private BooleanExpression titleCondition(String title) {
         return title == null ? null : post.title.like("%" + title + "%");
     }
+
+    @Override
+    public Optional<Post> getPost(Long postId) {
+        queryFactory.update(post)
+                .set(post.views, post.views.add(1))
+                .where(post.id.eq(postId))
+                .execute();
+
+        return Optional.ofNullable(
+                queryFactory.selectFrom(post)
+                        .where(post.id.eq(postId))
+                        .fetchOne()
+        );
+    }
+
 }
