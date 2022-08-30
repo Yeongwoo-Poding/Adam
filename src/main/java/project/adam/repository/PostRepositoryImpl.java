@@ -55,7 +55,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public Optional<Post> getPost(Long postId) {
+    public Optional<Post> findPostIncViews(Long postId) {
         queryFactory.update(post)
                 .set(post.views, post.views.add(1))
                 .where(post.id.eq(postId))
