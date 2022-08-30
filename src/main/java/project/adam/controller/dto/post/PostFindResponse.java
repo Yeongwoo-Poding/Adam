@@ -4,7 +4,7 @@ import lombok.Getter;
 import project.adam.entity.Post;
 import project.adam.entity.PostImage;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,8 +16,8 @@ public class PostFindResponse {
     private Long id;
     private UUID writerId;
     private String board;
-    private LocalDateTime createDate;
-    private LocalDateTime lastModifiedDate;
+    private ZonedDateTime createDate;
+    private ZonedDateTime lastModifiedDate;
     private String title;
     private String body;
     private int views;

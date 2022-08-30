@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import project.adam.entity.Post;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -13,8 +13,8 @@ public class PostListContent {
     private Long id;
     private UUID writerId;
     private String board;
-    private LocalDateTime createDate;
-    private LocalDateTime lastModifiedDate;
+    private ZonedDateTime createDate;
+    private ZonedDateTime lastModifiedDate;
     private String title;
     private String body;
     private int views;

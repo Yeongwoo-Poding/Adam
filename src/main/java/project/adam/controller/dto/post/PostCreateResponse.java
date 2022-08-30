@@ -3,14 +3,14 @@ package project.adam.controller.dto.post;
 import lombok.Getter;
 import project.adam.entity.Post;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 public class PostCreateResponse {
 
     private Long postId;
     private String board;
-    private LocalDateTime createDate;
+    private ZonedDateTime createDate;
     private String title;
     private String body;
 
