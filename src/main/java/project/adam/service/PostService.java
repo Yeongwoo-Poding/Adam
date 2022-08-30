@@ -92,9 +92,10 @@ public class PostService {
 
     @Transactional
     public Post find(Long postId) {
-        Post findPost = postRepository.findById(postId).orElseThrow();
-        findPost.view();
-        return findPost;
+        return postRepository.getPost(postId).orElseThrow();
+//        Post findPost = postRepository.findById(postId).orElseThrow();
+//        findPost.increaseView();
+//        return findPost;
     }
 
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
