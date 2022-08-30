@@ -3,7 +3,7 @@ package project.adam.controller.dto.comment;
 import lombok.Getter;
 import project.adam.entity.Comment;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,8 +15,8 @@ public class CommentListContent {
     private UUID writerId;
     private Long postId;
     private List<CommentListContent> replies = new ArrayList<>();
-    private LocalDateTime createDate;
-    private LocalDateTime lastModifiedDate;
+    private ZonedDateTime createDate;
+    private ZonedDateTime lastModifiedDate;
     private String body;
 
     public CommentListContent(Comment comment) {

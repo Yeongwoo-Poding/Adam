@@ -1,22 +1,30 @@
 package project.adam.entity;
 
 import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import java.time.ZonedDateTime;
 
 @MappedSuperclass
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
-    @CreatedDate
-    private LocalDateTime createDate;
+    private ZonedDateTime createDate;
+    private ZonedDateTime lastModifiedDate;
 
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    @PrePersist
+    public void prePersist() {
+        this.createDate = ZonedDateTime.now();
+        this.lastModifiedDate = ZonedDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastModifiedDate = ZonedDateTime.now();
+    }
 }

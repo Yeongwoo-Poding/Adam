@@ -3,7 +3,7 @@ package project.adam.controller.dto.comment;
 import lombok.Getter;
 import project.adam.entity.Comment;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -12,7 +12,7 @@ public class CommentCreateResponse {
     private Long commentId;
     private UUID writerId;
     private Long postId;
-    private LocalDateTime createDate;
+    private ZonedDateTime createDate;
     private String body;
 
     public CommentCreateResponse(Comment comment) {
