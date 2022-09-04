@@ -15,7 +15,7 @@ public class Pointcuts {
     @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestHeader)")
     private void sessionObject() {}
 
-    @Pointcut("serviceObject() && !aopObject()")
+    @Pointcut("controllerObject() && !aopObject()")
     public void logTarget() {}
 
     @Pointcut("execution(* project.adam.controller..*(..))")
