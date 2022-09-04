@@ -14,4 +14,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Modifying
     @Query("delete from PostThumbnail pt where pt.id = :thumbnailId")
     void deleteThumbnailById(Long thumbnailId);
+
+    @Query("select count(pr) from PostReport pr where pr.post.id = :postId")
+    int countPostReportById(Long postId);
+
+    @Modifying
+    @Query("delete from PostReport pr where pr.id = :postReportId")
+    void deletePostReportById(Long postReportId);
 }
