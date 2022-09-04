@@ -78,8 +78,7 @@ public class InitData {
                 postsId.add(postService.create(
                         i / 2 >= 1 ? member1Id : member2Id,
                         new PostCreateRequest("FREE", "post" + i, "post body" + i),
-                        new MultipartFile[]{}).getId()
-                );
+                        new MultipartFile[]{}).getId());
             }
             return postsId;
         }
@@ -91,10 +90,8 @@ public class InitData {
                         i % 2 == 0 ? member1Id : member2Id,
                         postsId.get(i / 4),
                         null,
-                        new CommentCreateRequest("comment body " + i)
-                ));
+                        new CommentCreateRequest("comment body " + i)).getId());
             }
-
             return commentsId;
         }
 
@@ -105,9 +102,8 @@ public class InitData {
                         i % 2 == 0 ? member1Id : member2Id,
                         postsId.get(i / 8),
                         commentsId.get(i / 2),
-                        new CommentCreateRequest("replies " + i)));
+                        new CommentCreateRequest("replies " + i)).getId());
             }
-
             return repliesId;
         }
 

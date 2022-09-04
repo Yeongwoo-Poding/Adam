@@ -21,3 +21,10 @@ logging:
 
 file:
   dir: /Users/SideProject/Code/Adam/image/
+
+thumbnail:
+  width: 200
+  height: 200
+
+report:
+  hiddenCount: 5

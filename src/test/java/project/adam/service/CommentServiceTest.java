@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.Comment;
+import project.adam.entity.Post;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
@@ -37,8 +38,7 @@ class CommentServiceTest {
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
 
         //when
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
-        Comment comment = commentService.find(commentId);
+        Comment comment = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //then
         assertThat(comment.getWriter().getId()).isEqualTo(commentWriterId);
@@ -70,13 +70,13 @@ class CommentServiceTest {
         UUID commentWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
+        Comment comment = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
-        commentService.update(commentId, new CommentUpdateRequest("updated comment"));
+        commentService.update(comment.getId(), new CommentUpdateRequest("updated comment"));
 
         //then
-        assertThat(commentService.find(commentId).getBody()).isEqualTo("updated comment");
+        assertThat(comment.getBody()).isEqualTo("updated comment");
     }
 
     @Test
@@ -87,13 +87,13 @@ class CommentServiceTest {
         UUID commentWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(commentWriterId.toString(), "member2"));
         Long postId = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "title", "new post"), new MultipartFile[]{}).getId();
-        Long commentId = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
+        Comment comment = commentService.create(memberService.find(commentWriterId).getId(), postId, null, new CommentCreateRequest("new comment"));
 
         //when
-        commentService.remove(commentId);
+        commentService.remove(comment.getId());
 
         //then
-        assertThatThrownBy(() -> commentService.find(commentId))
+        assertThatThrownBy(() -> commentService.find(comment.getId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -102,18 +102,18 @@ class CommentServiceTest {
         //given
         UUID postWriterId = UUID.randomUUID();
         memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
-        Long post1Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
-        Long post2Id = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{}).getId();
+        Post post1 = postService.create(postWriterId, new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{});
+        Post post2 = postService.create(postWriterId, new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{});
 
         PageRequest allPages = PageRequest.of(0, 10);
 
         //when
         for (int i = 0; i < 10; i++) {
-            commentService.create(postWriterId, (i % 2 == 0) ? post1Id : post2Id, null, new CommentCreateRequest("comment " + i));
+            commentService.create(postWriterId, (i % 2 == 0) ? post1.getId() : post2.getId(), null, new CommentCreateRequest("comment " + i));
         }
 
         //then
-        assertThat(commentService.findByPost(post1Id, allPages).getContent().size()).isEqualTo(5);
-        assertThat(commentService.findByPost(post2Id, allPages).getContent().size()).isEqualTo(5);
+        assertThat(commentService.findByPost(post1.getId(), allPages).getContent().size()).isEqualTo(5);
+        assertThat(commentService.findByPost(post2.getId(), allPages).getContent().size()).isEqualTo(5);
     }
 }

@@ -17,4 +17,10 @@ public class PostUpdateRequest {
     private String body;
 
     private Integer thumbnailIndex;
+
+    public PostUpdateRequest(String title, String body) {
+        this.title = title;
+        this.body = body;
+        this.thumbnailIndex = null;
+    }
 }
