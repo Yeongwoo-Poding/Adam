@@ -3,6 +3,7 @@ package project.adam.repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -15,11 +16,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static project.adam.entity.QPost.post;
+import static project.adam.entity.QPostReport.postReport;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
+
+    @Value("${report.hiddenCount}")
+    private Long reportHiddenCount;
 
     @Override
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
@@ -28,7 +33,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .from(post)
                 .where(
                         writerIdCondition(condition.getWriterId()),
-                        titleCondition(condition.getTitle())
+                        titleCondition(condition.getTitle()),
+                        validateHiddenCondition()
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -54,6 +60,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return title == null ? null : post.title.like("%" + title + "%");
     }
 
+    private BooleanExpression validateHiddenCondition() {
+        return queryFactory.select(postReport.count())
+                .from(postReport)
+                .where(postReport.post.id.eq(post.id))
+                .lt(reportHiddenCount);
+    }
+
     @Override
     public Optional<Post> findPostIncViews(Long postId) {
         queryFactory.update(post)
@@ -67,5 +80,4 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         .fetchOne()
         );
     }
-
 }

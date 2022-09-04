@@ -45,6 +45,9 @@ public class PostService {
     @Value("${thumbnail.height}")
     private int thumbnailHeight;
 
+    @Value("${report.hiddenCount}")
+    private int reportHiddenCount;
+
     @Transactional
     public Post create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
         Post savedPost = postRepository.save(new Post(
@@ -81,6 +84,7 @@ public class PostService {
 
     @Transactional
     public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
+        validationPostHidden(postId);
         Post findPost = postRepository.findById(postId).orElseThrow();
         findPost.update(postDto.getTitle(), postDto.getBody());
 
@@ -91,6 +95,8 @@ public class PostService {
 
     @Transactional
     public void remove(Long postId) {
+        validationPostHidden(postId);
+
         List<Comment> comments = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
         commentRepository.deleteAll(comments);
 
@@ -102,6 +108,7 @@ public class PostService {
 
     @Transactional
     public Post find(Long postId) {
+        validationPostHidden(postId);
         return postRepository.findPostIncViews(postId).orElseThrow();
     }
 
@@ -183,5 +190,32 @@ public class PostService {
     private void removeThumbnailPath(Long thumbnailId) {
         log.info("thumbnailId = {}", thumbnailId);
         postRepository.deleteThumbnailById(thumbnailId);
+    }
+
+    @Transactional
+    public void createReport(Post post, Member member) {
+        boolean isReportExist = post.getReports().stream()
+                .anyMatch(postReport -> postReport.getMember().equals(member));
+
+        if (isReportExist) {
+            throw new ApiException(ExceptionEnum.REPORTED_POST);
+        }
+        new PostReport(post, member);
+    }
+
+    @Transactional
+    public void deleteReport(Post post, Member member) {
+        PostReport report = post.getReports().stream()
+                .filter(postReport -> postReport.getMember().equals(member))
+                .findAny()
+                .orElseThrow(() -> new ApiException(ExceptionEnum.NOT_REPORTED_POST));
+
+        postRepository.deletePostReportById(report.getId());
+    }
+
+    private void validationPostHidden(Long postId) {
+        if (postRepository.countPostReportById(postId) >= reportHiddenCount) {
+            throw new ApiException(ExceptionEnum.HIDDEN_POST);
+        }
     }
 }

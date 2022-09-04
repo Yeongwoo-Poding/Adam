@@ -34,6 +34,9 @@ public class Comment extends BaseTimeEntity {
 
     private String body;
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    private List<CommentReport> reports = new ArrayList<>();
+
     public Comment(Member writer, Post post, Comment parent, String body) {
         this.writer = writer;
         this.post = post;

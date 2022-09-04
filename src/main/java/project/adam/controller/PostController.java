@@ -73,4 +73,20 @@ public class PostController {
         findMember.authorization(Objects.equals(findMember.getId(), findPost.getWriter().getId()) ? USER : ADMIN);
         postService.remove(postId);
     }
+
+    @PostMapping("/{postId}/report")
+    public void createReportPost(@RequestHeader UUID token,
+                                 @PathVariable Long postId) {
+        Member findMember = memberService.findByToken(token);
+        Post findPost = postService.find(postId);
+        postService.createReport(findPost, findMember);
+    }
+
+    @DeleteMapping("/{postId}/report")
+    public void deleteReportPost(@RequestHeader UUID token,
+                                 @PathVariable Long postId) {
+        Member findMember = memberService.findByToken(token);
+        Post findPost = postService.find(postId);
+        postService.deleteReport(findPost, findMember);
+    }
 }
