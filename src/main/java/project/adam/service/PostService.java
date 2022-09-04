@@ -39,6 +39,12 @@ public class PostService {
     @Value("${file.dir}")
     private String imagePath;
 
+    @Value("${thumbnail.width}")
+    private int thumbnailWidth;
+
+    @Value("${thumbnail.height}")
+    private int thumbnailHeight;
+
     @Transactional
     public Post create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
         Post savedPost = postRepository.save(new Post(
@@ -117,9 +123,7 @@ public class PostService {
     }
 
     private void createThumbnail(File image, Post post) throws IOException {
-        int width = 192;
-        int height = 192;
-        BufferedImage bufferedImage = resizeImage(ImageIO.read(image), width, height);
+        BufferedImage bufferedImage = resizeImage(ImageIO.read(image));
 
         String imageName = UUID.randomUUID() + "." + getExtension(image);
         ImageIO.write(bufferedImage, "png", new File(imagePath + imageName));
@@ -127,10 +131,10 @@ public class PostService {
         log.info("[{}.createThumbnail()] Add image {}", getClass(), postThumbnail.getName());
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+    private BufferedImage resizeImage(BufferedImage originalImage) throws IOException {
+        BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics2D.drawImage(originalImage, 0, 0, thumbnailWidth, thumbnailHeight, null);
         graphics2D.dispose();
         return resizedImage;
     }
