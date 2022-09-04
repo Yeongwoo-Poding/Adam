@@ -28,7 +28,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .leftJoin(comment.replies)
                 .fetchJoin()
                 .where(
-                        commentReport.count().lt(reportHiddenCount),
+                        comment.reports.size().lt(reportHiddenCount),
                         comment.post.eq(post),
                         comment.parent.isNull()
                 )

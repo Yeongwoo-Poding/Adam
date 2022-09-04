@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.adam.entity.Comment;
 import project.adam.entity.Post;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
@@ -129,14 +130,14 @@ class PostServiceTest {
 
         List<Long> post1CommitId = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            Long commentId = commentService.create(
+            Comment comment = commentService.create(
                     memberService.find(postWriterId).getId(),
                     i % 2 == 0 ? post1Id : post2Id,
                     null,
                     new CommentCreateRequest("comment " + i)
             );
             if (i % 2 == 0) {
-                post1CommitId.add(commentId);
+                post1CommitId.add(comment.getId());
             }
         }
 

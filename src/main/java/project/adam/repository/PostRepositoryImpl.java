@@ -63,7 +63,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private BooleanExpression validateHiddenCondition() {
         return queryFactory.select(postReport.count())
                 .from(postReport)
-                .where(postReport.post.id.eq(post.id))
+                .where(postReport.post.eq(post))
                 .lt(reportHiddenCount);
     }
 

@@ -37,8 +37,8 @@ public class CommentController {
     public CommentCreateResponse createComment(@RequestHeader UUID token,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(memberService.findByToken(token).getId(), postId, null, commentDto);
-        return new CommentCreateResponse(commentService.find(savedId));
+        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, null, commentDto);
+        return new CommentCreateResponse(savedComment);
     }
 
     @PostMapping("/{commentId}")
@@ -46,8 +46,8 @@ public class CommentController {
                                                @PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @Validated @RequestBody CommentCreateRequest commentDto) {
-        Long savedId = commentService.create(memberService.findByToken(token).getId(), postId, commentId, commentDto);
-        return new CommentCreateResponse(commentService.find(savedId));
+        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentId, commentDto);
+        return new CommentCreateResponse(savedComment);
     }
 
     @GetMapping("/{commentId}")

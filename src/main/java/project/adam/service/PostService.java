@@ -168,10 +168,11 @@ public class PostService {
             removeImagePath(image.getId());
         }
 
-        Long thumbnailId = findPost.getThumbnail().getId();
-        if (thumbnailId != null) {
-            removeThumbnailPath(thumbnailId);
+        PostThumbnail thumbnail = findPost.getThumbnail();
+        if (thumbnail == null) {
+            return;
         }
+        removeThumbnailPath(thumbnail.getId());
     }
 
     private void removeImageFile(String imageName) {

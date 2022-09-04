@@ -32,15 +32,13 @@ public class CommentService {
     private int reportHiddenCount;
 
     @Transactional
-    public Long create(UUID writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
-        Comment savedComment = commentRepository.save(new Comment(
+    public Comment create(UUID writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
+        return commentRepository.save(new Comment(
                 memberRepository.findById(writerId).orElseThrow(),
                 postRepository.findById(postId).orElseThrow(),
                 parentCommentId == null ? null : commentRepository.findById(parentCommentId).orElseThrow(),
                 commentDto.getBody()
         ));
-
-        return savedComment.getId();
     }
 
     @Transactional
