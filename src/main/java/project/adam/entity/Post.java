@@ -33,7 +33,10 @@ public class Post extends BaseTimeEntity {
 
     private int views;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+    private PostThumbnail thumbnail = null;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostImage> images = new ArrayList<>();
 
     public Post(Member writer, Board board, String title, String body) {
@@ -50,11 +53,11 @@ public class Post extends BaseTimeEntity {
         this.body = body;
     }
 
-    public void increaseView() {
-        this.views++;
+    public void setThumbnail(PostThumbnail thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public String getThumbnailName() {
-        return images.isEmpty() ? null : images.get(0).getName();
+        return (thumbnail == null) ? null : thumbnail.getName();
     }
 }
