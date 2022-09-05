@@ -31,7 +31,7 @@ public class Post extends BaseTimeEntity {
 
     private String body;
 
-    private int views;
+    private int viewCount;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
     private PostThumbnail thumbnail = null;
@@ -47,7 +47,7 @@ public class Post extends BaseTimeEntity {
         this.board = board;
         this.title = title;
         this.body = body;
-        this.views = 0;
+        this.viewCount = 0;
         writer.getPosts().add(this);
     }
     

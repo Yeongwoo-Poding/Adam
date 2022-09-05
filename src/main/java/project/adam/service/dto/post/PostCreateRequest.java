@@ -3,6 +3,7 @@ package project.adam.service.dto.post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.adam.entity.Board;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -11,7 +12,6 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class PostCreateRequest {
 
-    @NotEmpty
     private String board;
 
     @NotEmpty
@@ -21,8 +21,8 @@ public class PostCreateRequest {
 
     private Integer thumbnailIndex;
 
-    public PostCreateRequest(String board, String title, String body) {
-        this.board = board;
+    public PostCreateRequest(String boardName, String title, String body) {
+        this.board = boardName;
         this.title = title;
         this.body = body;
         this.thumbnailIndex = null;

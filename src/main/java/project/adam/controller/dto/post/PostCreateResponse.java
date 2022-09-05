@@ -8,14 +8,14 @@ import java.time.ZonedDateTime;
 @Getter
 public class PostCreateResponse {
 
-    private Long postId;
+    private Long id;
     private String board;
     private ZonedDateTime createDate;
     private String title;
     private String body;
 
     public PostCreateResponse(Post post) {
-        this.postId = post.getId();
+        this.id = post.getId();
         this.board = post.getBoard().toString();
         this.createDate = post.getCreateDate();
         this.title = post.getTitle();

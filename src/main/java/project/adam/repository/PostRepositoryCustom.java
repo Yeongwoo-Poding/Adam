@@ -11,5 +11,5 @@ public interface PostRepositoryCustom {
 
     Slice<Post> findAll(PostFindCondition condition, Pageable pageable);
 
-    Optional<Post> findPostIncViews(Long postId);
+    Optional<Post> findPostIncViewCount(Long postId);
 }

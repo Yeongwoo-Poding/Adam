@@ -25,12 +25,7 @@ public enum ExceptionEnum {
 
     UNIQUE_CONSTRAINT_VIOLATED(CONFLICT, "중복된 KEY가 존재합니다."),
     INVALID_REPLY(CONFLICT, "대댓글에는 댓글을 달 수 없습니다."),
-    HIDDEN_POST(CONFLICT, "숨겨진 게시물입니다."),
-    REPORTED_POST(CONFLICT, "이미 신고된 게시물입니다."),
-    NOT_REPORTED_POST(CONFLICT, "아직 신고되지 않은 게시물입니다."),
-    HIDDEN_COMMENT(CONFLICT, "숨겨진 댓글입니다."),
-    REPORTED_COMMENT(CONFLICT, "이미 신고된 댓글입니다."),
-    NOT_REPORTED_COMMENT(CONFLICT, "아직 신고되지 않은 댓글입니다.");
+    INVALID_REPORT(CONFLICT, "신고할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

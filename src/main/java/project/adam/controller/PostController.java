@@ -17,6 +17,7 @@ import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
+import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 
 import java.io.IOException;
@@ -76,10 +77,11 @@ public class PostController {
 
     @PostMapping("/{postId}/report")
     public void createReportPost(@RequestHeader UUID token,
-                                 @PathVariable Long postId) {
+                                 @PathVariable Long postId,
+                                 @RequestBody PostReportRequest request) {
         Member findMember = memberService.findByToken(token);
         Post findPost = postService.find(postId);
-        postService.createReport(findPost, findMember);
+        postService.createReport(findPost, findMember, request);
     }
 
 //    @DeleteMapping("/{postId}/report")

@@ -9,12 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.Comment;
 import project.adam.entity.CommentReport;
 import project.adam.entity.Member;
+import project.adam.entity.ReportType;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.CommentRepository;
 import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
+import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
 import java.util.UUID;
@@ -82,16 +84,16 @@ public class CommentService {
     }
 
     @Transactional
-    public void createCommentReport(Comment comment, Member member) {
+    public void createCommentReport(Comment comment, Member member, CommentReportRequest request) {
         validateCommentHidden(comment.getId());
 
         boolean isReportExist = comment.getReports().stream()
                 .anyMatch(commentReport -> commentReport.getMember().equals(member));
 
         if (isReportExist) {
-            throw new ApiException(ExceptionEnum.REPORTED_COMMENT);
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        new CommentReport(comment, member);
+        new CommentReport(comment, member, ReportType.valueOf(request.getReportType()));
     }
 
     @Transactional
@@ -101,14 +103,14 @@ public class CommentService {
         CommentReport report = comment.getReports().stream()
                 .filter(commentReport -> commentReport.getMember().equals(member))
                 .findAny()
-                .orElseThrow(() -> new ApiException(ExceptionEnum.NOT_REPORTED_COMMENT));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.INVALID_REPORT));
 
         commentRepository.deleteCommentReportById(report.getId());
     }
 
     private void validateCommentHidden(Long commentId) {
         if (commentRepository.countCommentReportById(commentId) >= reportHiddenCount) {
-            throw new ApiException(ExceptionEnum.HIDDEN_COMMENT);
+            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
         }
     }
 }
