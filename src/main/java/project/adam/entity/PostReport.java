@@ -23,9 +23,13 @@ public class PostReport {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public PostReport(Post post, Member member) {
+    @Enumerated(EnumType.STRING)
+    private ReportType reportType;
+
+    public PostReport(Post post, Member member, ReportType reportType) {
         this.post = post;
         this.member = member;
+        this.reportType = reportType;
         post.getReports().add(this);
     }
 }

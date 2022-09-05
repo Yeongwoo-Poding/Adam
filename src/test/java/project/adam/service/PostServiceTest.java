@@ -177,38 +177,4 @@ class PostServiceTest {
         //then
         assertThat(findPosts.getSize()).isEqualTo(10);
     }
-
-    @Test
-    void post_find_all_by_writer() throws IOException {
-        //given
-        UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
-        UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
-
-        for (int i = 0; i < 10; i++) {
-            PostCreateRequest postCreateRequest = new PostCreateRequest(
-                    "FREE",
-                    "post" + i,
-                    "post body " + i
-            );
-
-            postService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(), postCreateRequest, new MultipartFile[]{});
-        }
-
-        PageRequest allPages = PageRequest.of(0, 10);
-
-        //when
-        Slice<Post> member1Post = postService.findAll(new PostFindCondition(member1Id, null), allPages);
-        Slice<Post> member2Post = postService.findAll(new PostFindCondition(member2Id, null), allPages);
-
-        //then
-        assertThat(member1Post.getContent().size()).isEqualTo(5);
-        assertThat(member2Post.getContent().size()).isEqualTo(5);
-
-        HashSet<Post> member1PostSet = new HashSet<>(member1Post.getContent());
-        HashSet<Post> member2PostSet = new HashSet<>(member2Post.getContent());
-        member1PostSet.retainAll(member2PostSet);
-        assertThat(member1PostSet).isEmpty();
-    }
 }

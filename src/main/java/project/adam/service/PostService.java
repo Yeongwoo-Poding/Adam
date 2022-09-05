@@ -16,6 +16,7 @@ import project.adam.repository.MemberRepository;
 import project.adam.repository.PostRepository;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
+import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 
 import javax.imageio.ImageIO;
@@ -109,7 +110,7 @@ public class PostService {
     @Transactional
     public Post find(Long postId) {
         validationPostHidden(postId);
-        return postRepository.findPostIncViews(postId).orElseThrow();
+        return postRepository.findPostIncViewCount(postId).orElseThrow();
     }
 
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
@@ -210,14 +211,14 @@ public class PostService {
     }
 
     @Transactional
-    public void createReport(Post post, Member member) {
+    public void createReport(Post post, Member member, PostReportRequest request) {
         boolean isReportExist = post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
 
         if (isReportExist) {
-            throw new ApiException(ExceptionEnum.REPORTED_POST);
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        new PostReport(post, member);
+        new PostReport(post, member, ReportType.valueOf(request.getReportType()));
     }
 
     @Transactional
@@ -225,14 +226,14 @@ public class PostService {
         PostReport report = post.getReports().stream()
                 .filter(postReport -> postReport.getMember().equals(member))
                 .findAny()
-                .orElseThrow(() -> new ApiException(ExceptionEnum.NOT_REPORTED_POST));
+                .orElseThrow(() -> new ApiException(ExceptionEnum.INVALID_REPORT));
 
         postRepository.deletePostReportById(report.getId());
     }
 
     private void validationPostHidden(Long postId) {
         if (postRepository.countPostReportById(postId) >= reportHiddenCount) {
-            throw new ApiException(ExceptionEnum.HIDDEN_POST);
+            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
         }
     }
 }

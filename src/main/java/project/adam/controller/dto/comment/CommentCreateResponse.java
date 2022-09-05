@@ -4,21 +4,16 @@ import lombok.Getter;
 import project.adam.entity.Comment;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @Getter
 public class CommentCreateResponse {
 
-    private Long commentId;
-    private UUID writerId;
-    private Long postId;
+    private Long id;
     private ZonedDateTime createDate;
     private String body;
 
     public CommentCreateResponse(Comment comment) {
-        this.commentId = comment.getId();
-        this.writerId = comment.getWriter().getId();
-        this.postId = comment.getPost().getId();
+        this.id = comment.getId();
         this.createDate = comment.getCreateDate();
         this.body = comment.getBody();
     }

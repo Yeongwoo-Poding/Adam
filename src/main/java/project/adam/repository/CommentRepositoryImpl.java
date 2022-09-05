@@ -12,7 +12,6 @@ import project.adam.entity.Post;
 import java.util.List;
 
 import static project.adam.entity.QComment.comment;
-import static project.adam.entity.QCommentReport.commentReport;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom{

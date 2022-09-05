@@ -16,6 +16,7 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
 import project.adam.service.dto.comment.CommentCreateRequest;
+import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
 import java.util.Objects;
@@ -90,11 +91,12 @@ public class CommentController {
     @PostMapping("/{commentId}/report")
     public void createCommentReport(@RequestHeader UUID token,
                                     @PathVariable Long postId,
-                                    @PathVariable Long commentId) {
+                                    @PathVariable Long commentId,
+                                    @RequestBody CommentReportRequest request) {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.findByToken(token);
         validate(postId, findComment);
-        commentService.createCommentReport(findComment, loginMember);
+        commentService.createCommentReport(findComment, loginMember, request);
     }
 
 //    @DeleteMapping("/{commentId}/report")
