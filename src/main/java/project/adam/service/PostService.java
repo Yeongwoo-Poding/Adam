@@ -138,12 +138,28 @@ public class PostService {
         log.info("[{}.createThumbnail()] Add image {}", getClass(), postThumbnail.getName());
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage) throws IOException {
+    private BufferedImage resizeImage(BufferedImage originalImage) {
+        BufferedImage croppedImage = getSquareImage(originalImage);
+        System.out.println("width = " + croppedImage.getWidth() + "height = " + croppedImage.getHeight());
+
         BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(originalImage, 0, 0, thumbnailWidth, thumbnailHeight, null);
+        graphics2D.drawImage(croppedImage, 0, 0, thumbnailWidth, thumbnailHeight, null);
         graphics2D.dispose();
         return resizedImage;
+    }
+
+    private BufferedImage getSquareImage(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        if (width > height) {
+            int offset = (width - height) / 2;
+            return image.getSubimage(offset, 0, height, height);
+        } else {
+            int offset = (height - width) / 2;
+            return image.getSubimage(0, offset, width, width);
+        }
     }
 
     private File createImage(MultipartFile image, Post post) throws IOException {
