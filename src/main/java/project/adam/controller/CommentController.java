@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.comment.CommentCreateResponse;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.comment.CommentListFindResponse;
+import project.adam.controller.dto.comment.CommentUpdateResponse;
+import project.adam.controller.dto.post.PostUpdateResponse;
 import project.adam.entity.Comment;
 import project.adam.entity.Member;
 import project.adam.exception.ApiException;
@@ -66,15 +68,16 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public void updateComment(@RequestHeader UUID token,
-                              @PathVariable Long postId,
-                              @PathVariable Long commentId,
-                              @Validated @RequestBody CommentUpdateRequest commentDto) {
+    public CommentUpdateResponse updateComment(@RequestHeader UUID token,
+                                               @PathVariable Long postId,
+                                               @PathVariable Long commentId,
+                                               @Validated @RequestBody CommentUpdateRequest commentDto) {
         Comment findComment = commentService.find(commentId);
         Member loginMember = memberService.findByToken(token);
         loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
-        commentService.update(commentId, commentDto);
+        Comment updatedComment = commentService.update(commentId, commentDto);
+        return new CommentUpdateResponse(updatedComment);
     }
 
     @DeleteMapping("/{commentId}")

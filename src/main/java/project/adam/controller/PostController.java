@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.post.PostCreateResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
+import project.adam.controller.dto.post.PostUpdateResponse;
 import project.adam.entity.Member;
 import project.adam.entity.Post;
 import project.adam.service.MemberService;
@@ -56,14 +57,15 @@ public class PostController {
     }
 
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void updatePost(@RequestHeader UUID token,
-                           @PathVariable Long postId,
-                           @Validated @RequestPart("data") PostUpdateRequest postDto,
-                           @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
+    public PostUpdateResponse updatePost(@RequestHeader UUID token,
+                                         @PathVariable Long postId,
+                                         @Validated @RequestPart("data") PostUpdateRequest postDto,
+                                         @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Post findPost = postService.find(postId);
         Member findMember = memberService.findByToken(token);
         findMember.authorization(Objects.equals(findMember.getId(), findPost.getWriter().getId()) ? USER : ADMIN);
         postService.update(postId, postDto, images);
+        return new PostUpdateResponse(findPost);
     }
 
     @DeleteMapping("/{postId}")

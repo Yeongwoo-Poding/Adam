@@ -3,7 +3,6 @@ package project.adam.service.dto.post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.adam.entity.Board;
 
 import javax.validation.constraints.NotEmpty;
 
