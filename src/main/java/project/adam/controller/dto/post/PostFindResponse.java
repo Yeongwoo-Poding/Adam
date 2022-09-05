@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 @Getter
 public class PostFindResponse {
     private Long id;
-    private String title;
     private String writerName;
     private ZonedDateTime createdDate;
-    private int viewCount;
+    private String title;
     private String body;
+    private int viewCount;
     private int commentCount;
     private List<String> imageNames = new ArrayList<>();
 

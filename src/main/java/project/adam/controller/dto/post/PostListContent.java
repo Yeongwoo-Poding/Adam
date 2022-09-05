@@ -8,11 +8,11 @@ import project.adam.entity.Post;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostListContent {
     private Long id;
-    private String title;
     private String writerName;
+    private String title;
     private int viewCount;
-    private String thumbnailName;
     private int commentCount;
+    private String thumbnailName;
 
     public PostListContent(Post post) {
         this.id = post.getId();

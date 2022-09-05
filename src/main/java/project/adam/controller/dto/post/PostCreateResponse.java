@@ -2,8 +2,12 @@ package project.adam.controller.dto.post;
 
 import lombok.Getter;
 import project.adam.entity.Post;
+import project.adam.entity.PostImage;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class PostCreateResponse {
@@ -13,6 +17,7 @@ public class PostCreateResponse {
     private ZonedDateTime createDate;
     private String title;
     private String body;
+    private List<String> imageNames = new ArrayList<>();
 
     public PostCreateResponse(Post post) {
         this.id = post.getId();
@@ -20,5 +25,8 @@ public class PostCreateResponse {
         this.createDate = post.getCreateDate();
         this.title = post.getTitle();
         this.body = post.getBody();
+        this.imageNames = post.getImages().stream()
+                .map(PostImage::getName)
+                .collect(Collectors.toList());
     }
 }
