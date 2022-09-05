@@ -24,6 +24,7 @@ public enum ExceptionEnum {
     INVALID_METHOD(METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."),
 
     UNIQUE_CONSTRAINT_VIOLATED(CONFLICT, "중복된 KEY가 존재합니다."),
+    INVALID_REPLY(CONFLICT, "대댓글에는 댓글을 달 수 없습니다."),
     HIDDEN_POST(CONFLICT, "숨겨진 게시물입니다."),
     REPORTED_POST(CONFLICT, "이미 신고된 게시물입니다."),
     NOT_REPORTED_POST(CONFLICT, "아직 신고되지 않은 게시물입니다."),

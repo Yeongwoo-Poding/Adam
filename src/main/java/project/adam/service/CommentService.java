@@ -33,12 +33,30 @@ public class CommentService {
 
     @Transactional
     public Comment create(UUID writerId, Long postId, Long parentCommentId, CommentCreateRequest commentDto) {
-        return commentRepository.save(new Comment(
-                memberRepository.findById(writerId).orElseThrow(),
-                postRepository.findById(postId).orElseThrow(),
-                parentCommentId == null ? null : commentRepository.findById(parentCommentId).orElseThrow(),
-                commentDto.getBody()
-        ));
+        if (parentCommentId == null) {
+            return commentRepository.save(new Comment(
+                    memberRepository.findById(writerId).orElseThrow(),
+                    postRepository.findById(postId).orElseThrow(),
+                    null,
+                    commentDto.getBody()
+            ));
+        } else {
+            Comment parent = validateParentRoot(parentCommentId);
+            return commentRepository.save(new Comment(
+                    memberRepository.findById(writerId).orElseThrow(),
+                    postRepository.findById(postId).orElseThrow(),
+                    parent,
+                    commentDto.getBody()
+            ));
+        }
+    }
+
+    private Comment validateParentRoot(Long parentCommentId) {
+        Comment findComment = commentRepository.findById(parentCommentId).orElseThrow();
+        if (findComment.getParent() != null) {
+            throw new ApiException(ExceptionEnum.INVALID_REPLY);
+        }
+        return findComment;
     }
 
     @Transactional
