@@ -97,15 +97,15 @@ public class CommentController {
         commentService.createCommentReport(findComment, loginMember);
     }
 
-    @DeleteMapping("/{commentId}/report")
-    public void deleteCommentReport(@RequestHeader UUID token,
-                                    @PathVariable Long postId,
-                                    @PathVariable Long commentId) {
-        Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findByToken(token);
-        validate(postId, findComment);
-        commentService.deleteCommentReport(findComment, loginMember);
-    }
+//    @DeleteMapping("/{commentId}/report")
+//    public void deleteCommentReport(@RequestHeader UUID token,
+//                                    @PathVariable Long postId,
+//                                    @PathVariable Long commentId) {
+//        Comment findComment = commentService.find(commentId);
+//        Member loginMember = memberService.findByToken(token);
+//        validate(postId, findComment);
+//        commentService.deleteCommentReport(findComment, loginMember);
+//    }
 
     private void validate(Long postId, Comment comment) {
         if (!comment.getPost().getId().equals(postId)) {

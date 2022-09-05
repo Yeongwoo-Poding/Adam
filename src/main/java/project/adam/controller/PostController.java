@@ -82,11 +82,11 @@ public class PostController {
         postService.createReport(findPost, findMember);
     }
 
-    @DeleteMapping("/{postId}/report")
-    public void deleteReportPost(@RequestHeader UUID token,
-                                 @PathVariable Long postId) {
-        Member findMember = memberService.findByToken(token);
-        Post findPost = postService.find(postId);
-        postService.deleteReport(findPost, findMember);
-    }
+//    @DeleteMapping("/{postId}/report")
+//    public void deleteReportPost(@RequestHeader UUID token,
+//                                 @PathVariable Long postId) {
+//        Member findMember = memberService.findByToken(token);
+//        Post findPost = postService.find(postId);
+//        postService.deleteReport(findPost, findMember);
+//    }
 }
