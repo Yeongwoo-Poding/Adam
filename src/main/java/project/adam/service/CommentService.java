@@ -62,10 +62,11 @@ public class CommentService {
     }
 
     @Transactional
-    public void update(Long commentId, CommentUpdateRequest commentDto) {
+    public Comment update(Long commentId, CommentUpdateRequest commentDto) {
         validateCommentHidden(commentId);
         Comment findComment = commentRepository.findById(commentId).orElseThrow();
         findComment.update(commentDto.getBody());
+        return findComment;
     }
 
     @Transactional

@@ -84,7 +84,7 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
+    public Post update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
         validationPostHidden(postId);
         Post findPost = postRepository.findById(postId).orElseThrow();
         findPost.update(postDto.getTitle(), postDto.getBody());
@@ -92,6 +92,7 @@ public class PostService {
         removeImageFiles(findPost);
         removeImagePaths(findPost);
         createImagesAndThumbnail(images, postDto.getThumbnailIndex(), findPost);
+        return findPost;
     }
 
     @Transactional
