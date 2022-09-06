@@ -38,9 +38,15 @@ public class MemberController {
     }
 
     @GetMapping
-    public MemberFindResponse findMember(@RequestHeader UUID token) {
-        Member findMember = memberService.findByToken(token);
-        return new MemberFindResponse(findMember);
+    public MemberFindResponse findMember(@RequestHeader UUID token,
+                                         @RequestParam String email) {
+        Member loginMember = memberService.findByToken(token);
+        Member findMember = memberService.findByEmail(email);
+        if (loginMember == findMember) {
+            return new MemberFindResponse(findMember.getId(), findMember);
+        } else {
+            return new MemberFindResponse(findMember);
+        }
     }
 
     @DeleteMapping

@@ -18,7 +18,7 @@ class PostTest {
     @Test
     void test_update() {
         //given
-        Member member = new Member(UUID.randomUUID(), "member");
+        Member member = new Member(UUID.randomUUID(), "email1", "member");
         Post post = new Post(member, Board.FREE, "title1", "body1");
 
         //when

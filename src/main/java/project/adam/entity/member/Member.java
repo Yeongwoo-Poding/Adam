@@ -3,6 +3,7 @@ package project.adam.entity.member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.domain.Persistable;
 import project.adam.entity.common.BaseTimeEntity;
 import project.adam.entity.post.Post;
@@ -24,6 +25,9 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     @Column(name = "member_id", length = 16)
     private UUID id;
 
+    @Column(unique = true)
+    private String email;
+
     private String name;
 
     private String imageName;
@@ -37,15 +41,16 @@ public class Member extends BaseTimeEntity implements Persistable<UUID> {
     @Column(length = 16)
     private UUID token = null;
 
-    public Member(UUID id, String name) {
+    public Member(UUID id, String email, String name) {
         this.id = id;
+        this.email = email;
         this.name = name;
         this.privilege = Privilege.USER;
         this.token = UUID.randomUUID();
     }
 
-    public Member(UUID id, String name, Privilege privilege) {
-        this(id, name);
+    public Member(UUID id, String email, String name, Privilege privilege) {
+        this(id, email, name);
         this.privilege = privilege;
         this.token = UUID.randomUUID();
     }

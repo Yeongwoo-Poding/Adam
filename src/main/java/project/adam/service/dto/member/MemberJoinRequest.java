@@ -15,17 +15,22 @@ public class MemberJoinRequest {
     private String id;
 
     @NotEmpty
+    private String email;
+
+    @NotEmpty
     private String name;
 
     private Privilege privilege = Privilege.USER;
 
-    public MemberJoinRequest(String id, String name) {
+    public MemberJoinRequest(String id, String email, String name) {
         this.id = id;
+        this.email = email;
         this.name = name;
     }
 
-    public MemberJoinRequest(String id, String name, Privilege privilege) {
+    public MemberJoinRequest(String id, String email, String name, Privilege privilege) {
         this.id = id;
+        this.email = email;
         this.name = name;
         this.privilege = privilege;
     }

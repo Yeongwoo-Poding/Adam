@@ -22,8 +22,8 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
-
     private final MemberRepository memberRepository;
+
     private final CommentRepository commentRepository;
     private final PostService postService;
 
@@ -34,6 +34,7 @@ public class MemberService {
     public UUID join(MemberJoinRequest memberDto) {
         Member savedMember = memberRepository.save(new Member(
                 UUID.fromString(memberDto.getId()),
+                memberDto.getEmail(),
                 memberDto.getName(),
                 memberDto.getPrivilege()
         ));
@@ -49,6 +50,10 @@ public class MemberService {
         return memberRepository.findByToken(token).orElseThrow();
     }
 
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow();
+    }
+
     @Transactional
     public UUID login(UUID memberId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow();
@@ -62,13 +67,13 @@ public class MemberService {
         removePosts(deleteMember);
         removeMember(deleteMember);
     }
-
     private void removeCommits(Member member) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(member));
     }
     private void removePosts(Member member) {
         member.getPosts().forEach(post -> postService.remove(post.getId()));
     }
+
     private void removeMember(Member member) {
         removeExistingImage(member);
         memberRepository.delete(member);
