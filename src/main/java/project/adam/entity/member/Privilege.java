@@ -1,4 +1,4 @@
-package project.adam.entity;
+package project.adam.entity.member;
 
 public enum Privilege {
     USER(0), ADMIN(1);

@@ -1,7 +1,7 @@
 package project.adam.controller.dto.comment;
 
 import lombok.Getter;
-import project.adam.entity.Comment;
+import project.adam.entity.comment.Comment;
 
 import java.time.ZonedDateTime;
 

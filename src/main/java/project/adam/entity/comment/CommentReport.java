@@ -1,8 +1,10 @@
-package project.adam.entity;
+package project.adam.entity.comment;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.adam.entity.common.ReportType;
+import project.adam.entity.member.Member;
 
 import javax.persistence.*;
 

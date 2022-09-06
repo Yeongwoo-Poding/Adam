@@ -1,8 +1,8 @@
 package project.adam.controller.dto.post;
 
 import lombok.Getter;
-import project.adam.entity.Post;
-import project.adam.entity.PostImage;
+import project.adam.entity.post.Post;
+import project.adam.entity.post.PostImage;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;

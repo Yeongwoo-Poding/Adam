@@ -1,8 +1,8 @@
 package project.adam.controller.dto.member;
 
 import lombok.Getter;
-import project.adam.entity.Member;
-import project.adam.entity.Privilege;
+import project.adam.entity.member.Member;
+import project.adam.entity.member.Privilege;
 
 import java.util.UUID;
 

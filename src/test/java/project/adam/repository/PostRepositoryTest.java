@@ -6,23 +6,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.entity.Board;
-import project.adam.entity.Member;
-import project.adam.entity.Post;
+import project.adam.entity.member.Member;
+import project.adam.entity.post.Board;
+import project.adam.entity.post.Post;
+import project.adam.repository.member.MemberRepository;
+import project.adam.repository.post.PostRepository;
 import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static project.adam.entity.Privilege.ADMIN;
-import static project.adam.entity.Privilege.USER;
+import static project.adam.entity.member.Privilege.ADMIN;
+import static project.adam.entity.member.Privilege.USER;
 
 @SpringBootTest
 @Transactional
 class PostRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
-    @Autowired PostRepository postRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    PostRepository postRepository;
 
     @Test
     void post_save() {

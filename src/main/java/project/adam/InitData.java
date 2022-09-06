@@ -9,7 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import project.adam.entity.Privilege;
+import project.adam.entity.member.Privilege;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
 import project.adam.service.PostService;

@@ -3,7 +3,7 @@ package project.adam.controller.dto.post;
 import lombok.Getter;
 import org.springframework.data.domain.Slice;
 import project.adam.controller.dto.Paging;
-import project.adam.entity.Post;
+import project.adam.entity.post.Post;
 
 import java.util.ArrayList;
 import java.util.List;

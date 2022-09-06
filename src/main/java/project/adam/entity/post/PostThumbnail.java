@@ -1,4 +1,4 @@
-package project.adam.entity;
+package project.adam.entity.post;
 
 import lombok.AccessLevel;
 import lombok.Getter;

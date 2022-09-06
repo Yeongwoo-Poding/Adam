@@ -1,4 +1,4 @@
-package project.adam.repository;
+package project.adam.repository.post;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import project.adam.entity.Post;
+import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.List;

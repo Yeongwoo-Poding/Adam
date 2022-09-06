@@ -1,8 +1,11 @@
-package project.adam.entity;
+package project.adam.entity.comment;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.adam.entity.common.BaseTimeEntity;
+import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 
 import javax.persistence.*;
 import java.util.ArrayList;
