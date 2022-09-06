@@ -30,9 +30,9 @@ class CommentRepositoryTest {
     @Test
     void comment_save() {
         //given
-        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "email1", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "email2", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
@@ -53,9 +53,9 @@ class CommentRepositoryTest {
     @Test
     void comment_update() {
         //given
-        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "email1", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "email2", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");
@@ -74,9 +74,9 @@ class CommentRepositoryTest {
     @Test
     void comment_delete() {
         //given
-        Member postWriter = new Member(UUID.randomUUID(), "postWriter");
+        Member postWriter = new Member(UUID.randomUUID(), "email1", "postWriter");
         memberRepository.save(postWriter);
-        Member commentWriter = new Member(UUID.randomUUID(), "commentWriter");
+        Member commentWriter = new Member(UUID.randomUUID(), "email2", "commentWriter");
         memberRepository.save(commentWriter);
 
         Post post = new Post(postWriter, Board.FREE, "title", "body");

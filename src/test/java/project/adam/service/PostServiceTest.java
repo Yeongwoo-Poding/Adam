@@ -36,7 +36,7 @@ class PostServiceTest {
     void post_create() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "email1", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -67,7 +67,7 @@ class PostServiceTest {
     @Test
     void post_create_no_board() {
         UUID memberId = UUID.randomUUID();
-        UUID token = memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
+        UUID token = memberService.join(new MemberJoinRequest(memberId.toString(), "email1", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "NOBOARD",
                 "title",
@@ -81,7 +81,7 @@ class PostServiceTest {
     void post_update() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "email1", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -103,7 +103,7 @@ class PostServiceTest {
     void post_delete() throws IOException {
         //given
         UUID memberId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(memberId.toString(), "nickname"));
+        memberService.join(new MemberJoinRequest(memberId.toString(), "email1", "nickname"));
         PostCreateRequest postCreateRequest = new PostCreateRequest(
                 "FREE",
                 "title",
@@ -127,7 +127,7 @@ class PostServiceTest {
     void post_delete_remove_comments() throws IOException {
         //given
         UUID postWriterId = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(postWriterId.toString(), "member1"));
+        memberService.join(new MemberJoinRequest(postWriterId.toString(), "email1", "member1"));
         Long post1Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
         Long post2Id = postService.create(memberService.find(postWriterId).getId(), new PostCreateRequest("FREE", "post2", "post 2"), new MultipartFile[]{}).getId();
 
@@ -157,9 +157,9 @@ class PostServiceTest {
     void post_find_all() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
+        memberService.join(new MemberJoinRequest(member1Id.toString(), "email1", "member1"));
         UUID member2Id = UUID.randomUUID();
-        memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+        memberService.join(new MemberJoinRequest(member2Id.toString(), "email2", "member2"));
 
         for (int i = 0; i < 10; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(

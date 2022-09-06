@@ -30,7 +30,7 @@ class MemberServiceTest {
     void member_join() {
         //given
         UUID memberId = UUID.randomUUID();
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "email1", "nickname");
 
         //when
         UUID savedId = memberService.join(memberJoinRequest);
@@ -44,7 +44,7 @@ class MemberServiceTest {
     void member_withdraw() {
         //given
         UUID memberId = UUID.randomUUID();
-        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "nickname");
+        MemberJoinRequest memberJoinRequest = new MemberJoinRequest(memberId.toString(), "email1", "nickname");
         UUID token = memberService.join(memberJoinRequest);
 
         //when
@@ -59,9 +59,9 @@ class MemberServiceTest {
     void member_withdraw_remove_post() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
-        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
+        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "email1", "member1"));
         UUID member2Id = UUID.randomUUID();
-        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "email2", "member2"));
 
         for (int i = 0; i < 10; i++) {
             PostCreateRequest postCreateRequest = new PostCreateRequest(
@@ -86,9 +86,9 @@ class MemberServiceTest {
     void member_withdraw_remove_comment() throws IOException {
         //given
         UUID member1Id = UUID.randomUUID();
-        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "member1"));
+        UUID session1Id = memberService.join(new MemberJoinRequest(member1Id.toString(), "email1", "member1"));
         UUID member2Id = UUID.randomUUID();
-        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "member2"));
+        UUID session2Id = memberService.join(new MemberJoinRequest(member2Id.toString(), "email2", "member2"));
         Long post1Id = postService.create(memberService.find(member1Id).getId(),
                 new PostCreateRequest("FREE", "post1", "post 1"), new MultipartFile[]{}).getId();
         Long post2Id = postService.create(memberService.find(member2Id).getId(),
