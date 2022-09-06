@@ -14,19 +14,19 @@ public class MemberFindResponse {
     private UUID id;
     private String name;
     private String imageName;
-    private Privilege privilege;
+    private String email;
 
     public MemberFindResponse(Member member) {
         this.id = null;
         this.name = member.getName();
         this.imageName = member.getImageName();
-        this.privilege = member.getPrivilege();
+        this.email = member.getEmail();
     }
 
     public MemberFindResponse(UUID id, Member member) {
         this.id = id;
         this.name = member.getName();
         this.imageName = member.getImageName();
-        this.privilege = member.getPrivilege();
+        this.email = member.getEmail();
     }
 }
