@@ -1,8 +1,8 @@
-package project.adam.repository;
+package project.adam.repository.post;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import project.adam.entity.Post;
+import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
 
 import java.util.Optional;

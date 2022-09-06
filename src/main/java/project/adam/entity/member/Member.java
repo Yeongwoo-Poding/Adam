@@ -1,9 +1,11 @@
-package project.adam.entity;
+package project.adam.entity.member;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
+import project.adam.entity.common.BaseTimeEntity;
+import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 
 import javax.persistence.*;

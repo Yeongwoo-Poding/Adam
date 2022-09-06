@@ -3,6 +3,10 @@ package project.adam.entity;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.entity.comment.Comment;
+import project.adam.entity.member.Member;
+import project.adam.entity.post.Board;
+import project.adam.entity.post.Post;
 
 import java.util.UUID;
 

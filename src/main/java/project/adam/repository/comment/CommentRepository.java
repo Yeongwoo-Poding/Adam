@@ -1,11 +1,11 @@
-package project.adam.repository;
+package project.adam.repository.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import project.adam.entity.Comment;
-import project.adam.entity.Member;
-import project.adam.entity.Post;
+import project.adam.entity.comment.Comment;
+import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 
 import java.util.List;
 

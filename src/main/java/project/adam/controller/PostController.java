@@ -12,8 +12,8 @@ import project.adam.controller.dto.post.PostCreateResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.controller.dto.post.PostUpdateResponse;
-import project.adam.entity.Member;
-import project.adam.entity.Post;
+import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-import static project.adam.entity.Privilege.ADMIN;
-import static project.adam.entity.Privilege.USER;
+import static project.adam.entity.member.Privilege.ADMIN;
+import static project.adam.entity.member.Privilege.USER;
 
 @Slf4j
 @RestController

@@ -2,7 +2,7 @@ package project.adam.service.dto.member;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.adam.entity.Privilege;
+import project.adam.entity.member.Privilege;
 import project.adam.validator.UUIDPattern;
 
 import javax.validation.constraints.NotEmpty;

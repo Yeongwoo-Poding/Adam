@@ -2,7 +2,7 @@ package project.adam.controller.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import project.adam.entity.Post;
+import project.adam.entity.post.Post;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -3,13 +3,10 @@ package project.adam.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.entity.Board;
-import project.adam.entity.Member;
-import project.adam.entity.Post;
-import project.adam.service.dto.post.PostFindCondition;
+import project.adam.entity.member.Member;
+import project.adam.repository.member.MemberRepository;
+import project.adam.repository.post.PostRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,8 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class MemberRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
-    @Autowired PostRepository postRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    PostRepository postRepository;
 
     @Test
     void member_save() {

@@ -1,9 +1,9 @@
-package project.adam.repository;
+package project.adam.repository.comment;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import project.adam.entity.Comment;
-import project.adam.entity.Post;
+import project.adam.entity.comment.Comment;
+import project.adam.entity.post.Post;
 
 public interface CommentRepositoryCustom {
     Slice<Comment> findRootCommentByPost(Post post, Pageable pageable);

@@ -1,4 +1,4 @@
-package project.adam.repository;
+package project.adam.repository.comment;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import project.adam.entity.Comment;
-import project.adam.entity.Post;
+import project.adam.entity.comment.Comment;
+import project.adam.entity.post.Post;
 
 import java.util.List;
 

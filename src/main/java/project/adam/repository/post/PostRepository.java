@@ -1,9 +1,9 @@
-package project.adam.repository;
+package project.adam.repository.post;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import project.adam.entity.Post;
+import project.adam.entity.post.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 

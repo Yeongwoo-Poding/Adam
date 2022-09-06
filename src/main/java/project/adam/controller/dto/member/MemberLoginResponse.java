@@ -1,7 +1,7 @@
 package project.adam.controller.dto.member;
 
 import lombok.Getter;
-import project.adam.entity.Member;
+import project.adam.entity.member.Member;
 
 import java.util.UUID;
 

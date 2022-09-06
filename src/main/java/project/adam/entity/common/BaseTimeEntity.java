@@ -1,4 +1,4 @@
-package project.adam.entity;
+package project.adam.entity.common;
 
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

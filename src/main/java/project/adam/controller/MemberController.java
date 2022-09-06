@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.controller.dto.member.MemberImageResponse;
 import project.adam.controller.dto.member.MemberLoginResponse;
-import project.adam.entity.Member;
+import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.service.MemberService;
