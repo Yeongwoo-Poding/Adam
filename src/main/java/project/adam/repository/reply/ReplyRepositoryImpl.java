@@ -1,4 +1,4 @@
-package project.adam.repository.comment;
+package project.adam.repository.reply;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -6,15 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import project.adam.entity.comment.Comment;
-import project.adam.entity.post.Post;
+import project.adam.entity.reply.Reply;
 
 import java.util.List;
 
-import static project.adam.entity.comment.QComment.comment;
+import static project.adam.entity.reply.QReply.reply;
 
 @RequiredArgsConstructor
-public class CommentRepositoryImpl implements CommentRepositoryCustom{
+public class ReplyRepositoryImpl implements ReplyRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
@@ -22,13 +21,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     private int reportHiddenCount;
 
     @Override
-    public Slice<Comment> findRootCommentByPost(Post post, Pageable pageable) {
-        List<Comment> contents = queryFactory.selectFrom(comment)
-                .leftJoin(comment.replies)
-                .fetchJoin()
+    public Slice<Reply> findAllByCommentId(Long commentId, Pageable pageable) {
+        List<Reply> contents = queryFactory.selectFrom(reply)
                 .where(
-                        comment.reports.size().lt(reportHiddenCount),
-                        comment.post.eq(post)
+                        reply.comment.id.eq(commentId),
+                        reply.reports.size().lt(reportHiddenCount)
                 )
                 .fetch();
 

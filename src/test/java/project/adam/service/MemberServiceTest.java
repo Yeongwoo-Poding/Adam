@@ -97,7 +97,6 @@ class MemberServiceTest {
         for (int i = 0; i < 10; i++) {
             commentService.create((i % 2 == 0) ? memberService.find(member1Id).getId() : memberService.find(member2Id).getId(),
                     (i % 2 == 0) ? post2Id : post1Id,
-                    null,
                     new CommentCreateRequest("comment " + i)
             );
         }

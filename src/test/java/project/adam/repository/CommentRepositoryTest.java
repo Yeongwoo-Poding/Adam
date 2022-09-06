@@ -38,7 +38,7 @@ class CommentRepositoryTest {
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, null, "comment");
+        Comment comment = new Comment(commentWriter, post, "comment");
         commentRepository.save(comment);
 
         //when
@@ -61,7 +61,7 @@ class CommentRepositoryTest {
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, null, "comment");
+        Comment comment = new Comment(commentWriter, post, "comment");
         commentRepository.save(comment);
 
         //when
@@ -82,7 +82,7 @@ class CommentRepositoryTest {
         Post post = new Post(postWriter, Board.FREE, "title", "body");
         postRepository.save(post);
 
-        Comment comment = new Comment(commentWriter, post, null, "comment");
+        Comment comment = new Comment(commentWriter, post, "comment");
         commentRepository.save(comment);
 
         //when

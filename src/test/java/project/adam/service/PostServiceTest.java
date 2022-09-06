@@ -136,7 +136,6 @@ class PostServiceTest {
             Comment comment = commentService.create(
                     memberService.find(postWriterId).getId(),
                     i % 2 == 0 ? post1Id : post2Id,
-                    null,
                     new CommentCreateRequest("comment " + i)
             );
             if (i % 2 == 0) {
