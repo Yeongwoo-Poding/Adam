@@ -15,9 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, Comment
 
     List<Comment> findAllByWriter(Member writer);
 
-//    @Query("select c from Comment c left join fetch c.replies where c.post = :post and c.parent is null")
-//    Slice<Comment> findRootCommentByPost(Post post, Pageable pageable);
-
     @Query("select count(cr) from CommentReport cr where cr.comment.id = :commentId")
     int countCommentReportById(Long commentId);
 

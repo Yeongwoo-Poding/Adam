@@ -1,24 +1,22 @@
-package project.adam.entity.comment;
+package project.adam.entity.reply;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.adam.entity.comment.Comment;
 import project.adam.entity.common.BaseTimeEntity;
 import project.adam.entity.member.Member;
-import project.adam.entity.post.Post;
-import project.adam.entity.reply.Reply;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseTimeEntity {
+public class Reply extends BaseTimeEntity {
 
     @Id @GeneratedValue
-    @Column(name = "comment_id")
+    @Column(name = "reply_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,20 +24,17 @@ public class Comment extends BaseTimeEntity {
     private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
-    private List<Reply> replies = new ArrayList<>();
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
     private String body;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private List<CommentReport> reports = new ArrayList<>();
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL)
+    private List<ReplyReport> reports;
 
-    public Comment(Member writer, Post post, String body) {
+    public Reply(Member writer, Comment comment, String body) {
         this.writer = writer;
-        this.post = post;
+        this.comment = comment;
         this.body = body;
     }
 

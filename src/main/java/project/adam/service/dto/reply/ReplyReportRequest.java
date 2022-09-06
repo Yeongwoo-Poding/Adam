@@ -1,16 +1,15 @@
-package project.adam.service.dto.comment;
+package project.adam.service.dto.reply;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentReportRequest {
+public class ReplyReportRequest {
 
     @NotEmpty
     private String reportType;

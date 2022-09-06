@@ -14,8 +14,8 @@ import project.adam.service.dto.post.PostFindCondition;
 import java.util.List;
 import java.util.Optional;
 
-import static project.adam.entity.QPost.post;
-import static project.adam.entity.QPostReport.postReport;
+import static project.adam.entity.post.QPost.post;
+import static project.adam.entity.post.QPostReport.postReport;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom{

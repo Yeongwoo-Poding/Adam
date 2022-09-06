@@ -39,7 +39,7 @@ public class CommentController {
     public CommentCreateResponse createComment(@RequestHeader UUID token,
                                              @PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, null, commentDto);
+        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentDto);
         return new CommentCreateResponse(savedComment);
     }
 
@@ -48,7 +48,7 @@ public class CommentController {
                                                @PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @Validated @RequestBody CommentCreateRequest commentDto) {
-        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentId, commentDto);
+        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentDto);
         return new CommentCreateResponse(savedComment);
     }
 

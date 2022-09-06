@@ -21,7 +21,7 @@ class CommentTest {
         //given
         Member member = new Member(UUID.randomUUID(), "member");
         Post post = new Post(member, Board.FREE, "title1", "body1");
-        Comment comment1 = new Comment(member, post, null, "comment1");
+        Comment comment1 = new Comment(member, post, "comment1");
 
         //when
         comment1.update("comment2");
