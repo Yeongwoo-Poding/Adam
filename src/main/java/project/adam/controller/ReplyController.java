@@ -88,10 +88,7 @@ public class ReplyController {
     }
 
     private void validate(Long commentId, Long replyId) {
-        System.out.println("commentId = " + commentId);
-        System.out.println("replyId = " + replyId);
         Reply reply = replyService.find(replyId);
-        System.out.println("reply.getComment().getId() = " + reply.getComment().getId());
         if (reply.getComment().getId() != commentId) {
             throw new ApiException(ExceptionEnum.NO_DATA);
         }

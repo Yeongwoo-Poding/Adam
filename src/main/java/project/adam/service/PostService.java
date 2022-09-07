@@ -145,7 +145,6 @@ public class PostService {
 
     private BufferedImage resizeImage(BufferedImage originalImage) {
         BufferedImage croppedImage = getSquareImage(originalImage);
-        System.out.println("width = " + croppedImage.getWidth() + "height = " + croppedImage.getHeight());
 
         BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
