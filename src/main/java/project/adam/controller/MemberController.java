@@ -1,21 +1,22 @@
 package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.controller.dto.member.MemberImageResponse;
-import project.adam.controller.dto.member.MemberLoginResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.security.dto.RefreshTokenDto;
+import project.adam.security.dto.TokenDto;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 
 import java.io.IOException;
-import java.util.UUID;
 
 
 @RestController
@@ -26,53 +27,51 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public MemberLoginResponse joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
-        UUID token = memberService.join(memberDto);
-        return new MemberLoginResponse(token);
+    public void joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
+        memberService.join(memberDto);
     }
 
     @PostMapping("/session")
-    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
-        UUID token = memberService.login(UUID.fromString(memberDto.getId()));
-        return new MemberLoginResponse(token);
+    public TokenDto loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
+        return memberService.login(memberDto);
+    }
+
+    @PostMapping("/refresh")
+    public TokenDto refreshToken(@Validated @RequestBody RefreshTokenDto memberDto) {
+        return memberService.refreshToken(memberDto);
     }
 
     @GetMapping
-    public MemberFindResponse findMember(@RequestHeader UUID token,
-                                         @RequestParam String email) {
-        Member loginMember = memberService.findByToken(token);
+    public MemberFindResponse findMember(@RequestParam String email) {
         Member findMember = memberService.findByEmail(email);
-        if (loginMember == findMember) {
-            return new MemberFindResponse(findMember.getId(), findMember);
-        } else {
-            return new MemberFindResponse(findMember);
-        }
+        return new MemberFindResponse(findMember);
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping
-    public void deleteMember(@RequestHeader UUID token) {
-        memberService.withdraw(token);
+    public void deleteMember() {
+        memberService.withdraw();
     }
 
+    @Secured("ROLE_USER")
     @PostMapping("/image")
-    public void saveImage(@RequestHeader UUID token, @RequestPart MultipartFile image) throws IOException {
-        Member findMember = memberService.findByToken(token);
-
+    public void saveImage(@RequestPart MultipartFile image) throws IOException {
         if (image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
 
-        memberService.saveImage(findMember, image);
+        memberService.saveImage(image);
     }
 
     @GetMapping("/image")
-    public MemberImageResponse getImageName(@RequestHeader UUID token) {
-        Member findMember = memberService.findByToken(token);
+    public MemberImageResponse getImageName(@RequestParam String email) {
+        Member findMember = memberService.findByEmail(email);
         return new MemberImageResponse(memberService.hasImage(findMember), memberService.getImageName(findMember));
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping("/image")
-    public void removeImage(@RequestHeader UUID token) {
-        memberService.removeImage(memberService.findByToken(token));
+    public void removeImage() {
+        memberService.removeImage();
     }
 }

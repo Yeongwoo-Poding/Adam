@@ -2,7 +2,7 @@ package project.adam.service.dto.member;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.adam.entity.member.Privilege;
+import project.adam.entity.member.Authority;
 import project.adam.validator.UUIDPattern;
 
 import javax.validation.constraints.NotEmpty;
@@ -20,7 +20,7 @@ public class MemberJoinRequest {
     @NotEmpty
     private String name;
 
-    private Privilege privilege = Privilege.USER;
+    private Authority authority = Authority.ROLE_USER;
 
     public MemberJoinRequest(String id, String email, String name) {
         this.id = id;
@@ -28,10 +28,10 @@ public class MemberJoinRequest {
         this.name = name;
     }
 
-    public MemberJoinRequest(String id, String email, String name, Privilege privilege) {
+    public MemberJoinRequest(String id, String email, String name, Authority authority) {
         this.id = id;
         this.email = email;
         this.name = name;
-        this.privilege = privilege;
+        this.authority = authority;
     }
 }
