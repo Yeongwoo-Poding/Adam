@@ -17,6 +17,7 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
@@ -53,9 +54,10 @@ public class PostService {
     private int reportHiddenCount;
 
     @Transactional
-    public Post create(UUID token, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
+    public Post create(PostCreateRequest postDto, MultipartFile[] images) throws IOException {
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         Post savedPost = postRepository.save(new Post(
-                memberRepository.findById(token).orElseThrow(),
+                member,
                 Board.valueOf(postDto.getBoard()),
                 postDto.getTitle(),
                 postDto.getBody()
@@ -87,7 +89,7 @@ public class PostService {
     }
 
     @Transactional
-    public Post update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
+    public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
         validationPostHidden(postId);
         Post findPost = postRepository.findById(postId).orElseThrow();
         findPost.update(postDto.getTitle(), postDto.getBody());
@@ -95,7 +97,6 @@ public class PostService {
         removeImageFiles(findPost);
         removeImagePaths(findPost);
         createImagesAndThumbnail(images, postDto.getThumbnailIndex(), findPost);
-        return findPost;
     }
 
     @Transactional
@@ -214,7 +215,10 @@ public class PostService {
     }
 
     @Transactional
-    public void createReport(Post post, Member member, PostReportRequest request) {
+    public void createReport(Long postId, PostReportRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+
         boolean isReportExist = post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
 

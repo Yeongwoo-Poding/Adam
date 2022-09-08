@@ -13,7 +13,9 @@ import project.adam.entity.reply.ReplyReport;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 
 @Service
@@ -21,6 +23,7 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 @RequiredArgsConstructor
 public class ReplyService {
 
+    private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
 
@@ -28,7 +31,8 @@ public class ReplyService {
     private int reportHiddenCount;
 
     @Transactional
-    public Reply create(Member member, Long commentId, ReplyCreateRequest replyDto) {
+    public Reply create(Long commentId, ReplyCreateRequest replyDto) {
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         return replyRepository.save(
                 new Reply(
                         member,
@@ -45,10 +49,9 @@ public class ReplyService {
     }
 
     @Transactional
-    public Reply update(Long replyId, String body) {
+    public void update(Long replyId, String body) {
         Reply findReply = replyRepository.findById(replyId).orElseThrow();
         findReply.update(body);
-        return findReply;
     }
 
     @Transactional
@@ -57,8 +60,10 @@ public class ReplyService {
     }
 
     @Transactional
-    public void report(Member member, Long replyId, ReportType reportType) {
+    public void report(Long replyId, ReportType reportType) {
         Reply findReply = replyRepository.findById(replyId).orElseThrow();
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+
         boolean isReportExist = findReply.getReports().stream()
                 .anyMatch(replyReport -> replyReport.getMember().getId() == member.getId());
 

@@ -3,7 +3,6 @@ package project.adam.controller.dto.member;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import project.adam.entity.member.Member;
-import project.adam.entity.member.Privilege;
 
 import java.util.UUID;
 

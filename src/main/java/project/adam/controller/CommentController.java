@@ -4,27 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.comment.CommentCreateResponse;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.comment.CommentListFindResponse;
-import project.adam.controller.dto.comment.CommentUpdateResponse;
 import project.adam.entity.comment.Comment;
-import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.service.CommentService;
-import project.adam.service.MemberService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-
-import java.util.Objects;
-import java.util.UUID;
-
-import static project.adam.entity.member.Privilege.ADMIN;
-import static project.adam.entity.member.Privilege.USER;
 
 @Slf4j
 @RestController
@@ -32,23 +24,13 @@ import static project.adam.entity.member.Privilege.USER;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final MemberService memberService;
     private final CommentService commentService;
 
+    @Secured("ROLE_USER")
     @PostMapping
-    public CommentCreateResponse createComment(@RequestHeader UUID token,
-                                             @PathVariable Long postId,
+    public CommentCreateResponse createComment(@PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentDto);
-        return new CommentCreateResponse(savedComment);
-    }
-
-    @PostMapping("/{commentId}")
-    public CommentCreateResponse createComment(@RequestHeader UUID token,
-                                               @PathVariable Long postId,
-                                               @PathVariable Long commentId,
-                                               @Validated @RequestBody CommentCreateRequest commentDto) {
-        Comment savedComment = commentService.create(memberService.findByToken(token).getId(), postId, commentDto);
+        Comment savedComment = commentService.create(postId, commentDto);
         return new CommentCreateResponse(savedComment);
     }
 
@@ -66,50 +48,34 @@ public class CommentController {
         return new CommentListFindResponse(result);
     }
 
+    @Secured("ROLE_USER")
     @PutMapping("/{commentId}")
-    public CommentUpdateResponse updateComment(@RequestHeader UUID token,
-                                               @PathVariable Long postId,
+    public void updateComment(@PathVariable Long postId,
                                                @PathVariable Long commentId,
                                                @Validated @RequestBody CommentUpdateRequest commentDto) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findByToken(token);
-        loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
-        Comment updatedComment = commentService.update(commentId, commentDto);
-        return new CommentUpdateResponse(updatedComment);
+        commentService.update(commentId, commentDto);
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@RequestHeader UUID token,
-                              @PathVariable Long postId,
+    public void deleteComment(@PathVariable Long postId,
                               @PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findByToken(token);
-        loginMember.authorization(Objects.equals(findComment.getWriter().getId(), loginMember.getId()) ? USER : ADMIN);
         validate(postId, findComment);
         commentService.remove(commentId);
     }
 
+    @Secured("ROLE_USER")
     @PostMapping("/{commentId}/report")
-    public void createCommentReport(@RequestHeader UUID token,
-                                    @PathVariable Long postId,
+    public void createCommentReport(@PathVariable Long postId,
                                     @PathVariable Long commentId,
                                     @RequestBody CommentReportRequest request) {
         Comment findComment = commentService.find(commentId);
-        Member loginMember = memberService.findByToken(token);
         validate(postId, findComment);
-        commentService.createCommentReport(findComment, loginMember, request);
+        commentService.createCommentReport(commentId, request);
     }
-
-//    @DeleteMapping("/{commentId}/report")
-//    public void deleteCommentReport(@RequestHeader UUID token,
-//                                    @PathVariable Long postId,
-//                                    @PathVariable Long commentId) {
-//        Comment findComment = commentService.find(commentId);
-//        Member loginMember = memberService.findByToken(token);
-//        validate(postId, findComment);
-//        commentService.deleteCommentReport(findComment, loginMember);
-//    }
 
     private void validate(Long postId, Comment comment) {
         if (!comment.getPost().getId().equals(postId)) {

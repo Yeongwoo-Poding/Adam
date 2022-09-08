@@ -16,8 +16,8 @@ import project.adam.service.dto.post.PostFindCondition;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static project.adam.entity.member.Privilege.ADMIN;
-import static project.adam.entity.member.Privilege.USER;
+import static project.adam.entity.member.Authority.ROLE_ADMIN;
+import static project.adam.entity.member.Authority.ROLE_USER;
 
 @SpringBootTest
 @Transactional
@@ -49,8 +49,8 @@ class PostRepositoryTest {
     @Test
     void post_condition_textLike() {
         //given
-        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", "email1", ADMIN));
-        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", "email2", USER));
+        Member adminMember = memberRepository.save(new Member(UUID.randomUUID(), "adminMember", "email1", ROLE_ADMIN));
+        Member userMember = memberRepository.save(new Member(UUID.randomUUID(), "userMember", "email2", ROLE_USER));
 
         Post post1 = postRepository.save(new Post(adminMember, Board.FREE, "Post 1 success", "body 1"));
         Post post2 = postRepository.save(new Post(userMember, Board.FREE, "Post 2 success", "body 2"));

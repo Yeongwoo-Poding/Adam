@@ -15,11 +15,10 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-
-import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,20 +33,21 @@ public class CommentService {
     private int reportHiddenCount;
 
     @Transactional
-    public Comment create(UUID writerId, Long postId, CommentCreateRequest commentDto) {
+    public Comment create(Long postId, CommentCreateRequest commentDto) {
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+
         return commentRepository.save(new Comment(
-                memberRepository.findById(writerId).orElseThrow(),
+                member,
                 postRepository.findById(postId).orElseThrow(),
                 commentDto.getBody()
         ));
     }
 
     @Transactional
-    public Comment update(Long commentId, CommentUpdateRequest commentDto) {
+    public void update(Long commentId, CommentUpdateRequest commentDto) {
         validateCommentHidden(commentId);
         Comment findComment = commentRepository.findById(commentId).orElseThrow();
         findComment.update(commentDto.getBody());
-        return findComment;
     }
 
     @Transactional
@@ -66,7 +66,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void createCommentReport(Comment comment, Member member, CommentReportRequest request) {
+    public void createCommentReport(Long commentId, CommentReportRequest request) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+
         validateCommentHidden(comment.getId());
 
         boolean isReportExist = comment.getReports().stream()
