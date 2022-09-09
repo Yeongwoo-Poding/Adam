@@ -10,6 +10,7 @@ import project.adam.controller.dto.member.MemberImageResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.security.SecurityUtil;
 import project.adam.security.dto.RefreshTokenDto;
 import project.adam.security.dto.TokenDto;
 import project.adam.service.MemberService;
@@ -50,7 +51,8 @@ public class MemberController {
     @Secured("ROLE_USER")
     @DeleteMapping
     public void deleteMember() {
-        memberService.withdraw();
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        memberService.withdraw(member);
     }
 
     @Secured("ROLE_USER")

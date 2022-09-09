@@ -54,8 +54,7 @@ public class PostService {
     private int reportHiddenCount;
 
     @Transactional
-    public Post create(PostCreateRequest postDto, MultipartFile[] images) throws IOException {
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+    public Post create(Member member, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
         Post savedPost = postRepository.save(new Post(
                 member,
                 Board.valueOf(postDto.getBoard()),
@@ -215,9 +214,8 @@ public class PostService {
     }
 
     @Transactional
-    public void createReport(Long postId, PostReportRequest request) {
+    public void createReport(Member member, Long postId, PostReportRequest request) {
         Post post = postRepository.findById(postId).orElseThrow();
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
 
         boolean isReportExist = post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
@@ -226,16 +224,6 @@ public class PostService {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
         new PostReport(post, member, ReportType.valueOf(request.getReportType()));
-    }
-
-    @Transactional
-    public void deleteReport(Post post, Member member) {
-        PostReport report = post.getReports().stream()
-                .filter(postReport -> postReport.getMember().equals(member))
-                .findAny()
-                .orElseThrow(() -> new ApiException(ExceptionEnum.INVALID_REPORT));
-
-        postRepository.deletePostReportById(report.getId());
     }
 
     private void validationPostHidden(Long postId) {

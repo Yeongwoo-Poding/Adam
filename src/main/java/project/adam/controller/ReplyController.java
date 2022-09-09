@@ -9,9 +9,12 @@ import project.adam.controller.dto.reply.ReplyCreateResponse;
 import project.adam.controller.dto.reply.ReplyFindResponse;
 import project.adam.controller.dto.reply.ReplyListFindResponse;
 import project.adam.entity.common.ReportType;
+import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.security.SecurityUtil;
+import project.adam.service.MemberService;
 import project.adam.service.ReplyService;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.service.dto.reply.ReplyReportRequest;
@@ -24,13 +27,15 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ReplyController {
 
+    private final MemberService memberService;
     private final ReplyService replyService;
 
     @Secured("ROLE_USER")
     @PostMapping
     public ReplyCreateResponse createReply(@PathVariable Long commentId,
                                            @Validated @RequestBody ReplyCreateRequest createDto) {
-        return new ReplyCreateResponse(replyService.create(commentId, createDto));
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        return new ReplyCreateResponse(replyService.create(member, commentId, createDto));
     }
 
     @GetMapping("/{replyId}")
@@ -69,7 +74,8 @@ public class ReplyController {
                             @PathVariable Long replyId,
                             @Validated @RequestBody ReplyReportRequest reportDto) {
         validate(commentId, replyId);
-        replyService.report(replyId, ReportType.valueOf(reportDto.getReportType()));
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        replyService.report(member, replyId, ReportType.valueOf(reportDto.getReportType()));
     }
 
     private void validate(Long commentId, Long replyId) {

@@ -33,11 +33,6 @@ public class InitData {
     @Transactional
     static class DevClass {
 
-        private final MemberService memberService;
-        private final PostService postService;
-        private final CommentService commentService;
-        private final EntityManager em;
-
         @Value("${file.dir}")
         File imageFilePath;
 

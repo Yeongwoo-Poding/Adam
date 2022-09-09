@@ -11,9 +11,13 @@ import project.adam.controller.dto.comment.CommentCreateResponse;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.repository.member.MemberRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.CommentService;
+import project.adam.service.MemberService;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
@@ -24,13 +28,15 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 @RequiredArgsConstructor
 public class CommentController {
 
+    private final MemberService memberService;
     private final CommentService commentService;
 
     @Secured("ROLE_USER")
     @PostMapping
     public CommentCreateResponse createComment(@PathVariable Long postId,
                                              @Validated @RequestBody CommentCreateRequest commentDto) {
-        Comment savedComment = commentService.create(postId, commentDto);
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        Comment savedComment = commentService.create(member, postId, commentDto);
         return new CommentCreateResponse(savedComment);
     }
 
@@ -72,9 +78,10 @@ public class CommentController {
     public void createCommentReport(@PathVariable Long postId,
                                     @PathVariable Long commentId,
                                     @RequestBody CommentReportRequest request) {
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
         Comment findComment = commentService.find(commentId);
         validate(postId, findComment);
-        commentService.createCommentReport(commentId, request);
+        commentService.createCommentReport(member, commentId, request);
     }
 
     private void validate(Long postId, Comment comment) {
