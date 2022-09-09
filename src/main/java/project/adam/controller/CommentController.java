@@ -39,8 +39,7 @@ public class CommentController {
 
     @GetMapping("/{commentId}")
     public CommentFindResponse findComment(@PathVariable Long commentId) {
-        Comment findComment = commentService.find(commentId);
-        return new CommentFindResponse(findComment);
+        return new CommentFindResponse(commentService.find(commentId));
     }
 
     @GetMapping("/{commentId}/replies")
@@ -51,14 +50,12 @@ public class CommentController {
     @Secured("ROLE_USER")
     @PutMapping("/{commentId}")
     public void updateComment(@PathVariable Long commentId, @Validated @RequestBody CommentUpdateRequest commentDto) {
-        Comment findComment = commentService.find(commentId);
         commentService.update(commentId, commentDto);
     }
 
     @Secured("ROLE_USER")
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable Long commentId) {
-        Comment findComment = commentService.find(commentId);
         commentService.remove(commentId);
     }
 
@@ -66,7 +63,6 @@ public class CommentController {
     @PostMapping("/{commentId}/report")
     public void createCommentReport(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
-        Comment findComment = commentService.find(commentId);
         commentService.createCommentReport(member, commentId, request);
     }
 }

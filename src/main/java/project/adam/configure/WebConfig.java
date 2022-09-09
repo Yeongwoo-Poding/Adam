@@ -10,11 +10,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${file.dir}")
     private String imagePath;
-    private String connectPath = "/image/**";
+    private static final String CONNECT_PATH = "/image/**";
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(connectPath)
+        registry.addResourceHandler(CONNECT_PATH)
                 .addResourceLocations("file://" + imagePath);
     }
 }

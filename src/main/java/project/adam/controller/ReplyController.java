@@ -8,7 +8,6 @@ import project.adam.controller.dto.reply.ReplyCreateResponse;
 import project.adam.controller.dto.reply.ReplyFindResponse;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
-import project.adam.entity.reply.Reply;
 import project.adam.security.SecurityUtil;
 import project.adam.service.MemberService;
 import project.adam.service.ReplyService;
@@ -39,8 +38,7 @@ public class ReplyController {
     @Secured("ROLE_USER")
     @PutMapping("/{replyId}")
     public void updateReply(@PathVariable Long replyId, @Validated @RequestBody ReplyUpdateRequest updateDto) {
-        Reply findReply = replyService.find(replyId);
-        findReply.update(updateDto.getBody());
+        replyService.update(replyId, updateDto.getBody());
     }
 
     @Secured("ROLE_USER")

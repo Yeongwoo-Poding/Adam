@@ -13,7 +13,6 @@ import project.adam.entity.reply.ReplyReport;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
-import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 
@@ -22,7 +21,6 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 @RequiredArgsConstructor
 public class ReplyService {
 
-    private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
 

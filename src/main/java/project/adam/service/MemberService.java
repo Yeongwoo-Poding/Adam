@@ -154,19 +154,6 @@ public class MemberService {
         return fileExtension;
     }
 
-    public String getImageName(Member member) {
-        return member.getImage();
-    }
-
-    public boolean hasImage(Member member) {
-        String imageName = member.getImage();
-        if (imageName == null) {
-            return false;
-        }
-
-        return new File(imagePath + imageName).exists();
-    }
-
     private void removeExistingImage(Member member) {
         String existingImage = member.getImage();
         if (existingImage != null) {

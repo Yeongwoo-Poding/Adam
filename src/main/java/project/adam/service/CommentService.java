@@ -24,7 +24,6 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 

@@ -53,14 +53,12 @@ public class PostController {
 
     @GetMapping
     public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
-        Slice<Post> result = postService.findAll(condition, pageable);
-        return new PostListFindResponse(result);
+        return new PostListFindResponse(postService.findAll(condition, pageable));
     }
 
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
-        Slice<Comment> result = commentService.findByPost(postId, pageable);
-        return new CommentListFindResponse(result);
+        return new CommentListFindResponse(commentService.findByPost(postId, pageable));
     }
 
     @Secured("ROLE_USER")

@@ -43,8 +43,7 @@ public class MemberController {
 
     @GetMapping
     public MemberFindResponse findMember(@RequestParam String email) {
-        Member findMember = memberService.findByEmail(email);
-        return new MemberFindResponse(findMember);
+        return new MemberFindResponse(memberService.findByEmail(email));
     }
 
     @Secured("ROLE_USER")

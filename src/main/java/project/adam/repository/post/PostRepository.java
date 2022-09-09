@@ -17,8 +17,4 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     @Query("select count(pr) from PostReport pr where pr.post.id = :postId")
     int countPostReportById(Long postId);
-
-    @Modifying
-    @Query("delete from PostReport pr where pr.id = :postReportId")
-    void deletePostReportById(Long postReportId);
 }
