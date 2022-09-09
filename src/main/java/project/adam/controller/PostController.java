@@ -12,7 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.post.PostCreateResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
+import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
+import project.adam.security.SecurityUtil;
+import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
@@ -27,13 +30,15 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PostController {
 
+    private final MemberService memberService;
     private final PostService postService;
 
     @Secured("ROLE_USER")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public PostCreateResponse createPost(@Validated @RequestPart("data") PostCreateRequest postDto,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
-        Post savedPost = postService.create(postDto, images);
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        Post savedPost = postService.create(member, postDto, images);
         return new PostCreateResponse(savedPost);
     }
 
@@ -66,6 +71,7 @@ public class PostController {
     @PostMapping("/{postId}/report")
     public void createReportPost(@PathVariable Long postId,
                                  @RequestBody PostReportRequest request) {
-        postService.createReport(postId, request);
+        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        postService.createReport(member, postId, request);
     }
 }

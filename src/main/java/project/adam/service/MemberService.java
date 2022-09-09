@@ -95,24 +95,15 @@ public class MemberService {
         return tokenDto;
     }
 
-    public Member find(UUID id) {
-        return memberRepository.findById(id).orElseThrow();
-    }
-
-    public Member findByToken(UUID token) {
-        return memberRepository.findByToken(token).orElseThrow();
-    }
-
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow();
     }
+
     @Transactional
-    public void withdraw() {
-        String email = SecurityUtil.getCurrentMemberEmail();
-        Member deleteMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-        removeCommits(deleteMember);
-        removePosts(deleteMember);
-        removeMember(deleteMember);
+    public void withdraw(Member member) {
+        removeCommits(member);
+        removePosts(member);
+        removeMember(member);
     }
     private void removeCommits(Member member) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(member));

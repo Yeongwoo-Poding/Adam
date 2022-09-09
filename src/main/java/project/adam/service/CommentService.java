@@ -33,9 +33,7 @@ public class CommentService {
     private int reportHiddenCount;
 
     @Transactional
-    public Comment create(Long postId, CommentCreateRequest commentDto) {
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-
+    public Comment create(Member member, Long postId, CommentCreateRequest commentDto) {
         return commentRepository.save(new Comment(
                 member,
                 postRepository.findById(postId).orElseThrow(),
@@ -66,11 +64,9 @@ public class CommentService {
     }
 
     @Transactional
-    public void createCommentReport(Long commentId, CommentReportRequest request) {
+    public void createCommentReport(Member member, Long commentId, CommentReportRequest request) {
+        validateCommentHidden(commentId);
         Comment comment = commentRepository.findById(commentId).orElseThrow();
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-
-        validateCommentHidden(comment.getId());
 
         boolean isReportExist = comment.getReports().stream()
                 .anyMatch(commentReport -> commentReport.getMember().equals(member));
@@ -79,18 +75,6 @@ public class CommentService {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
         new CommentReport(comment, member, ReportType.valueOf(request.getReportType()));
-    }
-
-    @Transactional
-    public void deleteCommentReport(Comment comment, Member member) {
-        validateCommentHidden(comment.getId());
-
-        CommentReport report = comment.getReports().stream()
-                .filter(commentReport -> commentReport.getMember().equals(member))
-                .findAny()
-                .orElseThrow(() -> new ApiException(ExceptionEnum.INVALID_REPORT));
-
-        commentRepository.deleteCommentReportById(report.getId());
     }
 
     private void validateCommentHidden(Long commentId) {

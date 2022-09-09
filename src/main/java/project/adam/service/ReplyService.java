@@ -31,8 +31,7 @@ public class ReplyService {
     private int reportHiddenCount;
 
     @Transactional
-    public Reply create(Long commentId, ReplyCreateRequest replyDto) {
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+    public Reply create(Member member, Long commentId, ReplyCreateRequest replyDto) {
         return replyRepository.save(
                 new Reply(
                         member,
@@ -41,6 +40,7 @@ public class ReplyService {
     }
 
     public Reply find(Long replyId) {
+        validateReplyHidden(replyId);
         return replyRepository.findById(replyId).orElseThrow();
     }
 
@@ -50,19 +50,20 @@ public class ReplyService {
 
     @Transactional
     public void update(Long replyId, String body) {
+        validateReplyHidden(replyId);
         Reply findReply = replyRepository.findById(replyId).orElseThrow();
         findReply.update(body);
     }
 
     @Transactional
     public void delete(Long replyId) {
+        validateReplyHidden(replyId);
         replyRepository.delete(replyRepository.findById(replyId).orElseThrow());
     }
 
     @Transactional
-    public void report(Long replyId, ReportType reportType) {
+    public void report(Member member, Long replyId, ReportType reportType) {
         Reply findReply = replyRepository.findById(replyId).orElseThrow();
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
 
         boolean isReportExist = findReply.getReports().stream()
                 .anyMatch(replyReport -> replyReport.getMember().getId() == member.getId());
