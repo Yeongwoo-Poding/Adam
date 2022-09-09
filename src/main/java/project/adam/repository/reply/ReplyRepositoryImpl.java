@@ -23,6 +23,8 @@ public class ReplyRepositoryImpl implements ReplyRepositoryCustom{
     @Override
     public Slice<Reply> findAllByCommentId(Long commentId, Pageable pageable) {
         List<Reply> contents = queryFactory.selectFrom(reply)
+                .leftJoin(reply.writer)
+                .fetchJoin()
                 .where(
                         reply.comment.id.eq(commentId),
                         reply.reports.size().lt(reportHiddenCount)

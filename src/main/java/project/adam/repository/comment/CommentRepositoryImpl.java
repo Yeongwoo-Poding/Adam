@@ -24,6 +24,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
     @Override
     public Slice<Comment> findRootCommentByPost(Post post, Pageable pageable) {
         List<Comment> contents = queryFactory.selectFrom(comment)
+//                .leftJoin(comment.post)
+//                .fetchJoin()
+                .leftJoin(comment.writer)
+                .fetchJoin()
                 .leftJoin(comment.replies)
                 .fetchJoin()
                 .where(

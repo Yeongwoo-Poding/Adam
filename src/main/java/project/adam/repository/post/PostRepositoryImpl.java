@@ -30,6 +30,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         List<Post> contents = queryFactory.query()
                 .select(post)
                 .from(post)
+                .leftJoin(post.thumbnail)
+                .fetchJoin()
+                .leftJoin(post.writer)
+                .fetchJoin()
                 .where(searchCondition(condition.getContent()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -75,6 +79,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         return Optional.ofNullable(
                 queryFactory.selectFrom(post)
+                        .leftJoin(post.writer)
+                        .fetchJoin()
+                        .leftJoin(post.comments)
+                        .fetchJoin()
                         .where(post.id.eq(postId))
                         .fetchOne()
         );
