@@ -26,7 +26,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
 
     private String name;
 
-    private String imageName;
+    private String image;
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
@@ -56,8 +56,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         return token;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setImage(String imageName) {
+        this.image = imageName;
     }
 
     @Override

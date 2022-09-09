@@ -12,14 +12,14 @@ public class PostListContent {
     private String title;
     private int viewCount;
     private int commentCount;
-    private String thumbnailName;
+    private String thumbnail;
 
     public PostListContent(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.writerName = post.getWriter().getName();
         this.viewCount = post.getViewCount();
-        this.thumbnailName = post.getThumbnailName();
+        this.thumbnail = post.getThumbnailName();
         this.commentCount = post.getComments().size();
     }
 }

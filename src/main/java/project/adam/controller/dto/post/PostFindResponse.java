@@ -18,7 +18,7 @@ public class PostFindResponse {
     private String body;
     private int viewCount;
     private int commentCount;
-    private List<String> imageNames = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
 
     public PostFindResponse(Post post) {
         this.id = post.getId();
@@ -28,7 +28,7 @@ public class PostFindResponse {
         this.viewCount = post.getViewCount();
         this.body = post.getBody();
         this.commentCount = post.getComments().size();
-        this.imageNames = post.getImages().stream()
+        this.images = post.getImages().stream()
                 .map(PostImage::getName)
                 .collect(Collectors.toList());
     }

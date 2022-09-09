@@ -124,7 +124,7 @@ public class MemberService {
         removeExistingImage(member);
 
         String imageName = UUID.randomUUID() + getExtension(file);
-        member.setImageName(imageName);
+        member.setImage(imageName);
 
         File newFile = new File(imagePath + imageName);
         file.transferTo(newFile);
@@ -134,7 +134,7 @@ public class MemberService {
     public void removeImage() {
         Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         removeExistingImage(member);
-        member.setImageName(null);
+        member.setImage(null);
     }
 
     private String getExtension(MultipartFile file) {
@@ -155,11 +155,11 @@ public class MemberService {
     }
 
     public String getImageName(Member member) {
-        return member.getImageName();
+        return member.getImage();
     }
 
     public boolean hasImage(Member member) {
-        String imageName = member.getImageName();
+        String imageName = member.getImage();
         if (imageName == null) {
             return false;
         }
@@ -168,7 +168,7 @@ public class MemberService {
     }
 
     private void removeExistingImage(Member member) {
-        String existingImage = member.getImageName();
+        String existingImage = member.getImage();
         if (existingImage != null) {
             File image = new File(imagePath + existingImage);
             if (!image.delete()) {

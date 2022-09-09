@@ -17,7 +17,7 @@ public class PostCreateResponse {
     private ZonedDateTime createDate;
     private String title;
     private String body;
-    private List<String> imageNames = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
 
     public PostCreateResponse(Post post) {
         this.id = post.getId();
@@ -25,7 +25,7 @@ public class PostCreateResponse {
         this.createDate = post.getCreateDate();
         this.title = post.getTitle();
         this.body = post.getBody();
-        this.imageNames = post.getImages().stream()
+        this.images = post.getImages().stream()
                 .map(PostImage::getName)
                 .collect(Collectors.toList());
     }

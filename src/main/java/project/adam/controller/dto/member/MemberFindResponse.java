@@ -13,12 +13,12 @@ public class MemberFindResponse {
     private UUID id;
     private String name;
     private String email;
-    private String imageName;
+    private String image;
 
     public MemberFindResponse(Member member) {
         this.id = null;
         this.name = member.getName();
         this.email = member.getEmail();
-        this.imageName = member.getImageName();
+        this.image = member.getImage();
     }
 }
