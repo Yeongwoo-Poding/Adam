@@ -8,6 +8,7 @@ import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long>, CommentRepositoryCustom {
 
