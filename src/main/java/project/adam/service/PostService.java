@@ -17,7 +17,6 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.security.SecurityUtil;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;

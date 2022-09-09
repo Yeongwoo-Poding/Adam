@@ -8,11 +8,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import project.adam.service.CommentService;
-import project.adam.service.MemberService;
-import project.adam.service.PostService;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 
 @Profile({"local", "dev"})

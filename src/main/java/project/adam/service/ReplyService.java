@@ -15,7 +15,6 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
-import project.adam.security.SecurityUtil;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 
 @Service
@@ -31,11 +30,11 @@ public class ReplyService {
     private int reportHiddenCount;
 
     @Transactional
-    public Reply create(Member member, Long commentId, ReplyCreateRequest replyDto) {
+    public Reply create(Member member, ReplyCreateRequest replyDto) {
         return replyRepository.save(
                 new Reply(
                         member,
-                        commentRepository.findById(commentId).orElseThrow(),
+                        commentRepository.findById(replyDto.commentId).orElseThrow(),
                         replyDto.getBody()));
     }
 

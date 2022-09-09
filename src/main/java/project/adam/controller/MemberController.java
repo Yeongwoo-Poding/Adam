@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberFindResponse;
-import project.adam.controller.dto.member.MemberImageResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -32,7 +31,7 @@ public class MemberController {
         memberService.join(memberDto);
     }
 
-    @PostMapping("/session")
+    @PostMapping("/login")
     public TokenDto loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
         return memberService.login(memberDto);
     }
@@ -61,14 +60,7 @@ public class MemberController {
         if (image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-
         memberService.saveImage(image);
-    }
-
-    @GetMapping("/image")
-    public MemberImageResponse getImageName(@RequestParam String email) {
-        Member findMember = memberService.findByEmail(email);
-        return new MemberImageResponse(memberService.hasImage(findMember), memberService.getImageName(findMember));
     }
 
     @Secured("ROLE_USER")
