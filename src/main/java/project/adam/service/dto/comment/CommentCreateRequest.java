@@ -13,4 +13,6 @@ public class CommentCreateRequest {
 
     @NotEmpty
     private String body;
+
+    public Long postId;
 }

@@ -13,4 +13,6 @@ public class ReplyCreateRequest {
 
     @NotEmpty
     private String body;
+
+    public Long commentId;
 }

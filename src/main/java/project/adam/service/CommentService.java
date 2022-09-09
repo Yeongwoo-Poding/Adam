@@ -15,7 +15,6 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.security.SecurityUtil;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
@@ -33,10 +32,10 @@ public class CommentService {
     private int reportHiddenCount;
 
     @Transactional
-    public Comment create(Member member, Long postId, CommentCreateRequest commentDto) {
+    public Comment create(Member member, CommentCreateRequest commentDto) {
         return commentRepository.save(new Comment(
                 member,
-                postRepository.findById(postId).orElseThrow(),
+                postRepository.findById(commentDto.postId).orElseThrow(),
                 commentDto.getBody()
         ));
     }
