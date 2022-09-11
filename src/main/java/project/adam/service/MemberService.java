@@ -2,6 +2,7 @@ package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -23,6 +24,7 @@ import project.adam.security.refreshtoken.RefreshToken;
 import project.adam.security.refreshtoken.RefreshTokenRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
+import project.adam.utils.ImageUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +42,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final PostService postService;
+    private final ImageUtils imageUtils;
 
-    @Value("${file.dir}")
-    private String imagePath;
 
     @Transactional
     public UUID join(MemberJoinRequest memberDto) {
@@ -105,6 +106,7 @@ public class MemberService {
         removePosts(member);
         removeMember(member);
     }
+
     private void removeCommits(Member member) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(member));
     }
@@ -114,53 +116,22 @@ public class MemberService {
     }
 
     private void removeMember(Member member) {
-        removeExistingImage(member);
+        imageUtils.removeImageFile(member.getImage());
         memberRepository.delete(member);
     }
 
     @Transactional
     public void saveImage(MultipartFile file) throws IOException {
         Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-        removeExistingImage(member);
-
-        String imageName = UUID.randomUUID() + getExtension(file);
+        imageUtils.removeImageFile(member.getImage());
+        String imageName = imageUtils.createImageFile(file).getName();
         member.setImage(imageName);
-
-        File newFile = new File(imagePath + imageName);
-        file.transferTo(newFile);
     }
 
     @Transactional
     public void removeImage() {
         Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-        removeExistingImage(member);
+        imageUtils.removeImageFile(member.getImage());
         member.setImage(null);
-    }
-
-    private String getExtension(MultipartFile file) {
-        String contentType = file.getContentType();
-        String fileExtension;
-        if (contentType == null) {
-            throw new ApiException(ExceptionEnum.INVALID_HEADER);
-        }
-
-        if (contentType.equals("image/png")) {
-            fileExtension = ".png";
-        } else if (contentType.equals("image/jpeg")) {
-            fileExtension = ".jpeg";
-        } else {
-            throw new ApiException(ExceptionEnum.INVALID_HEADER);
-        }
-        return fileExtension;
-    }
-
-    private void removeExistingImage(Member member) {
-        String existingImage = member.getImage();
-        if (existingImage != null) {
-            File image = new File(imagePath + existingImage);
-            if (!image.delete()) {
-                log.warn( "[{}.removeImage] Image has not been deleted.", getClass().getName());
-            }
-        }
     }
 }
