@@ -39,6 +39,15 @@ public class CommentService {
         ));
     }
 
+    public Comment find(Long commentId) {
+        validateCommentHidden(commentId);
+        return commentRepository.findById(commentId).orElseThrow();
+    }
+
+    public Slice<Comment> findByPost(Long postId, Pageable pageable) {
+        return commentRepository.findRootCommentByPost(postRepository.findById(postId).orElseThrow(), pageable);
+    }
+
     @Transactional
     public void update(Long commentId, CommentUpdateRequest commentDto) {
         validateCommentHidden(commentId);
@@ -50,15 +59,6 @@ public class CommentService {
     public void remove(Long commentId) {
         validateCommentHidden(commentId);
         commentRepository.delete(commentRepository.findById(commentId).orElseThrow());
-    }
-
-    public Comment find(Long commentId) {
-        validateCommentHidden(commentId);
-        return commentRepository.findById(commentId).orElseThrow();
-    }
-
-    public Slice<Comment> findByPost(Long postId, Pageable pageable) {
-        return commentRepository.findRootCommentByPost(postRepository.findById(postId).orElseThrow(), pageable);
     }
 
     @Transactional
