@@ -12,7 +12,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import project.adam.security.dto.TokenDto;
+import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.exception.ApiException;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -20,11 +21,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
+
 @Slf4j
 @Component
 public class TokenProvider {
     private static final String AUTHORITIES_KEY = "auth";
-    private static final String BEARER_TYPE = "bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
 
@@ -35,7 +37,7 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto generateTokenDto(Authentication authentication) {
+    public MemberLoginResponse generateTokenDto(Authentication authentication) {
         String authorites = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -56,8 +58,7 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
-        return TokenDto.builder()
-                .grantType(BEARER_TYPE)
+        return MemberLoginResponse.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(accessExpireDate.getTime())
                 .refreshToken(refreshToken)
@@ -68,7 +69,7 @@ public class TokenProvider {
         Claims claims = parseClaims(accessToken);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다");
+            throw new ApiException(AUTHENTICATION_FAILED);
         }
 
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))

@@ -10,7 +10,6 @@ import project.adam.entity.post.Post;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -34,26 +33,16 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
-    @Column(length = 16)
-    private UUID token = null;
-
     public Member(String id, String email, String name) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.authority = Authority.ROLE_USER;
-        this.token = UUID.randomUUID();
     }
 
     public Member(String id, String email, String name, Authority authority) {
         this(id, email, name);
         this.authority = authority;
-        this.token = UUID.randomUUID();
-    }
-
-    public UUID login() {
-        this.token = UUID.randomUUID();
-        return token;
     }
 
     public void setImage(String imageName) {

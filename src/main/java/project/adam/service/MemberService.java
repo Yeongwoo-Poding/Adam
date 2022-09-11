@@ -2,8 +2,6 @@ package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -11,24 +9,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.member.MemberRefreshResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
-import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.security.SecurityUtil;
 import project.adam.security.TokenProvider;
-import project.adam.security.dto.RefreshTokenDto;
-import project.adam.security.dto.TokenDto;
 import project.adam.security.refreshtoken.RefreshToken;
 import project.adam.security.refreshtoken.RefreshTokenRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 import project.adam.utils.ImageUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
+
+import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
+import static project.adam.exception.ExceptionEnum.UNIQUE_CONSTRAINT_VIOLATED;
 
 @Slf4j
 @Service
@@ -46,54 +44,53 @@ public class MemberService {
 
 
     @Transactional
-    public UUID join(MemberJoinRequest memberDto) {
+    public void join(MemberJoinRequest memberDto) {
         if (memberRepository.existsByEmail(memberDto.getEmail())) {
-            throw new RuntimeException("이미 가입되어 있는 유저입니다");
+            throw new ApiException(UNIQUE_CONSTRAINT_VIOLATED);
         }
 
-        Member savedMember = memberRepository.save(new Member(
+        memberRepository.save(new Member(
                 passwordEncoder.encode(memberDto.getId()),
                 memberDto.getEmail(),
                 memberDto.getName(),
                 memberDto.getAuthority()
         ));
-
-        return savedMember.getToken();
     }
 
     @Transactional
-    public TokenDto login(MemberLoginRequest memberDto) {
+    public MemberLoginResponse login(MemberLoginRequest memberDto) {
         UsernamePasswordAuthenticationToken authenticationToken = memberDto.toAuthentication();
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authenticate);
+        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authenticate);
         RefreshToken refreshToken = RefreshToken.builder()
                 .key(authenticate.getName())
-                .value(tokenDto.getRefreshToken())
+                .value(memberLoginResponse.getRefreshToken())
                 .build();
 
         refreshTokenRepository.save(refreshToken);
 
-        return tokenDto;
+        return memberLoginResponse;
     }
 
-    public TokenDto refreshToken(RefreshTokenDto memberDto) {
+    @Transactional
+    public MemberLoginResponse refreshToken(MemberRefreshResponse memberDto) {
         if (!tokenProvider.validateToken(memberDto.getRefreshToken())) {
-            throw new RuntimeException("Refresh Token이 유효하지 않습니다");
+            throw new ApiException(AUTHENTICATION_FAILED);
         }
 
         Authentication authentication = tokenProvider.getAuthentication(memberDto.getAccessToken());
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName()).orElseThrow(() -> new RuntimeException("로그아웃된 사용자입니다."));
+        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName()).orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
 
         if (!refreshToken.getValue().equals(memberDto.getRefreshToken())) {
-            throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다");
+            throw new ApiException(AUTHENTICATION_FAILED);
         }
 
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authentication);
 
-        RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
+        RefreshToken newRefreshToken = refreshToken.updateValue(memberLoginResponse.getRefreshToken());
         refreshTokenRepository.save(newRefreshToken);
 
-        return tokenDto;
+        return memberLoginResponse;
     }
 
     public Member findByEmail(String email) {

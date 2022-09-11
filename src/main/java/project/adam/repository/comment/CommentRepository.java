@@ -1,7 +1,6 @@
 package project.adam.repository.comment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.member.Member;

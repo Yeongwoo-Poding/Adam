@@ -3,6 +3,8 @@ package project.adam.security;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 
 @Slf4j
 public class SecurityUtil {
@@ -13,7 +15,7 @@ public class SecurityUtil {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null && authentication.getName() == null) {
-            throw new RuntimeException("Security Context에 인증정보가 없습니다");
+            throw new ApiException(ExceptionEnum.AUTHENTICATION_FAILED);
         }
 
         return authentication.getName();

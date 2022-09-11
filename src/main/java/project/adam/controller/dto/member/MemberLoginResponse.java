@@ -1,20 +1,17 @@
 package project.adam.controller.dto.member;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import project.adam.entity.member.Member;
-
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MemberLoginResponse {
 
-    UUID token;
-
-    public MemberLoginResponse(UUID token) {
-        this.token = token;
-    }
-
-    public MemberLoginResponse(Member member) {
-        this.token = member.getToken();
-    }
+    private String accessToken;
+    private String refreshToken;
+    private Long accessTokenExpiresIn;
 }
