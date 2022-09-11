@@ -11,29 +11,29 @@ import java.util.UUID;
 @Aspect
 public class LogTraceAspect {
 
-    private ThreadLocal<String> uuidPrifix = new ThreadLocal<>();
+    private final ThreadLocal<String> uuidPrefix = new ThreadLocal<>();
 
     @Around("project.adam.aop.Pointcuts.logTarget()")
     public Object logger(ProceedingJoinPoint joinPoint) throws Throwable {
         boolean isNew = false;
-        if (uuidPrifix.get() == null) {
+        if (uuidPrefix.get() == null) {
             isNew = true;
-            uuidPrifix.set(UUID.randomUUID().toString().substring(0, 8));
+            uuidPrefix.set(UUID.randomUUID().toString().substring(0, 8));
         }
-        log.info("[{}] {}", uuidPrifix.get(), joinPoint.getSignature());
+        log.info("[{}] {}", uuidPrefix.get(), joinPoint.getSignature());
         long startTime = System.currentTimeMillis();
         try {
             Object result = joinPoint.proceed();
             long endTime = System.currentTimeMillis();
-            log.info("[{}] {} Success in {}ms", uuidPrifix.get(), joinPoint.getSignature(), endTime - startTime);
+            log.info("[{}] {} Success in {}ms", uuidPrefix.get(), joinPoint.getSignature(), endTime - startTime);
             return result;
         } catch (Exception e) {
             long endTime = System.currentTimeMillis();
-            log.info("[{}] {} Fail in {}ms", uuidPrifix.get(), joinPoint.getSignature(), endTime - startTime);
+            log.info("[{}] {} Fail in {}ms", uuidPrefix.get(), joinPoint.getSignature(), endTime - startTime);
             throw e;
         } finally {
             if (isNew) {
-                uuidPrifix.remove();
+                uuidPrefix.remove();
             }
         }
     }

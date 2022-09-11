@@ -6,12 +6,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberFindResponse;
+import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.member.MemberRefreshResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.security.SecurityUtil;
-import project.adam.security.dto.RefreshTokenDto;
-import project.adam.security.dto.TokenDto;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
@@ -32,12 +32,12 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public TokenDto loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
+    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
         return memberService.login(memberDto);
     }
 
     @PostMapping("/refresh")
-    public TokenDto refreshToken(@Validated @RequestBody RefreshTokenDto memberDto) {
+    public MemberLoginResponse refreshToken(@Validated @RequestBody MemberRefreshResponse memberDto) {
         return memberService.refreshToken(memberDto);
     }
 

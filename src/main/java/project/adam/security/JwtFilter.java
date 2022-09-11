@@ -15,7 +15,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String BEARER_PREFIX = "Bearer ";
 
     private final TokenProvider tokenProvider;
 
@@ -32,7 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        return bearerToken;
+        return request.getHeader(AUTHORIZATION_HEADER);
     }
 }
