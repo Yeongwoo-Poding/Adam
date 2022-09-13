@@ -26,8 +26,7 @@ import project.adam.utils.ImageUtils;
 
 import java.io.IOException;
 
-import static project.adam.exception.ExceptionEnum.AUTHENTICATION_FAILED;
-import static project.adam.exception.ExceptionEnum.UNIQUE_CONSTRAINT_VIOLATED;
+import static project.adam.exception.ExceptionEnum.*;
 
 @Slf4j
 @Service
@@ -125,10 +124,13 @@ public class MemberService {
     }
 
     @Transactional
-    public void saveImage(MultipartFile file) throws IOException {
+    public void saveImage(MultipartFile image) throws IOException {
+        if (image == null) {
+            throw new ApiException(INVALID_INPUT);
+        }
         Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         imageUtils.removeImageFile(member.getImage());
-        String imageName = imageUtils.createImageFile(file).getName();
+        String imageName = imageUtils.createImageFile(image).getName();
         member.setImage(imageName);
     }
 
