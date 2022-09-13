@@ -17,13 +17,4 @@ public class PostCreateRequest {
     private String title;
 
     private String body;
-
-    private Integer thumbnailIndex;
-
-    public PostCreateRequest(String boardName, String title, String body) {
-        this.board = boardName;
-        this.title = title;
-        this.body = body;
-        this.thumbnailIndex = null;
-    }
 }
