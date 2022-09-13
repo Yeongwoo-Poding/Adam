@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 
-@Profile({"local", "dev"})
+@Profile({"local", "dev", "test"})
 @Component
 @RequiredArgsConstructor
 public class InitData {
