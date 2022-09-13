@@ -48,11 +48,14 @@ public class PostService {
                 postDto.getBody()
         ));
 
-        createImages(images, savedPost);
-        if (postDto.getThumbnailIndex() != null) {
-            String imageName = savedPost.getImages().get(postDto.getThumbnailIndex()).getName();
-            MultipartFile image = images[postDto.getThumbnailIndex()];
-            createThumbnail(imageName, image, savedPost);
+        if (images != null) {
+            createImages(images, savedPost);
+            Integer thumbnailIndex = postDto.getThumbnailIndex();
+            if (isValidIndex(thumbnailIndex, images.length)) {
+                String imageName = savedPost.getImages().get(thumbnailIndex).getName();
+                MultipartFile image = images[thumbnailIndex];
+                createThumbnail(imageName, image, savedPost);
+            }
         }
         return savedPost;
     }
@@ -67,18 +70,6 @@ public class PostService {
         return postRepository.findAll(condition, pageable);
     }
 
-    private void createImages(MultipartFile[] images, Post post) throws IOException {
-        for (MultipartFile image : images) {
-            File imageFile = imageUtils.createImageFile(image);
-            new PostImage(post, imageFile.getName());
-        }
-    }
-
-    private void createThumbnail(String originImageName, MultipartFile image, Post post) throws IOException {
-        File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
-        new PostThumbnail(post, thumbnailFile.getName());
-    }
-
     @Transactional
     public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
         validationPostHidden(postId);
@@ -90,11 +81,13 @@ public class PostService {
         removeThumbnailFile(findPost);
         removeThumbnailData(findPost);
 
-        createImages(images, findPost);
-        if (postDto.getThumbnailIndex() != null) {
-            String imageName = findPost.getImages().get(postDto.getThumbnailIndex()).getName();
-            MultipartFile image = images[postDto.getThumbnailIndex()];
-            createThumbnail(imageName, image, findPost);
+        if (images != null) {
+            createImages(images, findPost);
+            if (postDto.getThumbnailIndex() != null) {
+                String imageName = findPost.getImages().get(postDto.getThumbnailIndex()).getName();
+                MultipartFile image = images[postDto.getThumbnailIndex()];
+                createThumbnail(imageName, image, findPost);
+            }
         }
     }
 
@@ -110,6 +103,26 @@ public class PostService {
         removeImageFiles(findPost);
         removeThumbnailFile(findPost);
         postRepository.delete(findPost);
+    }
+
+    private void createImages(MultipartFile[] images, Post post) throws IOException {
+        for (MultipartFile image : images) {
+            File imageFile = imageUtils.createImageFile(image);
+            new PostImage(post, imageFile.getName());
+        }
+    }
+
+    private void createThumbnail(String originImageName, MultipartFile image, Post post) throws IOException {
+        File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
+        new PostThumbnail(post, thumbnailFile.getName());
+    }
+
+    public boolean isValidIndex(Integer idx, int imageCount) {
+        if (idx == null) {
+            return false;
+        }
+
+        return idx < imageCount;
     }
 
     private void removeImageFiles(Post post) {
