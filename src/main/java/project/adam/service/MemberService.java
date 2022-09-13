@@ -15,6 +15,7 @@ import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
+import project.adam.repository.reply.ReplyRepository;
 import project.adam.security.SecurityUtil;
 import project.adam.security.TokenProvider;
 import project.adam.security.refreshtoken.RefreshToken;
@@ -39,6 +40,7 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final PostService postService;
     private final ImageUtils imageUtils;
 
@@ -99,12 +101,17 @@ public class MemberService {
 
     @Transactional
     public void withdraw(Member member) {
-        removeCommits(member);
+        removeReplies(member);
+        removeComments(member);
         removePosts(member);
         removeMember(member);
     }
 
-    private void removeCommits(Member member) {
+    private void removeReplies(Member member) {
+        replyRepository.deleteAll(replyRepository.findAllByWriter(member));
+    }
+
+    private void removeComments(Member member) {
         commentRepository.deleteAll(commentRepository.findAllByWriter(member));
     }
 
