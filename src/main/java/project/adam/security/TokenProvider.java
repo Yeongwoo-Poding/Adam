@@ -60,7 +60,7 @@ public class TokenProvider {
 
         return MemberLoginResponse.builder()
                 .accessToken(accessToken)
-                .accessTokenExpiresIn(accessExpireDate.getTime())
+                .expiredDate(accessExpireDate)
                 .refreshToken(refreshToken)
                 .build();
     }

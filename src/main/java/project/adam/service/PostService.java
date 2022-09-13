@@ -50,12 +50,9 @@ public class PostService {
 
         if (images != null) {
             createImages(images, savedPost);
-            Integer thumbnailIndex = postDto.getThumbnailIndex();
-            if (isValidIndex(thumbnailIndex, images.length)) {
-                String imageName = savedPost.getImages().get(thumbnailIndex).getName();
-                MultipartFile image = images[thumbnailIndex];
-                createThumbnail(imageName, image, savedPost);
-            }
+            String imageName = savedPost.getImages().get(0).getName();
+            MultipartFile image = images[0];
+            createThumbnail(imageName, image, savedPost);
         }
         return savedPost;
     }
@@ -83,11 +80,9 @@ public class PostService {
 
         if (images != null) {
             createImages(images, findPost);
-            if (postDto.getThumbnailIndex() != null) {
-                String imageName = findPost.getImages().get(postDto.getThumbnailIndex()).getName();
-                MultipartFile image = images[postDto.getThumbnailIndex()];
-                createThumbnail(imageName, image, findPost);
-            }
+            String imageName = findPost.getImages().get(0).getName();
+            MultipartFile image = images[0];
+            createThumbnail(imageName, image, findPost);
         }
     }
 
@@ -115,14 +110,6 @@ public class PostService {
     private void createThumbnail(String originImageName, MultipartFile image, Post post) throws IOException {
         File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
         new PostThumbnail(post, thumbnailFile.getName());
-    }
-
-    public boolean isValidIndex(Integer idx, int imageCount) {
-        if (idx == null) {
-            return false;
-        }
-
-        return idx < imageCount;
     }
 
     private void removeImageFiles(Post post) {
