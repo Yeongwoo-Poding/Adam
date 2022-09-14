@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
 
@@ -34,7 +35,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetchJoin()
                 .leftJoin(post.writer)
                 .fetchJoin()
-                .where(searchCondition(condition.getContent()))
+                .where(searchCondition(condition))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -47,10 +48,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return new SliceImpl<>(contents, pageable, hasNext);
     }
 
-    private BooleanBuilder searchCondition(String text) {
+    private BooleanBuilder searchCondition(PostFindCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.or(titleCondition(text));
-        builder.or(bodyCondition(text));
+        builder.or(titleCondition(condition.getContent()));
+        builder.or(bodyCondition(condition.getContent()));
+        builder.and(boardCondition(condition.getBoard()));
         builder.and(validateHiddenCondition());
         return builder;
     }
@@ -61,6 +63,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private BooleanExpression bodyCondition(String body) {
         return body == null ? null : post.body.like("%" + body + "%");
+    }
+
+    private BooleanExpression boardCondition(String boardId) {
+        if (boardId == null) {
+            return null;
+        }
+        return post.board.eq(Board.valueOf(boardId));
     }
 
     private BooleanExpression validateHiddenCondition() {

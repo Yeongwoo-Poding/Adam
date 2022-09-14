@@ -10,5 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostFindCondition {
 
+    private String board;
     private String content;
 }
