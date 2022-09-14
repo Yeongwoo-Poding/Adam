@@ -6,10 +6,13 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
 import project.adam.entity.common.BaseTimeEntity;
 import project.adam.entity.post.Post;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -52,5 +55,26 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @Override
     public boolean isNew() {
         return getCreateDate() == null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Member member = (Member) o;
+        return id.equals(member.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public void authorization(String memberId) {
+        if (!memberId.equals(this.id)) {
+            if (this.authority != Authority.ROLE_ADMIN) {
+                throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            }
+        }
     }
 }

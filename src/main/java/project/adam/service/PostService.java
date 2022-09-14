@@ -15,7 +15,9 @@ import project.adam.entity.post.*;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
@@ -32,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ImageUtils imageUtils;
@@ -69,8 +72,11 @@ public class PostService {
 
     @Transactional
     public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
-        validationPostHidden(postId);
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         Post findPost = postRepository.findById(postId).orElseThrow();
+        loginMember.authorization(findPost.getWriter().getId());
+
+        validationPostHidden(postId);
         findPost.update(postDto.getTitle(), postDto.getBody());
 
         removeImageFiles(findPost);
@@ -88,12 +94,14 @@ public class PostService {
 
     @Transactional
     public void remove(Long postId) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+        Post findPost = postRepository.findById(postId).orElseThrow();
+        loginMember.authorization(findPost.getWriter().getId());
+
         validationPostHidden(postId);
 
         List<Comment> comments = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
         commentRepository.deleteAll(comments);
-
-        Post findPost = postRepository.findById(postId).orElseThrow();
 
         removeImageFiles(findPost);
         removeThumbnailFile(findPost);

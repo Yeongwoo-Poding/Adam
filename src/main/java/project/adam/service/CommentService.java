@@ -10,10 +10,13 @@ import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
@@ -23,6 +26,7 @@ import project.adam.service.dto.comment.CommentUpdateRequest;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
@@ -49,15 +53,22 @@ public class CommentService {
 
     @Transactional
     public void update(Long commentId, CommentUpdateRequest commentDto) {
-        validateCommentHidden(commentId);
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         Comment findComment = commentRepository.findById(commentId).orElseThrow();
+        loginMember.authorization(findComment.getWriter().getId());
+
+        validateCommentHidden(commentId);
         findComment.update(commentDto.getBody());
     }
 
     @Transactional
     public void remove(Long commentId) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+        Comment findComment = commentRepository.findById(commentId).orElseThrow();
+        loginMember.authorization(findComment.getWriter().getId());
+
         validateCommentHidden(commentId);
-        commentRepository.delete(commentRepository.findById(commentId).orElseThrow());
+        commentRepository.delete(findComment);
     }
 
     @Transactional
