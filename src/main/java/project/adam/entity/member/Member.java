@@ -70,8 +70,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         return Objects.hash(id);
     }
 
-    public void authorization(String memberId) {
-        if (!memberId.equals(this.id)) {
+    public void authorization(Member member) {
+        if (!member.equals(this)) {
             if (this.authority != Authority.ROLE_ADMIN) {
                 throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
             }
