@@ -16,7 +16,7 @@ import project.adam.exception.ApiException;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
-import project.adam.security.SecurityUtil;
+import project.adam.security.SecurityUtils;
 import project.adam.security.TokenProvider;
 import project.adam.security.refreshtoken.RefreshToken;
 import project.adam.security.refreshtoken.RefreshTokenRepository;
@@ -115,7 +115,7 @@ public class MemberService {
     }
 
     private void removePosts(Member member) {
-        member.getPosts().forEach(post -> postService.remove(post.getId()));
+        member.getPosts().forEach(postService::remove);
     }
 
     private void removeMember(Member member) {
@@ -124,20 +124,23 @@ public class MemberService {
     }
 
     @Transactional
-    public void saveImage(MultipartFile image) throws IOException {
+    public void saveImage(Member member, MultipartFile image) throws IOException {
         if (image == null) {
             throw new ApiException(INVALID_INPUT);
         }
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         imageUtils.removeImageFile(member.getImage());
         String imageName = imageUtils.createImageFile(image).getName();
         member.setImage(imageName);
     }
 
     @Transactional
-    public void removeImage() {
-        Member member = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+    public void removeImage(Member member) {
         imageUtils.removeImageFile(member.getImage());
         member.setImage(null);
+    }
+
+    public void authorization(Member member) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
+        loginMember.authorization(member);
     }
 }

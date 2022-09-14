@@ -8,7 +8,8 @@ import project.adam.controller.dto.reply.ReplyCreateResponse;
 import project.adam.controller.dto.reply.ReplyFindResponse;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
-import project.adam.security.SecurityUtil;
+import project.adam.entity.reply.Reply;
+import project.adam.security.SecurityUtils;
 import project.adam.service.MemberService;
 import project.adam.service.ReplyService;
 import project.adam.service.dto.reply.ReplyCreateRequest;
@@ -26,7 +27,7 @@ public class ReplyController {
     @Secured("ROLE_USER")
     @PostMapping
     public ReplyCreateResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) {
-        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         return new ReplyCreateResponse(replyService.create(member, createDto));
     }
 
@@ -38,19 +39,24 @@ public class ReplyController {
     @Secured("ROLE_USER")
     @PutMapping("/{replyId}")
     public void updateReply(@PathVariable Long replyId, @Validated @RequestBody ReplyUpdateRequest updateDto) {
-        replyService.update(replyId, updateDto.getBody());
+        Reply findReply = replyService.find(replyId);
+        memberService.authorization(findReply.getWriter());
+        replyService.update(findReply, updateDto.getBody());
     }
 
     @Secured("ROLE_USER")
     @DeleteMapping("/{replyId}")
     public void deleteReply(@PathVariable Long replyId) {
-        replyService.delete(replyId);
+        Reply findReply = replyService.find(replyId);
+        memberService.authorization(findReply.getWriter());
+        replyService.delete(findReply);
     }
 
     @Secured("ROLE_USER")
     @PostMapping("/{replyId}/report")
     public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest reportDto) {
-        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
-        replyService.report(member, replyId, ReportType.valueOf(reportDto.getReportType()));
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        Reply findReply = replyService.find(replyId);
+        replyService.report(member, findReply, ReportType.valueOf(reportDto.getReportType()));
     }
 }

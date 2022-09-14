@@ -11,7 +11,7 @@ import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.reply.ReplyListFindResponse;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.member.Member;
-import project.adam.security.SecurityUtil;
+import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
 import project.adam.service.ReplyService;
@@ -32,7 +32,7 @@ public class CommentController {
     @Secured("ROLE_USER")
     @PostMapping
     public CommentCreateResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) {
-        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment savedComment = commentService.create(member, commentDto);
         return new CommentCreateResponse(savedComment);
     }
@@ -50,19 +50,24 @@ public class CommentController {
     @Secured("ROLE_USER")
     @PutMapping("/{commentId}")
     public void updateComment(@PathVariable Long commentId, @Validated @RequestBody CommentUpdateRequest commentDto) {
-        commentService.update(commentId, commentDto);
+        Comment findComment = commentService.find(commentId);
+        memberService.authorization(findComment.getWriter());
+        commentService.update(findComment, commentDto);
     }
 
     @Secured("ROLE_USER")
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable Long commentId) {
-        commentService.remove(commentId);
+        Comment findComment = commentService.find(commentId);
+        memberService.authorization(findComment.getWriter());
+        commentService.remove(findComment);
     }
 
     @Secured("ROLE_USER")
     @PostMapping("/{commentId}/report")
     public void createCommentReport(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
-        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
-        commentService.createCommentReport(member, commentId, request);
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        Comment findComment = commentService.find(commentId);
+        commentService.createCommentReport(member, findComment, request);
     }
 }

@@ -15,9 +15,7 @@ import project.adam.entity.post.*;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
-import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.security.SecurityUtil;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
@@ -34,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ImageUtils imageUtils;
@@ -62,7 +59,7 @@ public class PostService {
 
     @Transactional
     public Post find(Long postId) {
-        validationPostHidden(postId);
+        validatePostHidden(postId);
         return postRepository.findPostIncViewCount(postId).orElseThrow();
     }
 
@@ -71,41 +68,34 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Long postId, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
-        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-        Post findPost = postRepository.findById(postId).orElseThrow();
-        loginMember.authorization(findPost.getWriter().getId());
+    public void update(Post post, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
+        validatePostHidden(post.getId());
 
-        validationPostHidden(postId);
-        findPost.update(postDto.getTitle(), postDto.getBody());
+        post.update(postDto.getTitle(), postDto.getBody());
 
-        removeImageFiles(findPost);
-        removeImageDatas(findPost);
-        removeThumbnailFile(findPost);
-        removeThumbnailData(findPost);
+        removeImageFiles(post);
+        removeImageDatas(post);
+        removeThumbnailFile(post);
+        removeThumbnailData(post);
 
         if (images != null) {
-            createImages(images, findPost);
-            String imageName = findPost.getImages().get(0).getName();
+            createImages(images, post);
+            String imageName = post.getImages().get(0).getName();
             MultipartFile image = images[0];
-            createThumbnail(imageName, image, findPost);
+            createThumbnail(imageName, image, post);
         }
     }
 
     @Transactional
-    public void remove(Long postId) {
-        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
-        Post findPost = postRepository.findById(postId).orElseThrow();
-        loginMember.authorization(findPost.getWriter().getId());
+    public void remove(Post post) {
+        validatePostHidden(post.getId());
 
-        validationPostHidden(postId);
-
-        List<Comment> comments = commentRepository.findAllByPost(postRepository.findById(postId).orElseThrow());
+        List<Comment> comments = commentRepository.findAllByPost(post);
         commentRepository.deleteAll(comments);
 
-        removeImageFiles(findPost);
-        removeThumbnailFile(findPost);
-        postRepository.delete(findPost);
+        removeImageFiles(post);
+        removeThumbnailFile(post);
+        postRepository.delete(post);
     }
 
     private void createImages(MultipartFile[] images, Post post) throws IOException {
@@ -142,9 +132,7 @@ public class PostService {
     }
 
     @Transactional
-    public void createReport(Member member, Long postId, PostReportRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow();
-
+    public void createReport(Member member, Post post, PostReportRequest request) {
         boolean isReportExist = post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
 
@@ -154,7 +142,7 @@ public class PostService {
         new PostReport(post, member, ReportType.valueOf(request.getReportType()));
     }
 
-    private void validationPostHidden(Long postId) {
+    private void validatePostHidden(Long postId) {
         if (postRepository.countPostReportById(postId) >= reportHiddenCount) {
             throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
         }

@@ -11,7 +11,7 @@ import project.adam.controller.dto.member.MemberRefreshResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
-import project.adam.security.SecurityUtil;
+import project.adam.security.SecurityUtils;
 import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
@@ -49,7 +49,7 @@ public class MemberController {
     @Secured("ROLE_USER")
     @DeleteMapping
     public void deleteMember() {
-        Member member = memberService.findByEmail(SecurityUtil.getCurrentMemberEmail());
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         memberService.withdraw(member);
     }
 
@@ -59,12 +59,14 @@ public class MemberController {
         if (image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-        memberService.saveImage(image);
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        memberService.saveImage(member, image);
     }
 
     @Secured("ROLE_USER")
     @DeleteMapping("/image")
     public void removeImage() {
-        memberService.removeImage();
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        memberService.removeImage(member);
     }
 }
