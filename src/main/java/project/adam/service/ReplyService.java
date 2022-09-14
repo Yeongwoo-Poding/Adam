@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.adam.entity.comment.Comment;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
@@ -13,7 +14,9 @@ import project.adam.entity.reply.ReplyReport;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
+import project.adam.security.SecurityUtil;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 
 @Service
@@ -21,6 +24,7 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 @RequiredArgsConstructor
 public class ReplyService {
 
+    private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
 
@@ -47,15 +51,22 @@ public class ReplyService {
 
     @Transactional
     public void update(Long replyId, String body) {
-        validateReplyHidden(replyId);
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
         Reply findReply = replyRepository.findById(replyId).orElseThrow();
+        loginMember.authorization(findReply.getWriter().getId());
+
+        validateReplyHidden(replyId);
         findReply.update(body);
     }
 
     @Transactional
     public void delete(Long replyId) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow();
+        Reply findReply = replyRepository.findById(replyId).orElseThrow();
+        loginMember.authorization(findReply.getWriter().getId());
+
         validateReplyHidden(replyId);
-        replyRepository.delete(replyRepository.findById(replyId).orElseThrow());
+        replyRepository.delete(findReply);
     }
 
     @Transactional
