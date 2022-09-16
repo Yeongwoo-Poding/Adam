@@ -25,6 +25,7 @@ import project.adam.service.dto.member.MemberLoginRequest;
 import project.adam.utils.ImageUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 import static project.adam.exception.ExceptionEnum.*;
 
@@ -70,7 +71,15 @@ public class MemberService {
 
         refreshTokenRepository.save(refreshToken);
 
+        Member loginMember = memberRepository.findByEmail(authenticate.getName()).orElseThrow();
+        loginMember.setDeviceToken(memberDto.getDeviceToken());
+
         return memberLoginResponse;
+    }
+
+    @Transactional
+    public void logout(Member member) {
+        member.setDeviceToken(null);
     }
 
     @Transactional
@@ -96,6 +105,10 @@ public class MemberService {
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow();
+    }
+
+    public List<Member> findAll() {
+        return memberRepository.findAll();
     }
 
     @Transactional

@@ -16,6 +16,8 @@ public class MemberLoginRequest {
 
     private String email;
 
+    private String deviceToken;
+
     public UsernamePasswordAuthenticationToken toAuthentication() {
         return new UsernamePasswordAuthenticationToken(email, id);
     }

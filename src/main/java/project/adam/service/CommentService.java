@@ -12,11 +12,15 @@ import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.fcm.FcmService;
+import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
+
+import java.io.IOException;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,17 +29,38 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final FcmService fcmService;
 
     @Value("${report.hiddenCount}")
     private int reportHiddenCount;
 
     @Transactional
-    public Comment create(Member member, CommentCreateRequest commentDto) {
-        return commentRepository.save(new Comment(
+    public Comment create(Member member, CommentCreateRequest commentDto) throws IOException {
+        Comment createdComment = commentRepository.save(new Comment(
                 member,
                 postRepository.findById(commentDto.postId).orElseThrow(),
                 commentDto.getBody()
         ));
+
+        if (isOthers(member, createdComment)) {
+            sendPushToPostWriter(createdComment);
+        }
+
+        return createdComment;
+    }
+
+    private void sendPushToPostWriter(Comment comment) throws IOException {
+        FcmRequestBuilder request = FcmRequestBuilder.builder()
+                .member(comment.getPost().getWriter())
+                .title(comment.getPost().getTitle() + "에 댓글이 달렸어요!")
+                .body(comment.getBody())
+                .postId(comment.getPost().getId())
+                .build();
+        fcmService.sendMessageTo(request);
+    }
+
+    private boolean isOthers(Member member, Comment comment) {
+        return member != comment.getPost().getWriter();
     }
 
     public Comment find(Long commentId) {

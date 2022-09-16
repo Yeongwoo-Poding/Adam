@@ -16,6 +16,8 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/replies")
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class ReplyController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public ReplyCreateResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) {
+    public ReplyCreateResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         return new ReplyCreateResponse(replyService.create(member, createDto));
     }
