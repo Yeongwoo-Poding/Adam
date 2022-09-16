@@ -20,7 +20,7 @@ public abstract class BaseTimeEntity {
     @PrePersist
     public void prePersist() {
         this.createdDate = ZonedDateTime.now();
-        this.lastModifiedDate = ZonedDateTime.now();
+        this.lastModifiedDate = this.createdDate;
     }
 
     @PreUpdate
