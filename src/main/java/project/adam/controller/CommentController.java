@@ -19,6 +19,8 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequestMapping("/comments")
@@ -31,7 +33,7 @@ public class CommentController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public CommentCreateResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) {
+    public CommentCreateResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment savedComment = commentService.create(member, commentDto);
         return new CommentCreateResponse(savedComment);

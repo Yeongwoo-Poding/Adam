@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.BaseTimeEntity;
 import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 
 import javax.persistence.*;
 import java.util.List;
@@ -40,5 +41,9 @@ public class Reply extends BaseTimeEntity {
 
     public void update(String body) {
         this.body = body;
+    }
+
+    public Post getPost() {
+        return comment.getPost();
     }
 }

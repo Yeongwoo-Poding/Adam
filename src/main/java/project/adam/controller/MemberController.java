@@ -36,9 +36,23 @@ public class MemberController {
         return memberService.login(memberDto);
     }
 
+    @Secured("ROLE_USER")
+    @DeleteMapping("/logout")
+    public void logoutMember() {
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        memberService.logout(member);
+    }
+
     @PostMapping("/refresh")
     public MemberLoginResponse refreshToken(@Validated @RequestBody MemberRefreshResponse memberDto) {
         return memberService.refreshToken(memberDto);
+    }
+
+    @Secured("ROLE_USER")
+    @GetMapping("/me")
+    public MemberFindResponse findMe() {
+        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
+        return new MemberFindResponse(member);
     }
 
     @GetMapping
