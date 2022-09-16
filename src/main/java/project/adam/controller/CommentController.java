@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.controller.dto.comment.CommentCreateResponse;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.reply.ReplyListFindResponse;
 import project.adam.entity.comment.Comment;
@@ -33,10 +32,10 @@ public class CommentController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public CommentCreateResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) throws IOException {
+    public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment savedComment = commentService.create(member, commentDto);
-        return new CommentCreateResponse(savedComment);
+        return new CommentFindResponse(savedComment);
     }
 
     @GetMapping("/{commentId}")

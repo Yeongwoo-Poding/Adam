@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.comment.CommentListFindResponse;
-import project.adam.controller.dto.post.PostCreateResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.entity.member.Member;
@@ -37,11 +36,11 @@ public class PostController {
 
     @Secured("ROLE_USER")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public PostCreateResponse createPost(@Validated @RequestPart("data") PostCreateRequest postDto,
+    public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest postDto,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Post savedPost = postService.create(member, postDto, images);
-        return new PostCreateResponse(savedPost);
+        return new PostFindResponse(savedPost);
     }
 
     @GetMapping("/{postId}")

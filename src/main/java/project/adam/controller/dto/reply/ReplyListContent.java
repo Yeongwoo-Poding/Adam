@@ -15,7 +15,7 @@ public class ReplyListContent {
     public ReplyListContent(Reply reply) {
         this.id = reply.getId();
         this.writerName = reply.getWriter().getName();
-        this.createdDate = reply.getCreateDate();
+        this.createdDate = reply.getCreatedDate();
         this.body = reply.getBody();
     }
 }

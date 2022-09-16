@@ -10,14 +10,14 @@ public class ReplyFindResponse {
 
     private Long id;
     private String writerName;
-    private ZonedDateTime createDate;
+    private ZonedDateTime createdDate;
     private ZonedDateTime lastModifiedDate;
     private String body;
 
     public ReplyFindResponse(Reply reply) {
         this.id = reply.getId();
         this.writerName = reply.getWriter().getName();
-        this.createDate = reply.getCreateDate();
+        this.createdDate = reply.getCreatedDate();
         this.lastModifiedDate = reply.getLastModifiedDate();
         this.body = reply.getBody();
     }
