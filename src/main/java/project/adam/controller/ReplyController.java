@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.adam.controller.dto.reply.ReplyCreateResponse;
 import project.adam.controller.dto.reply.ReplyFindResponse;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
@@ -28,9 +27,9 @@ public class ReplyController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public ReplyCreateResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) throws IOException {
+    public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        return new ReplyCreateResponse(replyService.create(member, createDto));
+        return new ReplyFindResponse(replyService.create(member, createDto));
     }
 
     @GetMapping("/{replyId}")

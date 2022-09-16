@@ -19,7 +19,7 @@ public class CommentListContent {
     public CommentListContent(Comment comment) {
         this.id = comment.getId();
         this.writerName = comment.getWriter().getName();
-        this.createdDate = comment.getCreateDate();
+        this.createdDate = comment.getCreatedDate();
         this.body = comment.getBody();
         this.replies = comment.getReplies().stream()
                 .map(ReplyListContent::new)

@@ -64,7 +64,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
 
     @Override
     public boolean isNew() {
-        return getCreateDate() == null;
+        return this.getCreatedDate() == null;
     }
 
     @Override

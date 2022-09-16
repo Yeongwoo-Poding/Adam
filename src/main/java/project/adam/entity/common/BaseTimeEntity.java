@@ -14,12 +14,12 @@ import java.time.ZonedDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
-    private ZonedDateTime createDate;
+    private ZonedDateTime createdDate;
     private ZonedDateTime lastModifiedDate;
 
     @PrePersist
     public void prePersist() {
-        this.createDate = ZonedDateTime.now();
+        this.createdDate = ZonedDateTime.now();
         this.lastModifiedDate = ZonedDateTime.now();
     }
 
