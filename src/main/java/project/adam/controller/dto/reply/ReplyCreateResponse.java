@@ -10,11 +10,9 @@ public class ReplyCreateResponse {
 
     private Long id;
     private ZonedDateTime createDate;
-    private String body;
 
     public ReplyCreateResponse(Reply reply) {
         this.id = reply.getId();
         this.createDate = reply.getCreateDate();
-        this.body = reply.getBody();
     }
 }

@@ -18,6 +18,7 @@ local.properties
 ### Intellij###
 build
 .gradle
+src/main/resources/firebase
 
 # ignore properties file
 config.properties
