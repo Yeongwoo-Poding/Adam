@@ -99,7 +99,7 @@ public class CommentService {
 
     private void validateCommentHidden(Long commentId) {
         if (commentRepository.countCommentReportById(commentId) >= reportHiddenCount) {
-            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }
 }

@@ -27,4 +27,8 @@ public abstract class BaseTimeEntity {
     public void preUpdate() {
         this.lastModifiedDate = ZonedDateTime.now();
     }
+
+    public boolean isModified() {
+        return createdDate != lastModifiedDate;
+    }
 }
