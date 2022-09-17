@@ -33,6 +33,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    private boolean isLogin;
+
     private String deviceToken;
 
     @OneToMany(mappedBy = "writer")
@@ -54,12 +56,17 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         this.image = imageName;
     }
 
-    public void setDeviceToken(String deviceToken) {
+    public void login(String deviceToken) {
         this.deviceToken = deviceToken;
+        this.isLogin = true;
+    }
+
+    public void logout() {
+        this.isLogin = false;
     }
 
     public boolean isLogin() {
-        return this.deviceToken != null;
+        return this.isLogin;
     }
 
     @Override

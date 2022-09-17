@@ -1,4 +1,4 @@
-package project.adam.security.refreshtoken;
+package project.adam.security.jwttoken.refreshtoken;
 
 import lombok.Builder;
 import lombok.Getter;

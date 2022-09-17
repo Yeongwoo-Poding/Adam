@@ -3,6 +3,7 @@ package project.adam.controller;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ public class FcmController {
     private final FcmService fcmService;
     private final MemberService memberService;
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/message")
     public FcmTestResponse testMessage(@RequestBody FcmTestRequest request) throws IOException {
         List<Member> members = memberService.findAll().stream().filter(Member::isLogin).collect(Collectors.toList());
