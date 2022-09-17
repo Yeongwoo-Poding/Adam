@@ -144,7 +144,7 @@ public class PostService {
 
     private void validatePostHidden(Long postId) {
         if (postRepository.countPostReportById(postId) >= reportHiddenCount) {
-            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }
 }

@@ -8,6 +8,8 @@ import project.adam.controller.dto.reply.ReplyFindResponse;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.security.SecurityUtils;
 import project.adam.service.MemberService;
 import project.adam.service.ReplyService;
@@ -32,6 +34,7 @@ public class ReplyController {
         return new ReplyFindResponse(replyService.create(member, createDto));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("/{replyId}")
     public ReplyFindResponse findReply(@PathVariable Long replyId) {
         return new ReplyFindResponse(replyService.find(replyId));
@@ -58,6 +61,9 @@ public class ReplyController {
     public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest reportDto) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Reply findReply = replyService.find(replyId);
+        if (member.equals(findReply.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         replyService.report(member, findReply, ReportType.valueOf(reportDto.getReportType()));
     }
 }

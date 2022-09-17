@@ -13,6 +13,8 @@ import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
@@ -43,16 +45,19 @@ public class PostController {
         return new PostFindResponse(savedPost);
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
         return new PostFindResponse(postService.find(postId));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping
     public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
         return new PostListFindResponse(postService.findAll(condition, pageable));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
         return new CommentListFindResponse(commentService.findByPost(postId, pageable));
@@ -78,9 +83,12 @@ public class PostController {
 
     @Secured("ROLE_USER")
     @PostMapping("/{postId}/report")
-    public void createReportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
+    public void reportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Post findPost = postService.find(postId);
+        if (member.equals(findPost.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         postService.createReport(member, findPost, request);
     }
 }

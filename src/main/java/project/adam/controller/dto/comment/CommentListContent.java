@@ -5,6 +5,7 @@ import project.adam.controller.dto.reply.ReplyListContent;
 import project.adam.entity.comment.Comment;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,13 +14,15 @@ public class CommentListContent {
     private Long id;
     private String writerName;
     private ZonedDateTime createdDate;
+    private boolean isModified;
     private String body;
-    private List<ReplyListContent> replies;
+    private List<ReplyListContent> replies = new ArrayList<>();
 
     public CommentListContent(Comment comment) {
         this.id = comment.getId();
         this.writerName = comment.getWriter().getName();
         this.createdDate = comment.getCreatedDate();
+        this.isModified = comment.isModified();
         this.body = comment.getBody();
         this.replies = comment.getReplies().stream()
                 .map(ReplyListContent::new)

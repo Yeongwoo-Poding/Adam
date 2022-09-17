@@ -116,7 +116,7 @@ public class ReplyService {
 
     private void validateReplyHidden(Long replyId) {
         if (replyRepository.countReplyReportById(replyId) >= reportHiddenCount) {
-            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }
 }

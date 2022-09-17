@@ -14,7 +14,7 @@ public class PostFindResponse {
     private Long id;
     private String writerName;
     private ZonedDateTime createdDate;
-    private ZonedDateTime lastModifiedDate;
+    private boolean isModified;
     private String title;
     private String body;
     private int viewCount;
@@ -26,7 +26,7 @@ public class PostFindResponse {
         this.title = post.getTitle();
         this.writerName = post.getWriter().getName();
         this.createdDate = post.getCreatedDate();
-        this.lastModifiedDate = post.getLastModifiedDate();
+        this.isModified = post.isModified();
         this.viewCount = post.getViewCount();
         this.body = post.getBody();
         this.commentCount = post.getComments().size();

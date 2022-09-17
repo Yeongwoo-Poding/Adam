@@ -18,6 +18,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static project.adam.exception.ExceptionEnum.*;
 
@@ -26,61 +27,75 @@ import static project.adam.exception.ExceptionEnum.*;
 public class ApiExceptionAdvice {
     @ExceptionHandler({ApiException.class})
     public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final ApiException e) {
-        log.warn("ApiException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(e.getError()), e.getError().getStatus());
+        String id = createId();
+        log.warn("[{}] ApiException", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(e.getError(), id), e.getError().getStatus());
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class, HttpMediaTypeNotSupportedException.class})
     public ResponseEntity<ApiExceptionEntity> jsonExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("INVALID_JSON_FORMAT", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT), INVALID_JSON_FORMAT.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_JSON_FORMAT", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT, id), INVALID_JSON_FORMAT.getStatus());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, MissingServletRequestPartException.class})
     public ResponseEntity<ApiExceptionEntity> inputExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("INVALID_INPUT", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT), INVALID_INPUT.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_INPUT", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_INPUT, id), INVALID_INPUT.getStatus());
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ApiExceptionEntity> parameterExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("MissingServletRequestParameterException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_PARAMETER), INVALID_PARAMETER.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_PARAMETER", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_PARAMETER, id), INVALID_PARAMETER.getStatus());
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiExceptionEntity> typeExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("HttpMessageNotReadableException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_TYPE), INVALID_TYPE.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_TYPE", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_TYPE, id), INVALID_TYPE.getStatus());
     }
 
     @ExceptionHandler({MissingRequestHeaderException.class, MultipartException.class})
     public ResponseEntity<ApiExceptionEntity> headerExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("MissingRequestHeaderException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_HEADER), INVALID_HEADER.getStatus());
-    }
-
-    @ExceptionHandler({MissingRequestCookieException.class})
-    public ResponseEntity<ApiExceptionEntity> authenticationExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("MissingRequestCookieException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(AUTHENTICATION_FAILED), AUTHENTICATION_FAILED.getStatus());
-    }
-
-    @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
-    public ResponseEntity<ApiExceptionEntity> dataExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("NO_DATA", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA), NO_DATA.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_HEADER", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_HEADER, id), INVALID_HEADER.getStatus());
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
     public ResponseEntity<ApiExceptionEntity> methodExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("HttpMessageNotReadableException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_METHOD), INVALID_METHOD.getStatus());
+        String id = createId();
+        log.warn("[{}] INVALID_METHOD", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(INVALID_METHOD, id), INVALID_METHOD.getStatus());
+    }
+
+    @ExceptionHandler({MissingRequestCookieException.class})
+    public ResponseEntity<ApiExceptionEntity> authenticationExceptionHandler(HttpServletRequest request, final Exception e) {
+        String id = createId();
+        log.warn("[{}] AUTHENTICATION_FAILED", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(AUTHENTICATION_FAILED, id), AUTHENTICATION_FAILED.getStatus());
+    }
+
+    @ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
+    public ResponseEntity<ApiExceptionEntity> dataExceptionHandler(HttpServletRequest request, final Exception e) {
+        String id = createId();
+        log.warn("[{}] NO_DATA", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA, id), NO_DATA.getStatus());
     }
 
     @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
     public ResponseEntity<ApiExceptionEntity> conflictExceptionHandler(HttpServletRequest request, final Exception e) {
-        log.warn("SQLIntegrityConstraintViolationException", e);
-        return new ResponseEntity<>(new ApiExceptionEntity(UNIQUE_CONSTRAINT_VIOLATED), UNIQUE_CONSTRAINT_VIOLATED.getStatus());
+        String id = createId();
+        log.warn("[{}] UNIQUE_CONSTRAINT_VIOLATED", id, e);
+        return new ResponseEntity<>(new ApiExceptionEntity(UNIQUE_CONSTRAINT_VIOLATED, id), UNIQUE_CONSTRAINT_VIOLATED.getStatus());
+    }
+
+    private String createId() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 }

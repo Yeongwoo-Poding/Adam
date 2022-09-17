@@ -10,6 +10,8 @@ import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.reply.ReplyListFindResponse;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.member.Member;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
@@ -38,11 +40,13 @@ public class CommentController {
         return new CommentFindResponse(savedComment);
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("/{commentId}")
     public CommentFindResponse findComment(@PathVariable Long commentId) {
         return new CommentFindResponse(commentService.find(commentId));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("/{commentId}/replies")
     public ReplyListFindResponse findReplies(@PathVariable Long commentId, Pageable pageable) {
         return new ReplyListFindResponse(replyService.findAllByComment(commentId, pageable));
@@ -66,9 +70,12 @@ public class CommentController {
 
     @Secured("ROLE_USER")
     @PostMapping("/{commentId}/report")
-    public void createCommentReport(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
+    public void reportComment(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment findComment = commentService.find(commentId);
+        if (member.equals(findComment.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         commentService.createCommentReport(member, findComment, request);
     }
 }
