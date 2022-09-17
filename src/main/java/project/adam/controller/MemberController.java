@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberFindResponse;
 import project.adam.controller.dto.member.MemberLoginResponse;
-import project.adam.controller.dto.member.MemberRefreshResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -43,10 +42,10 @@ public class MemberController {
         memberService.logout(member);
     }
 
-    @PostMapping("/refresh")
-    public MemberLoginResponse refreshToken(@Validated @RequestBody MemberRefreshResponse memberDto) {
-        return memberService.refreshToken(memberDto);
-    }
+//    @PostMapping("/refresh")
+//    public MemberLoginResponse refreshToken(@Validated @RequestBody MemberRefreshResponse memberDto) {
+//        return memberService.refreshToken(memberDto);
+//    }
 
     @Secured("ROLE_USER")
     @GetMapping("/me")

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberLoginResponse;
-import project.adam.controller.dto.member.MemberRefreshResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.repository.comment.CommentRepository;
@@ -18,8 +17,6 @@ import project.adam.repository.member.MemberRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.security.SecurityUtils;
 import project.adam.security.TokenProvider;
-import project.adam.security.refreshtoken.RefreshToken;
-import project.adam.security.refreshtoken.RefreshTokenRepository;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 import project.adam.utils.ImageUtils;
@@ -27,7 +24,8 @@ import project.adam.utils.ImageUtils;
 import java.io.IOException;
 import java.util.List;
 
-import static project.adam.exception.ExceptionEnum.*;
+import static project.adam.exception.ExceptionEnum.INVALID_INPUT;
+import static project.adam.exception.ExceptionEnum.UNIQUE_CONSTRAINT_VIOLATED;
 
 @Slf4j
 @Service
@@ -37,7 +35,7 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+//    private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
@@ -64,44 +62,44 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken = memberDto.toAuthentication();
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authenticate);
-        RefreshToken refreshToken = RefreshToken.builder()
-                .key(authenticate.getName())
-                .value(memberLoginResponse.getRefreshToken())
-                .build();
-
-        refreshTokenRepository.save(refreshToken);
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .key(authenticate.getName())
+//                .value(memberLoginResponse.getRefreshToken())
+//                .build();
+//
+//        refreshTokenRepository.save(refreshToken);
 
         Member loginMember = memberRepository.findByEmail(authenticate.getName()).orElseThrow();
-        loginMember.setDeviceToken(memberDto.getDeviceToken());
+        loginMember.login(memberDto.getDeviceToken());
 
         return memberLoginResponse;
     }
 
     @Transactional
     public void logout(Member member) {
-        member.setDeviceToken(null);
+        member.logout();
     }
 
-    @Transactional
-    public MemberLoginResponse refreshToken(MemberRefreshResponse memberDto) {
-        if (!tokenProvider.validateToken(memberDto.getRefreshToken())) {
-            throw new ApiException(AUTHENTICATION_FAILED);
-        }
-
-        Authentication authentication = tokenProvider.getAuthentication(memberDto.getAccessToken());
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName()).orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
-
-        if (!refreshToken.getValue().equals(memberDto.getRefreshToken())) {
-            throw new ApiException(AUTHENTICATION_FAILED);
-        }
-
-        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authentication);
-
-        RefreshToken newRefreshToken = refreshToken.updateValue(memberLoginResponse.getRefreshToken());
-        refreshTokenRepository.save(newRefreshToken);
-
-        return memberLoginResponse;
-    }
+//    @Transactional
+//    public MemberLoginResponse refreshToken(MemberRefreshResponse memberDto) {
+//        if (!tokenProvider.validateToken(memberDto.getRefreshToken())) {
+//            throw new ApiException(AUTHENTICATION_FAILED);
+//        }
+//
+//        Authentication authentication = tokenProvider.getAuthentication(memberDto.getAccessToken());
+//        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName()).orElseThrow(() -> new ApiException(AUTHENTICATION_FAILED));
+//
+//        if (!refreshToken.getValue().equals(memberDto.getRefreshToken())) {
+//            throw new ApiException(AUTHENTICATION_FAILED);
+//        }
+//
+//        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authentication);
+//
+//        RefreshToken newRefreshToken = refreshToken.updateValue(memberLoginResponse.getRefreshToken());
+//        refreshTokenRepository.save(newRefreshToken);
+//
+//        return memberLoginResponse;
+//    }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow();
