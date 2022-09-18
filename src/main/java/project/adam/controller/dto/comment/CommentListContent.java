@@ -14,7 +14,7 @@ public class CommentListContent {
     private Long id;
     private String writerName;
     private ZonedDateTime createdDate;
-    private boolean isModified;
+    private boolean modified;
     private String body;
     private List<ReplyListContent> replies = new ArrayList<>();
 
@@ -22,7 +22,7 @@ public class CommentListContent {
         this.id = comment.getId();
         this.writerName = comment.getWriter().getName();
         this.createdDate = comment.getCreatedDate();
-        this.isModified = comment.isModified();
+        this.modified = comment.isModified();
         this.body = comment.getBody();
         this.replies = comment.getReplies().stream()
                 .map(ReplyListContent::new)

@@ -68,8 +68,8 @@ public class MemberController {
 
     @Secured("ROLE_USER")
     @PostMapping("/image")
-    public void saveImage(@RequestPart MultipartFile image) throws IOException {
-        if (image.isEmpty()) {
+    public void saveImage(MultipartFile image) throws IOException {
+        if (image == null || image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());

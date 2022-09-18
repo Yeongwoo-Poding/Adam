@@ -13,7 +13,7 @@ public class PostListContent {
     private String writerName;
     private String board;
     private ZonedDateTime createdDate;
-    private boolean isModified;
+    private boolean modified;
     private String title;
     private int viewCount;
     private int commentCount;
@@ -24,7 +24,7 @@ public class PostListContent {
         this.title = post.getTitle();
         this.board = post.getBoard().toString();
         this.createdDate = post.getCreatedDate();
-        this.isModified = post.isModified();
+        this.modified = post.isModified();
         this.writerName = post.getWriter().getName();
         this.viewCount = post.getViewCount();
         this.thumbnail = post.getThumbnailName();
