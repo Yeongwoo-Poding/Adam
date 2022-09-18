@@ -14,7 +14,7 @@ import java.io.File;
 @Profile({"local", "dev", "test"})
 @Component
 @RequiredArgsConstructor
-public class InitData {
+public class DevUtils {
 
     private final DevClass dev;
 
