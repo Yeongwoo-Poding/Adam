@@ -35,7 +35,7 @@ public class FcmService {
 
     @Async
     public void sendMessageTo(FcmRequestBuilder requestDto) throws IOException {
-        if (requestDto.getMember().getDeviceToken() == null) {
+        if (!requestDto.getMember().isLogin()) {
             return;
         }
 
