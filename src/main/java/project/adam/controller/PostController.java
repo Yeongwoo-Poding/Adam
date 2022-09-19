@@ -48,7 +48,7 @@ public class PostController {
     @Secured("ROLE_USER")
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
-        return new PostFindResponse(postService.find(postId));
+        return new PostFindResponse(postService.findIncViewCount(postId));
     }
 
     @Secured("ROLE_USER")
