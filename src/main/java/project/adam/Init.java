@@ -2,10 +2,7 @@ package project.adam;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
@@ -19,7 +16,6 @@ import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.util.UUID;
 
 @Slf4j
