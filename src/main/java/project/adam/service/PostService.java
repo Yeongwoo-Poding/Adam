@@ -57,8 +57,13 @@ public class PostService {
         return savedPost;
     }
 
-    @Transactional
     public Post find(Long postId) {
+        validatePostHidden(postId);
+        return postRepository.findById(postId).orElseThrow();
+    }
+
+    @Transactional
+    public Post findIncViewCount(Long postId) {
         validatePostHidden(postId);
         return postRepository.findPostIncViewCount(postId).orElseThrow();
     }
@@ -111,12 +116,18 @@ public class PostService {
     }
 
     private void removeImageFiles(Post post) {
+        if (post.getImages() == null) {
+            return;
+        }
         for (PostImage image : post.getImages()) {
             imageUtils.removeImageFile(image.getName());
         }
     }
 
     private void removeImageDatas(Post post) {
+        if (post.getImages() == null) {
+            return;
+        }
         for (PostImage image : post.getImages()) {
             postRepository.deleteImageById(image.getId());
         }
@@ -124,10 +135,16 @@ public class PostService {
     }
 
     private void removeThumbnailFile(Post post) {
-        imageUtils.removeImageFile(post.getThumbnailName());
+        if (post.getThumbnail() == null) {
+            return;
+        }
+        imageUtils.removeImageFile(post.getThumbnail().getName());
     }
 
     private void removeThumbnailData(Post post) {
+        if (post.getThumbnail() == null) {
+            return;
+        }
         postRepository.deleteThumbnailById(post.getThumbnail().getId());
     }
 

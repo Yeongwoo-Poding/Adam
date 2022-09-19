@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FcmTestRequest {
+public class FcmPushRequest {
+
     private String title;
     private String body;
     private Long postId;

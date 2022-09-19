@@ -12,7 +12,7 @@ plugins {
 }
 
 group = 'project'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 sourceCompatibility = '11'
 
 configurations {
@@ -32,7 +32,6 @@ dependencies {
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.google.firebase:firebase-admin:9.0.0'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
     compileOnly 'org.projectlombok:lombok'

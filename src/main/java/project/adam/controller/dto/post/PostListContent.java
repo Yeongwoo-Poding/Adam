@@ -27,7 +27,7 @@ public class PostListContent {
         this.modified = post.isModified();
         this.writerName = post.getWriter().getName();
         this.viewCount = post.getViewCount();
-        this.thumbnail = post.getThumbnailName();
+        this.thumbnail = post.getThumbnail() == null ? null : post.getThumbnail().getName();
         this.commentCount = post.getComments().size();
     }
 }

@@ -62,8 +62,4 @@ public class Post extends BaseTimeEntity {
     public void setThumbnail(PostThumbnail thumbnail) {
         this.thumbnail = thumbnail;
     }
-
-    public String getThumbnailName() {
-        return (thumbnail == null) ? null : thumbnail.getName();
-    }
 }
