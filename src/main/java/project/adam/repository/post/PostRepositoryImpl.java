@@ -36,6 +36,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .leftJoin(post.writer)
                 .fetchJoin()
                 .where(searchCondition(condition))
+                .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
