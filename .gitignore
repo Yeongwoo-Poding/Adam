@@ -19,6 +19,7 @@ local.properties
 build
 .gradle
 src/main/resources/firebase
+src/main/java/project/adam/CreateAdmin.java
 
 # ignore properties file
 config.properties
