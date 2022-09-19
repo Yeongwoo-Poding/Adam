@@ -24,7 +24,6 @@ public enum ExceptionEnum {
     NO_DATA(NOT_FOUND, "존재하지 않는 데이터입니다."),
 
     UNIQUE_CONSTRAINT_VIOLATED(CONFLICT, "중복된 KEY가 존재합니다."),
-    INVALID_REPLY(CONFLICT, "대댓글에는 댓글을 달 수 없습니다."),
     INVALID_REPORT(CONFLICT, "신고할 수 없습니다.");
 
     private final HttpStatus status;
