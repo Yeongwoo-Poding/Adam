@@ -4,7 +4,6 @@ import lombok.Getter;
 import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 public class PostFindResponse {
     private Long id;
     private String writerName;
-    private ZonedDateTime createdDate;
+    private String createdDate;
     private boolean modified;
     private String title;
     private String body;
@@ -25,7 +24,7 @@ public class PostFindResponse {
         this.id = post.getId();
         this.title = post.getTitle();
         this.writerName = post.getWriter().getName();
-        this.createdDate = post.getCreatedDate();
+        this.createdDate = post.getFormattedCreatedDate();
         this.modified = post.isModified();
         this.viewCount = post.getViewCount();
         this.body = post.getBody();
