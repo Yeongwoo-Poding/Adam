@@ -3,13 +3,13 @@ package project.adam.controller.dto.reply;
 import lombok.Getter;
 import project.adam.entity.reply.Reply;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 public class ReplyListContent {
     private Long id;
     private String writerName;
-    private ZonedDateTime createdDate;
+    private LocalDateTime createdDate;
     private boolean modified;
     private String body;
 
