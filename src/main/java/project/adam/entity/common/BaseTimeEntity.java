@@ -3,10 +3,7 @@ package project.adam.entity.common;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
+    @Column(updatable = false)
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 
@@ -29,7 +27,7 @@ public abstract class BaseTimeEntity {
     }
 
     public boolean isModified() {
-        return createdDate != lastModifiedDate;
+        return !createdDate.isEqual(lastModifiedDate);
     }
 
     public String getFormattedCreatedDate() {

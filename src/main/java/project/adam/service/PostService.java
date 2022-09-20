@@ -41,20 +41,19 @@ public class PostService {
 
     @Transactional
     public Post create(Member member, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
-        Post savedPost = postRepository.save(new Post(
+        Post createdPost = new Post(
                 member,
                 Board.valueOf(postDto.getBoard()),
                 postDto.getTitle(),
                 postDto.getBody()
-        ));
-
+        );
         if (images != null) {
-            createImages(images, savedPost);
-            String imageName = savedPost.getImages().get(0).getName();
+            createImages(images, createdPost);
+            String imageName = createdPost.getImages().get(0).getName();
             MultipartFile image = images[0];
-            createThumbnail(imageName, image, savedPost);
+            createThumbnail(imageName, image, createdPost);
         }
-        return savedPost;
+        return postRepository.save(createdPost);
     }
 
     public Post find(Long postId) {
