@@ -32,7 +32,7 @@ public class ApiExceptionAdvice {
         return new ResponseEntity<>(new ApiExceptionEntity(e.getError(), id), e.getError().getStatus());
     }
 
-    @ExceptionHandler({HttpMessageNotReadableException.class, HttpMediaTypeNotSupportedException.class})
+    @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiExceptionEntity> jsonExceptionHandler(HttpServletRequest request, final Exception e) {
         String id = createId();
         log.warn("[{}] INVALID_JSON_FORMAT at {}", id, request.getRequestURL(), e);
@@ -60,7 +60,7 @@ public class ApiExceptionAdvice {
         return new ResponseEntity<>(new ApiExceptionEntity(INVALID_TYPE, id), INVALID_TYPE.getStatus());
     }
 
-    @ExceptionHandler({MissingRequestHeaderException.class, MultipartException.class})
+    @ExceptionHandler({MissingRequestHeaderException.class, MultipartException.class, HttpMediaTypeNotSupportedException.class})
     public ResponseEntity<ApiExceptionEntity> headerExceptionHandler(HttpServletRequest request, final Exception e) {
         String id = createId();
         log.warn("[{}] INVALID_HEADER at {}", id, request.getRequestURL(), e);
