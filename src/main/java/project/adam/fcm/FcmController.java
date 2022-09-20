@@ -1,4 +1,4 @@
-package project.adam.controller;
+package project.adam.fcm;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
