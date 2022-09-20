@@ -32,6 +32,7 @@ public class Post extends BaseTimeEntity {
 
     private String title;
 
+    @Column(length = 1000)
     private String body;
 
     private int viewCount;

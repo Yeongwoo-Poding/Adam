@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
-import project.adam.fcm.FcmService;
 import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.service.MemberService;

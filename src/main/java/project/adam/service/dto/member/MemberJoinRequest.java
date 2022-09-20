@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class MemberJoinRequest {
 
+    @NotEmpty
     @UUIDPattern
     private String id;
 

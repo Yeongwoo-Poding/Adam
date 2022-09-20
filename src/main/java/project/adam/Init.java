@@ -55,15 +55,12 @@ public class Init {
             }
 
             for (long i = 0L; i < (N * N * N); i++) {
-                System.out.println("number: " + i % (N * N) + 1);
                 Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
                 Post post = postRepository.findById(i % (N * N) + 1).orElseThrow();
                 commentRepository.save(new Comment(writer, post, "writer: " + writer.getName() + " post: " + post.getId()));
             }
 
             for (long i = 0L; i < (N * N * N * N); i++) {
-                System.out.println("number: " + i % (N * N) + 1);
-                System.out.println("number: " + i % (N * N * N) + 1);
                 Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
                 Post post = postRepository.findById(i % (N * N) + 1).orElseThrow();
                 Comment comment = commentRepository.findById(i % (N * N * N) + 1).orElseThrow();

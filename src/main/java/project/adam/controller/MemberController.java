@@ -70,7 +70,7 @@ public class MemberController {
     @PostMapping("/image")
     public void saveImage(MultipartFile image) throws IOException {
         if (image == null || image.isEmpty()) {
-            throw new ApiException(ExceptionEnum.INVALID_INPUT);
+            throw new ApiException(ExceptionEnum.INVALID_HEADER);
         }
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         memberService.saveImage(member, image);

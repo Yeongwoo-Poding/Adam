@@ -1,6 +1,7 @@
-package project.adam.security.exception;
+package project.adam.exception.custom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -13,9 +14,10 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    ObjectMapper om = new ObjectMapper();
+    private final ObjectMapper om;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
