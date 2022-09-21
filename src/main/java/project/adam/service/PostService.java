@@ -170,7 +170,7 @@ public class PostService {
         PostReport.builder()
                 .post(post)
                 .member(member)
-                .reportType(request.getReport())
+                .reportType(request.getReportType())
                 .build();
     }
 

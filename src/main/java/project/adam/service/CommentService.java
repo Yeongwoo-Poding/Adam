@@ -99,7 +99,7 @@ public class CommentService {
         CommentReport.builder()
                 .comment(comment)
                 .member(member)
-                .reportType(request.getReport())
+                .reportType(request.getReportType())
                 .build();
     }
 

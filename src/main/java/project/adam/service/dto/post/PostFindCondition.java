@@ -12,7 +12,7 @@ public class PostFindCondition {
     private String content;
 
     public PostFindCondition(String boardId, String content) {
-        this.board = Board.valueOf(boardId);
+        this.board = boardId == null ? null : Board.valueOf(boardId);
         this.content = content;
     }
 }

@@ -53,7 +53,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         BooleanBuilder builder = new BooleanBuilder();
         builder.or(titleCondition(condition.getContent()));
         builder.or(bodyCondition(condition.getContent()));
-        builder.and(boardCondition(condition.getBoard().toString()));
+        builder.and(boardCondition(condition.getBoard()));
         builder.and(validateHiddenCondition());
         return builder;
     }
@@ -66,11 +66,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return body == null ? null : post.body.like("%" + body + "%");
     }
 
-    private BooleanExpression boardCondition(String boardId) {
-        if (boardId == null) {
+    private BooleanExpression boardCondition(Board board) {
+        if (board == null) {
             return null;
         }
-        return post.board.eq(Board.valueOf(boardId));
+        return post.board.eq(board);
     }
 
     private BooleanExpression validateHiddenCondition() {

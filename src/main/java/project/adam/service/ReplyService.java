@@ -43,6 +43,8 @@ public class ReplyService {
                 .body(request.getBody())
                 .build();
 
+        replyRepository.save(createdReply);
+
         if (isOthersPost(member, createdReply.getPost())) {
             sendPushToPostWriter(createdReply);
         } else if (isOthersComment(member, createdReply.getComment())) {
@@ -115,7 +117,7 @@ public class ReplyService {
         ReplyReport.builder()
                 .reply(reply)
                 .member(member)
-                .reportType(request.getReport())
+                .reportType(request.getReportType())
                 .build();
     }
 

@@ -11,8 +11,8 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class ReplyCreateRequest {
 
+    public Long commentId;
+
     @NotEmpty
     private String body;
-
-    public Long commentId;
 }

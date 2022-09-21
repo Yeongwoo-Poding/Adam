@@ -8,9 +8,9 @@ import project.adam.entity.common.ReportType;
 @NoArgsConstructor
 public class CommentReportRequest {
 
-    private ReportType report;
+    private ReportType reportType;
 
     public CommentReportRequest(String reportType) {
-        this.report = ReportType.valueOf(reportType);
+        this.reportType = ReportType.valueOf(reportType);
     }
 }
