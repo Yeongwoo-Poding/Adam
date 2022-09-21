@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
+import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
+import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -38,10 +40,15 @@ public class PostController {
 
     @Secured("ROLE_USER")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest postDto,
+    public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest request,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        Post savedPost = postService.create(member, postDto, images);
+        Post savedPost = postService.create(member, request, images);
+
+        if (savedPost.getBoard().equals(Board.NOTICE) && member.getAuthority().equals(Authority.ROLE_USER)) {
+            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+        }
+
         return new PostFindResponse(savedPost);
     }
 
@@ -66,11 +73,11 @@ public class PostController {
     @Secured("ROLE_USER")
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updatePost(@PathVariable Long postId,
-                           @Validated @RequestPart("data") PostUpdateRequest postDto,
+                           @Validated @RequestPart("data") PostUpdateRequest request,
                            @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Post findPost = postService.find(postId);
         memberService.authorization(findPost.getWriter());
-        postService.update(findPost, postDto, images);
+        postService.update(findPost, request, images);
     }
 
     @Secured("ROLE_USER")

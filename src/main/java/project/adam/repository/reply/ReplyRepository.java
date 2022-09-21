@@ -12,5 +12,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>, ReplyReposi
     @Query("select count(rr) from ReplyReport rr where rr.reply.id = :replyId")
     int countReplyReportById(Long replyId);
 
-    List<Reply> findAllByWriter(Member member);
+    List<Reply> findRepliesByWriter(Member member);
 }

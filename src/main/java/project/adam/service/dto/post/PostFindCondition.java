@@ -1,15 +1,18 @@
 package project.adam.service.dto.post;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import project.adam.entity.post.Board;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class PostFindCondition {
 
-    private String board;
+    private Board board;
     private String content;
+
+    public PostFindCondition(String boardId, String content) {
+        this.board = Board.valueOf(boardId);
+        this.content = content;
+    }
 }

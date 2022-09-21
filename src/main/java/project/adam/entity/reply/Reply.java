@@ -1,6 +1,7 @@
 package project.adam.entity.reply;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.comment.Comment;
@@ -9,6 +10,7 @@ import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,8 +33,9 @@ public class Reply extends BaseTimeEntity {
     private String body;
 
     @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL)
-    private List<ReplyReport> reports;
+    private List<ReplyReport> reports = new ArrayList<>();
 
+    @Builder
     public Reply(Member writer, Comment comment, String body) {
         this.writer = writer;
         this.comment = comment;

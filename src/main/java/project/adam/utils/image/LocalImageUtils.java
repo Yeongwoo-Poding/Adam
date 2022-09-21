@@ -17,17 +17,14 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@Profile({"test"})
+@Profile({"local", "test"})
 public class LocalImageUtils implements ImageUtils {
+
+    private static final int THUMBNAIL_WIDTH = 200;
+    private static final int THUMBNAIL_HEIGHT = 200;
 
     @Value("${file.dir}")
     private String imagePath;
-
-    @Value("${thumbnail.width}")
-    private int thumbnailWidth;
-
-    @Value("${thumbnail.height}")
-    private int thumbnailHeight;
 
     public File createImageFile(MultipartFile image) throws IOException {
         String imageName = UUID.randomUUID() + "." + getExtension(image);
@@ -93,9 +90,9 @@ public class LocalImageUtils implements ImageUtils {
     private BufferedImage resizeImage(BufferedImage originalImage) {
         BufferedImage croppedImage = getSquareImage(originalImage);
 
-        BufferedImage resizedImage = new BufferedImage(thumbnailWidth, thumbnailHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage resizedImage = new BufferedImage(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(croppedImage, 0, 0, thumbnailWidth, thumbnailHeight, null);
+        graphics2D.drawImage(croppedImage, 0, 0, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, null);
         graphics2D.dispose();
         return resizedImage;
     }

@@ -26,13 +26,13 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public void joinMember(@Validated @RequestBody MemberJoinRequest memberDto) {
-        memberService.join(memberDto);
+    public void joinMember(@Validated @RequestBody MemberJoinRequest request) {
+        memberService.join(request);
     }
 
     @PostMapping("/login")
-    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest memberDto) {
-        return memberService.login(memberDto);
+    public MemberLoginResponse loginMember(@Validated @RequestBody MemberLoginRequest request) {
+        return memberService.login(request);
     }
 
     @Secured("ROLE_USER")

@@ -23,11 +23,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
-    @Value("${report.hiddenCount}")
-    private Long reportHiddenCount;
+    @Value("${report.count}")
+    private Long reportCount;
 
     @Override
-    public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
+    public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
         List<Post> contents = queryFactory.query()
                 .select(post)
                 .from(post)
@@ -53,7 +53,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         BooleanBuilder builder = new BooleanBuilder();
         builder.or(titleCondition(condition.getContent()));
         builder.or(bodyCondition(condition.getContent()));
-        builder.and(boardCondition(condition.getBoard()));
+        builder.and(boardCondition(condition.getBoard().toString()));
         builder.and(validateHiddenCondition());
         return builder;
     }
@@ -77,11 +77,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory.select(postReport.count())
                 .from(postReport)
                 .where(postReport.post.eq(post))
-                .lt(reportHiddenCount);
+                .lt(reportCount);
     }
 
     @Override
-    public Optional<Post> findPostIncViewCount(Long postId) {
+    public Optional<Post> showPost(Long postId) {
         queryFactory.update(post)
                 .set(post.viewCount, post.viewCount.add(1))
                 .where(post.id.eq(postId))

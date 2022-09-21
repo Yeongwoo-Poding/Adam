@@ -1,6 +1,7 @@
 package project.adam.controller.dto.post;
 
 import lombok.Getter;
+import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
 
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 @Getter
 public class PostFindResponse {
     private Long id;
+    private Board board;
     private String writerName;
     private String createdDate;
     private boolean modified;
@@ -22,6 +24,7 @@ public class PostFindResponse {
 
     public PostFindResponse(Post post) {
         this.id = post.getId();
+        this.board = post.getBoard();
         this.title = post.getTitle();
         this.writerName = post.getWriter().getName();
         this.createdDate = post.getFormattedCreatedDate();

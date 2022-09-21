@@ -1,6 +1,7 @@
 package project.adam.entity.member;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
@@ -40,6 +41,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
+    @Builder
     public Member(String id, String email, String name) {
         this.id = id;
         this.email = email;

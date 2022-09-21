@@ -17,15 +17,16 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Component
-@Profile({"prod", "dev", "local"})
+@Profile({"prod", "dev"})
 public class S3ImageUtils implements ImageUtils {
+
+    private static final int THUMBNAIL_WIDTH = 200;
+    private static final int THUMBNAIL_HEIGHT = 200;
 
     private AmazonS3 s3Client;
 
@@ -40,15 +41,6 @@ public class S3ImageUtils implements ImageUtils {
 
     @Value("${cloud.aws.region.static}")
     private String region;
-
-    @Value("${file.prefix}")
-    private String prefix;
-
-    @Value("${file.dir}")
-    private String dir;
-
-    private static final int THUMBNAIL_WIDTH = 200;
-    private static final int THUMBNAIL_HEIGHT = 200;
 
     @PostConstruct
     public void setS3Client() {

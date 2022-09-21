@@ -1,6 +1,7 @@
 package project.adam.entity.post;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.ReportType;
@@ -28,6 +29,7 @@ public class PostReport {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
+    @Builder
     public PostReport(Post post, Member member, ReportType reportType) {
         this.post = post;
         this.member = member;

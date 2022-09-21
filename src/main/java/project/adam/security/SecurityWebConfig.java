@@ -2,24 +2,26 @@ package project.adam.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import project.adam.exception.custom.CustomAccessDeniedHandler;
 import project.adam.exception.custom.CustomAuthenticationEntryPoint;
 import project.adam.repository.member.MemberRepository;
 
+@Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@RequiredArgsConstructor
+public class SecurityWebConfig {
 
     private final TokenProvider tokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -31,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
     public DefaultWebSecurityExpressionHandler handler() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
@@ -40,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return handler;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
 
@@ -62,9 +65,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
+                .and()
 
-        SecurityFilter customFilter = new SecurityFilter(tokenProvider, memberRepository);
-        http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new SecurityFilter(tokenProvider, memberRepository), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 }

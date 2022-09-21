@@ -38,7 +38,7 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public MemberLoginResponse generateTokenDto(Authentication authentication) {
+    public MemberLoginResponse generateTokenResponse(Authentication authentication) {
         String authorites = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));

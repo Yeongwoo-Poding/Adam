@@ -6,5 +6,5 @@ import project.adam.entity.comment.Comment;
 import project.adam.entity.post.Post;
 
 public interface CommentRepositoryCustom {
-    Slice<Comment> findRootCommentByPost(Post post, Pageable pageable);
+    Slice<Comment> findRootCommentsByPost(Post post, Pageable pageable);
 }

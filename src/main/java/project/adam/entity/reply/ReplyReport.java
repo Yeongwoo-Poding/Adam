@@ -1,6 +1,7 @@
 package project.adam.entity.reply;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.ReportType;
@@ -28,6 +29,7 @@ public class ReplyReport {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
+    @Builder
     public ReplyReport(Reply reply, Member member, ReportType reportType) {
         this.reply = reply;
         this.member = member;

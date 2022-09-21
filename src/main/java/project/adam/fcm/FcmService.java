@@ -9,6 +9,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
@@ -17,6 +18,7 @@ import project.adam.fcm.dto.FcmRequest;
 import project.adam.fcm.dto.FcmRequest.Notification;
 import project.adam.fcm.dto.FcmRequestBuilder;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,29 +29,38 @@ import static project.adam.fcm.dto.FcmRequest.Message;
 @Service
 @RequiredArgsConstructor
 public class FcmService {
-    // firebase app id = fcmprac-1d8ea
-    private static final String API_URL = "https://fcm.googleapis.com/v1/projects/fcmprac-1d8ea/messages:send";
+
     private static final String FIREBASE_CONFIG_PATH = "firebase/firebase_service_key.json";
     private static final String GOOGLE_API_URL = "https://www.googleapis.com/auth/cloud-platform";
+
+    @Value("${application.id.client}")
+    private String clientAppId;
+    private String clientPushAPI;
+
+    @PostConstruct
+    public void init() {
+        this.clientPushAPI = "https://fcm.googleapis.com/v1/projects/" + clientAppId + "/messages:send";
+    }
+
     private final ObjectMapper objectMapper;
 
     @Async
-    public void sendMessageTo(FcmRequestBuilder requestDto) throws IOException {
-        if (!requestDto.getMember().isLogin()) {
+    public void sendMessageTo(FcmRequestBuilder requestBuilder) throws IOException {
+        if (!requestBuilder.getMember().isLogin()) {
             return;
         }
 
         String message = makeMessage(
-                requestDto.getMember().getDeviceToken(),
-                requestDto.getTitle(),
-                requestDto.getBody(),
-                requestDto.getPostId());
-        log.info("[FCM] Send message to {}", requestDto.getMember().getEmail());
+                requestBuilder.getMember().getDeviceToken(),
+                requestBuilder.getTitle(),
+                requestBuilder.getBody(),
+                requestBuilder.getPostId());
+        log.info("[FCM] Send message to {}", requestBuilder.getMember().getEmail());
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(clientPushAPI)
                 .post(requestBody)
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
@@ -68,7 +79,8 @@ public class FcmService {
     }
 
     private String getAccessToken() throws IOException {
-        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(new ClassPathResource(FIREBASE_CONFIG_PATH).getInputStream()).createScoped(List.of(GOOGLE_API_URL));
+        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
+                new ClassPathResource(FIREBASE_CONFIG_PATH).getInputStream()).createScoped(List.of(GOOGLE_API_URL));
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
     }

@@ -1,5 +1,6 @@
 package project.adam.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -35,6 +36,12 @@ public class ApiExceptionAdvice {
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiExceptionEntity> jsonExceptionHandler(HttpServletRequest request, final Exception e) {
         String id = createId();
+
+        // Enum Type Error
+        if (e.getCause() != null && e.getCause() instanceof InvalidFormatException) {
+            log.warn("[{}] NO_DATA at {}", id, request.getRequestURL(), e);
+            return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA, id), NO_DATA.getStatus());
+        }
         log.warn("[{}] INVALID_JSON_FORMAT at {}", id, request.getRequestURL(), e);
         return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT, id), INVALID_JSON_FORMAT.getStatus());
     }

@@ -8,11 +8,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class ImageConfig implements WebMvcConfigurer {
 
-    @Value("${file.dir}")
-    private String imagePath;
-
     @Value("${file.prefix}")
     private String imagePathPrefix;
+
+    @Value("${file.dir}")
+    private String imagePath;
 
     private static final String CONNECT_PATH = "/image/**";
 

@@ -18,11 +18,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
-    @Value("${report.hiddenCount}")
-    private int reportHiddenCount;
+    @Value("${report.count}")
+    private int reportCount;
 
     @Override
-    public Slice<Comment> findRootCommentByPost(Post post, Pageable pageable) {
+    public Slice<Comment> findRootCommentsByPost(Post post, Pageable pageable) {
         List<Comment> contents = queryFactory.selectFrom(comment)
 //                .leftJoin(comment.post)
 //                .fetchJoin()
@@ -31,7 +31,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .leftJoin(comment.replies)
                 .fetchJoin()
                 .where(
-                        comment.reports.size().lt(reportHiddenCount),
+                        comment.reports.size().lt(reportCount),
                         comment.post.eq(post)
                 )
                 .fetch();
