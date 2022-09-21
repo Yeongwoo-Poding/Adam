@@ -33,7 +33,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
-            Optional<Member> maybeMember = memberRepository.findByEmail(authentication.getName());
+            Optional<Member> maybeMember = memberRepository.findMemberByEmail(authentication.getName());
             if (maybeMember.isPresent()) {
                 Member member = maybeMember.get();
                 if (member.isLogin()) {

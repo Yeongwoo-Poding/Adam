@@ -1,6 +1,7 @@
 package project.adam.entity.comment;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.BaseTimeEntity;
@@ -29,14 +30,15 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    private String body;
+
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE)
     private List<Reply> replies = new ArrayList<>();
-
-    private String body;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<CommentReport> reports = new ArrayList<>();
 
+    @Builder
     public Comment(Member writer, Post post, String body) {
         this.writer = writer;
         this.post = post;

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
-import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
@@ -19,6 +18,8 @@ import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.reply.ReplyCreateRequest;
+import project.adam.service.dto.reply.ReplyReportRequest;
+import project.adam.service.dto.reply.ReplyUpdateRequest;
 
 import java.io.IOException;
 
@@ -31,16 +32,16 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final FcmService fcmService;
 
-    @Value("${report.hiddenCount}")
-    private int reportHiddenCount;
+    @Value("${report.count}")
+    private int reportCount;
 
     @Transactional
-    public Reply create(Member member, ReplyCreateRequest replyDto) throws IOException {
-        Reply createdReply = replyRepository.save(
-                new Reply(
-                        member,
-                        commentRepository.findById(replyDto.commentId).orElseThrow(),
-                        replyDto.getBody()));
+    public Reply create(Member member, ReplyCreateRequest request) throws IOException {
+        Reply createdReply = Reply.builder()
+                .writer(member)
+                .comment(commentRepository.findById(request.commentId).orElseThrow())
+                .body(request.getBody())
+                .build();
 
         if (isOthersPost(member, createdReply.getPost())) {
             sendPushToPostWriter(createdReply);
@@ -51,12 +52,12 @@ public class ReplyService {
         return createdReply;
     }
 
-    private void sendPushToCommentWriter(Reply createdReply) throws IOException {
+    private void sendPushToCommentWriter(Reply reply) throws IOException {
         FcmRequestBuilder request = FcmRequestBuilder.builder()
-                .member(createdReply.getComment().getWriter())
-                .title(createdReply.getComment().getBody() + "에 대댓글이 달렸어요!")
-                .body(createdReply.getBody())
-                .postId(createdReply.getPost().getId())
+                .member(reply.getComment().getWriter())
+                .title(reply.getComment().getBody() + "에 대댓글이 달렸어요!")
+                .body(reply.getBody())
+                .postId(reply.getPost().getId())
                 .build();
 
         fcmService.sendMessageTo(request);
@@ -87,13 +88,13 @@ public class ReplyService {
     }
 
     public Slice<Reply> findAllByComment(Long commentId, Pageable pageable) {
-        return replyRepository.findAllByCommentId(commentId, pageable);
+        return replyRepository.findRepliesByCommentId(commentId, pageable);
     }
 
     @Transactional
-    public void update(Reply reply, String body) {
+    public void update(Reply reply, ReplyUpdateRequest request) {
         validateReplyHidden(reply.getId());
-        reply.update(body);
+        reply.update(request.getBody());
     }
 
     @Transactional
@@ -103,7 +104,7 @@ public class ReplyService {
     }
 
     @Transactional
-    public void report(Member member, Reply reply, ReportType reportType) {
+    public void report(Member member, Reply reply, ReplyReportRequest request) {
         boolean isReportExist = reply.getReports().stream()
                 .anyMatch(replyReport -> replyReport.getMember().equals(member));
 
@@ -111,11 +112,15 @@ public class ReplyService {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
 
-        new ReplyReport(reply, member, reportType);
+        ReplyReport.builder()
+                .reply(reply)
+                .member(member)
+                .reportType(request.getReport())
+                .build();
     }
 
     private void validateReplyHidden(Long replyId) {
-        if (replyRepository.countReplyReportById(replyId) >= reportHiddenCount) {
+        if (replyRepository.countReplyReportById(replyId) >= reportCount) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }

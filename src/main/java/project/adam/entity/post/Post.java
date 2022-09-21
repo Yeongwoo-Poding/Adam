@@ -1,6 +1,7 @@
 package project.adam.entity.post;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.comment.Comment;
@@ -46,6 +47,7 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostReport> reports = new ArrayList<>();
 
+    @Builder
     public Post(Member writer, Board board, String title, String body) {
         this.writer = writer;
         this.board = board;

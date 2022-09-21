@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
-import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -31,16 +30,18 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final FcmService fcmService;
 
-    @Value("${report.hiddenCount}")
-    private int reportHiddenCount;
+    @Value("${report.count}")
+    private int reportCount;
 
     @Transactional
-    public Comment create(Member member, CommentCreateRequest commentDto) throws IOException {
-        Comment createdComment = commentRepository.save(new Comment(
-                member,
-                postRepository.findById(commentDto.postId).orElseThrow(),
-                commentDto.getBody()
-        ));
+    public Comment create(Member member, CommentCreateRequest request) throws IOException {
+        Comment createdComment = Comment.builder()
+                        .writer(member)
+                        .post(postRepository.findById(request.postId).orElseThrow())
+                        .body(request.getBody())
+                        .build();
+
+        commentRepository.save(createdComment);
 
         if (isOthers(member, createdComment)) {
             sendPushToPostWriter(createdComment);
@@ -69,13 +70,13 @@ public class CommentService {
     }
 
     public Slice<Comment> findByPost(Long postId, Pageable pageable) {
-        return commentRepository.findRootCommentByPost(postRepository.findById(postId).orElseThrow(), pageable);
+        return commentRepository.findRootCommentsByPost(postRepository.findById(postId).orElseThrow(), pageable);
     }
 
     @Transactional
-    public void update(Comment comment, CommentUpdateRequest commentDto) {
+    public void update(Comment comment, CommentUpdateRequest request) {
         validateCommentHidden(comment.getId());
-        comment.update(commentDto.getBody());
+        comment.update(request.getBody());
     }
 
     @Transactional
@@ -94,11 +95,16 @@ public class CommentService {
         if (isReportExist) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        new CommentReport(comment, member, ReportType.valueOf(request.getReportType()));
+
+        CommentReport.builder()
+                .comment(comment)
+                .member(member)
+                .reportType(request.getReport())
+                .build();
     }
 
     private void validateCommentHidden(Long commentId) {
-        if (commentRepository.countCommentReportById(commentId) >= reportHiddenCount) {
+        if (commentRepository.countCommentReportById(commentId) >= reportCount) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }

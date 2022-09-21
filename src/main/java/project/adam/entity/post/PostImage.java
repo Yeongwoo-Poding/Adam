@@ -1,6 +1,7 @@
 package project.adam.entity.post;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class PostImage {
 
     private String name;
 
+    @Builder
     public PostImage(Post post, String name) {
         this.post = post;
         this.name = name;

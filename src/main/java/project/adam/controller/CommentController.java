@@ -34,9 +34,9 @@ public class CommentController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest commentDto) throws IOException {
+    public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest request) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        Comment savedComment = commentService.create(member, commentDto);
+        Comment savedComment = commentService.create(member, request);
         return new CommentFindResponse(savedComment);
     }
 
@@ -54,10 +54,10 @@ public class CommentController {
 
     @Secured("ROLE_USER")
     @PutMapping("/{commentId}")
-    public void updateComment(@PathVariable Long commentId, @Validated @RequestBody CommentUpdateRequest commentDto) {
+    public void updateComment(@PathVariable Long commentId, @Validated @RequestBody CommentUpdateRequest request) {
         Comment findComment = commentService.find(commentId);
         memberService.authorization(findComment.getWriter());
-        commentService.update(findComment, commentDto);
+        commentService.update(findComment, request);
     }
 
     @Secured("ROLE_USER")

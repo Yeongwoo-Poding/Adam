@@ -9,11 +9,11 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     @Modifying
     @Query("delete from PostImage pi where pi.id = :imageId")
-    void deleteImageById(Long imageId);
+    void deletePostImageById(Long imageId);
 
     @Modifying
     @Query("delete from PostThumbnail pt where pt.id = :thumbnailId")
-    void deleteThumbnailById(Long thumbnailId);
+    void deletePostThumbnailById(Long thumbnailId);
 
     @Query("select count(pr) from PostReport pr where pr.post.id = :postId")
     int countPostReportById(Long postId);

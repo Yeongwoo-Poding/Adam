@@ -6,5 +6,5 @@ import project.adam.entity.reply.Reply;
 
 public interface ReplyRepositoryCustom {
 
-    Slice<Reply> findAllByCommentId(Long commentId, Pageable pageable);
+    Slice<Reply> findRepliesByCommentId(Long commentId, Pageable pageable);
 }

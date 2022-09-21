@@ -5,7 +5,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.reply.ReplyFindResponse;
-import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
@@ -29,9 +28,9 @@ public class ReplyController {
 
     @Secured("ROLE_USER")
     @PostMapping
-    public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest createDto) throws IOException {
+    public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest request) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        return new ReplyFindResponse(replyService.create(member, createDto));
+        return new ReplyFindResponse(replyService.create(member, request));
     }
 
     @Secured("ROLE_USER")
@@ -42,10 +41,10 @@ public class ReplyController {
 
     @Secured("ROLE_USER")
     @PutMapping("/{replyId}")
-    public void updateReply(@PathVariable Long replyId, @Validated @RequestBody ReplyUpdateRequest updateDto) {
+    public void updateReply(@PathVariable Long replyId, @Validated @RequestBody ReplyUpdateRequest request) {
         Reply findReply = replyService.find(replyId);
         memberService.authorization(findReply.getWriter());
-        replyService.update(findReply, updateDto.getBody());
+        replyService.update(findReply, request);
     }
 
     @Secured("ROLE_USER")
@@ -58,12 +57,12 @@ public class ReplyController {
 
     @Secured("ROLE_USER")
     @PostMapping("/{replyId}/report")
-    public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest reportDto) {
+    public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Reply findReply = replyService.find(replyId);
         if (member.equals(findReply.getWriter())) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        replyService.report(member, findReply, ReportType.valueOf(reportDto.getReportType()));
+        replyService.report(member, findReply, request);
     }
 }

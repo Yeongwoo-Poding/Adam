@@ -44,24 +44,25 @@ public class MemberService {
 
 
     @Transactional
-    public void join(MemberJoinRequest memberDto) {
-        if (memberRepository.existsByEmail(memberDto.getEmail())) {
+    public void join(MemberJoinRequest request) {
+        if (memberRepository.existsByEmail(request.getEmail())) {
             throw new ApiException(UNIQUE_CONSTRAINT_VIOLATED);
         }
 
-        memberRepository.save(new Member(
-                passwordEncoder.encode(memberDto.getId()),
-                memberDto.getEmail(),
-                memberDto.getName(),
-                memberDto.getAuthority()
-        ));
+        Member createdMember = Member.builder()
+                .id(passwordEncoder.encode(request.getId()))
+                .email(request.getEmail())
+                .name(request.getName())
+                .build();
+
+        memberRepository.save(createdMember);
     }
 
     @Transactional
-    public MemberLoginResponse login(MemberLoginRequest memberDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = memberDto.toAuthentication();
+    public MemberLoginResponse login(MemberLoginRequest request) {
+        UsernamePasswordAuthenticationToken authenticationToken = request.toAuthentication();
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenDto(authenticate);
+        MemberLoginResponse memberLoginResponse = tokenProvider.generateTokenResponse(authenticate);
 //        RefreshToken refreshToken = RefreshToken.builder()
 //                .key(authenticate.getName())
 //                .value(memberLoginResponse.getRefreshToken())
@@ -69,8 +70,8 @@ public class MemberService {
 //
 //        refreshTokenRepository.save(refreshToken);
 
-        Member loginMember = memberRepository.findByEmail(authenticate.getName()).orElseThrow();
-        loginMember.login(memberDto.getDeviceToken());
+        Member loginMember = memberRepository.findMemberByEmail(authenticate.getName()).orElseThrow();
+        loginMember.login(request.getDeviceToken());
 
         return memberLoginResponse;
     }
@@ -102,7 +103,7 @@ public class MemberService {
 //    }
 
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow();
+        return memberRepository.findMemberByEmail(email).orElseThrow();
     }
 
     public List<Member> findAll() {
@@ -118,11 +119,11 @@ public class MemberService {
     }
 
     private void removeReplies(Member member) {
-        replyRepository.deleteAll(replyRepository.findAllByWriter(member));
+        replyRepository.deleteAll(replyRepository.findRepliesByWriter(member));
     }
 
     private void removeComments(Member member) {
-        commentRepository.deleteAll(commentRepository.findAllByWriter(member));
+        commentRepository.deleteAll(commentRepository.findCommentsByWriter(member));
     }
 
     private void removePosts(Member member) {
@@ -151,7 +152,7 @@ public class MemberService {
     }
 
     public void authorization(Member member) {
-        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
+        Member loginMember = memberRepository.findMemberByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
         loginMember.authorization(member);
     }
 }

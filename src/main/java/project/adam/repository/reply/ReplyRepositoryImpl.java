@@ -17,17 +17,17 @@ public class ReplyRepositoryImpl implements ReplyRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
-    @Value("${report.hiddenCount}")
-    private int reportHiddenCount;
+    @Value("${report.count}")
+    private int reportCount;
 
     @Override
-    public Slice<Reply> findAllByCommentId(Long commentId, Pageable pageable) {
+    public Slice<Reply> findRepliesByCommentId(Long commentId, Pageable pageable) {
         List<Reply> contents = queryFactory.selectFrom(reply)
                 .leftJoin(reply.writer)
                 .fetchJoin()
                 .where(
                         reply.comment.id.eq(commentId),
-                        reply.reports.size().lt(reportHiddenCount)
+                        reply.reports.size().lt(reportCount)
                 )
                 .fetch();
 

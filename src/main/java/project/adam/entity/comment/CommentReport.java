@@ -1,6 +1,7 @@
 package project.adam.entity.comment;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.ReportType;
@@ -28,6 +29,7 @@ public class CommentReport {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
+    @Builder
     public CommentReport(Comment comment, Member member, ReportType reportType) {
         this.comment = comment;
         this.member = member;

@@ -19,6 +19,7 @@ local.properties
 build
 .gradle
 src/main/resources/firebase
+src/main/resources/application-secret.yml
 src/main/java/project/adam/CreateAdmin.java
 
 # ignore properties file
@@ -156,6 +157,5 @@ $RECYCLE.BIN/
 
 # intellij
 .idea
-*.yml
 
 # End of https://www.gitignore.io/api/git,java,maven,windows,eclipse

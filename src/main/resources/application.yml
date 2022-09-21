@@ -1,0 +1,95 @@
+spring:
+  profiles:
+    active: local
+  config:
+    import: application-secret.yml
+
+report:
+  count: 5
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+    open-in-view: true
+
+logging:
+  level:
+    root: warn
+    project.adam: info
+
+server:
+  port: 1790
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: true
+
+logging:
+  level:
+    project.adam.controller: info
+
+server:
+  port: 8080
+  
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: true
+
+logging:
+  level:
+    project.adam.controller: debug
+    org.hibernate:
+      SQL: debug
+
+server:
+  port: 8080
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: true

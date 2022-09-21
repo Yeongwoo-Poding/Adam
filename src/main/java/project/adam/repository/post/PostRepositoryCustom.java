@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface PostRepositoryCustom {
 
-    Slice<Post> findAll(PostFindCondition condition, Pageable pageable);
+    Slice<Post> findPosts(PostFindCondition condition, Pageable pageable);
 
-    Optional<Post> findPostIncViewCount(Long postId);
+    Optional<Post> showPost(Long postId);
 }

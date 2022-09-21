@@ -1,16 +1,16 @@
 package project.adam.service.dto.reply;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotEmpty;
+import project.adam.entity.common.ReportType;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ReplyReportRequest {
 
-    @NotEmpty
-    private String reportType;
+    private ReportType report;
+
+    public ReplyReportRequest(String reportType) {
+        this.report = ReportType.valueOf(reportType);
+    }
 }

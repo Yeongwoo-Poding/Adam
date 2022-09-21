@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
-import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
-import project.adam.entity.post.*;
+import project.adam.entity.post.Post;
+import project.adam.entity.post.PostImage;
+import project.adam.entity.post.PostReport;
+import project.adam.entity.post.PostThumbnail;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
@@ -36,23 +38,25 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ImageUtils imageUtils;
 
-    @Value("${report.hiddenCount}")
-    private int reportHiddenCount;
+    @Value("${report.count}")
+    private int reportCount;
 
     @Transactional
-    public Post create(Member member, PostCreateRequest postDto, MultipartFile[] images) throws IOException {
-        Post createdPost = new Post(
-                member,
-                Board.valueOf(postDto.getBoard()),
-                postDto.getTitle(),
-                postDto.getBody()
-        );
+    public Post create(Member member, PostCreateRequest request, MultipartFile[] images) throws IOException {
+        Post createdPost = Post.builder()
+                .writer(member)
+                .board(request.getBoard())
+                .title(request.getTitle())
+                .body(request.getBody())
+                .build();
+
         if (images != null) {
             createImages(images, createdPost);
             String imageName = createdPost.getImages().get(0).getName();
             MultipartFile image = images[0];
             createThumbnail(imageName, image, createdPost);
         }
+
         return postRepository.save(createdPost);
     }
 
@@ -64,18 +68,18 @@ public class PostService {
     @Transactional
     public Post findIncViewCount(Long postId) {
         validatePostHidden(postId);
-        return postRepository.findPostIncViewCount(postId).orElseThrow();
+        return postRepository.showPost(postId).orElseThrow();
     }
 
     public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
-        return postRepository.findAll(condition, pageable);
+        return postRepository.findPosts(condition, pageable);
     }
 
     @Transactional
-    public void update(Post post, PostUpdateRequest postDto, MultipartFile[] images) throws IOException {
+    public void update(Post post, PostUpdateRequest request, MultipartFile[] images) throws IOException {
         validatePostHidden(post.getId());
 
-        post.update(postDto.getTitle(), postDto.getBody());
+        post.update(request.getTitle(), request.getBody());
 
         removeImageFiles(post);
         removeImageDatas(post);
@@ -94,7 +98,7 @@ public class PostService {
     public void remove(Post post) {
         validatePostHidden(post.getId());
 
-        List<Comment> comments = commentRepository.findAllByPost(post);
+        List<Comment> comments = commentRepository.findCommentsByPost(post);
         commentRepository.deleteAll(comments);
 
         removeImageFiles(post);
@@ -105,13 +109,20 @@ public class PostService {
     private void createImages(MultipartFile[] images, Post post) throws IOException {
         for (MultipartFile image : images) {
             File imageFile = imageUtils.createImageFile(image);
-            new PostImage(post, imageFile.getName());
+            PostImage.builder()
+                    .post(post)
+                    .name(imageFile.getName())
+                    .build();
         }
     }
 
     private void createThumbnail(String originImageName, MultipartFile image, Post post) throws IOException {
         File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
-        new PostThumbnail(post, thumbnailFile.getName());
+
+        PostThumbnail.builder()
+                .post(post)
+                .name(thumbnailFile.getName())
+                .build();
     }
 
     private void removeImageFiles(Post post) {
@@ -128,7 +139,7 @@ public class PostService {
             return;
         }
         for (PostImage image : post.getImages()) {
-            postRepository.deleteImageById(image.getId());
+            postRepository.deletePostImageById(image.getId());
         }
         post.getImages().clear();
     }
@@ -144,7 +155,7 @@ public class PostService {
         if (post.getThumbnail() == null) {
             return;
         }
-        postRepository.deleteThumbnailById(post.getThumbnail().getId());
+        postRepository.deletePostThumbnailById(post.getThumbnail().getId());
     }
 
     @Transactional
@@ -155,11 +166,16 @@ public class PostService {
         if (isReportExist) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        new PostReport(post, member, ReportType.valueOf(request.getReportType()));
+
+        PostReport.builder()
+                .post(post)
+                .member(member)
+                .reportType(request.getReport())
+                .build();
     }
 
     private void validatePostHidden(Long postId) {
-        if (postRepository.countPostReportById(postId) >= reportHiddenCount) {
+        if (postRepository.countPostReportById(postId) >= reportCount) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }

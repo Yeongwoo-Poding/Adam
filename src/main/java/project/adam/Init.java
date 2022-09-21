@@ -49,19 +49,19 @@ public class Init {
             }
 
             for (long i = 0L; i < (N * N); i++) {
-                Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
+                Member writer = memberRepository.findMemberByEmail("email" + (i % N + 1)).orElseThrow();
                 postRepository.save(new Post(writer, Board.FREE, writer.getEmail(), "writer: " + writer.getName()));
                 postRepository.save(new Post(writer, Board.QUESTION, writer.getEmail(), "writer: " + writer.getName()));
             }
 
             for (long i = 0L; i < (N * N * N); i++) {
-                Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
+                Member writer = memberRepository.findMemberByEmail("email" + (i % N + 1)).orElseThrow();
                 Post post = postRepository.findById(i % (N * N) + 1).orElseThrow();
                 commentRepository.save(new Comment(writer, post, "writer: " + writer.getName() + " post: " + post.getId()));
             }
 
             for (long i = 0L; i < (N * N * N * N); i++) {
-                Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
+                Member writer = memberRepository.findMemberByEmail("email" + (i % N + 1)).orElseThrow();
                 Post post = postRepository.findById(i % (N * N) + 1).orElseThrow();
                 Comment comment = commentRepository.findById(i % (N * N * N) + 1).orElseThrow();
                 replyRepository.save(new Reply(writer, comment, "writer: " + writer.getName() + " post: " + post.getId() + " comment: " + comment.getId()));

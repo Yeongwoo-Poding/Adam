@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long>, CommentRepositoryCustom {
 
-    List<Comment> findAllByPost(Post post);
+    List<Comment> findCommentsByPost(Post post);
 
-    List<Comment> findAllByWriter(Member writer);
+    List<Comment> findCommentsByWriter(Member writer);
 
     @Query("select count(cr) from CommentReport cr where cr.comment.id = :commentId")
     int countCommentReportById(Long commentId);
