@@ -20,7 +20,7 @@ import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
-import project.adam.utils.ImageUtils;
+import project.adam.utils.image.ImageUtils;
 
 import java.io.File;
 import java.io.IOException;

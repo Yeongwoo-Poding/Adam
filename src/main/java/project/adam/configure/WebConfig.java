@@ -15,10 +15,6 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${file.dir}")
-    private String imagePath;
-    private static final String CONNECT_PATH = "/image/**";
-
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
@@ -28,11 +24,5 @@ public class WebConfig implements WebMvcConfigurer {
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.add(0, new CustomNotFoundException(objectMapper()));
         resolvers.add(1, new CustomMethodException(objectMapper()));
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(CONNECT_PATH)
-                .addResourceLocations("file://" + imagePath);
     }
 }

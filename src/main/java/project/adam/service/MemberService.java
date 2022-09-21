@@ -19,7 +19,7 @@ import project.adam.security.SecurityUtils;
 import project.adam.security.TokenProvider;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
-import project.adam.utils.ImageUtils;
+import project.adam.utils.image.ImageUtils;
 
 import java.io.IOException;
 import java.util.List;

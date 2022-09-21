@@ -1,7 +1,8 @@
-package project.adam.utils;
+package project.adam.utils.image;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.exception.ApiException;
@@ -16,7 +17,8 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class ImageUtils {
+@Profile({"test"})
+public class LocalImageUtils implements ImageUtils {
 
     @Value("${file.dir}")
     private String imagePath;
@@ -34,6 +36,16 @@ public class ImageUtils {
         return imageFile;
     }
 
+    public File createThumbnailFile(String originImageName, MultipartFile originalImage) throws IOException {
+        File originalFile = new File(imagePath + originImageName);
+        BufferedImage bufferedImage = resizeImage(ImageIO.read(originalFile));
+
+        String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
+        File createdImage = new File(imagePath + imageName);
+        ImageIO.write(bufferedImage, getExtension(originalImage), createdImage);
+        return createdImage;
+    }
+
     public void removeImageFile(String imageName) {
         if (imageName == null) {
             return;
@@ -45,14 +57,20 @@ public class ImageUtils {
         }
     }
 
-    public File createThumbnailFile(String originImageName, MultipartFile originalImage) throws IOException {
-        File originalFile = new File(imagePath + originImageName);
-        BufferedImage bufferedImage = resizeImage(ImageIO.read(originalFile));
+    public void removeAll() {
+        File imageDir = new File(imagePath);
+        if (!imageDir.exists()) {
+            log.warn("[DeInit] 이미지 파일 경로가 없습니다.");
+            return;
+        }
 
-        String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
-        File createdImage = new File(imagePath + imageName);
-        ImageIO.write(bufferedImage, getExtension(originalImage), createdImage);
-        return createdImage;
+        File[] files = imageDir.listFiles();
+        for (File file : files) {
+            String deleteFileName = file.getName();
+            if (file.delete()) {
+                log.info("[DeInit] 파일 삭제 {}", deleteFileName);
+            }
+        }
     }
 
     private String getExtension(MultipartFile file) {
