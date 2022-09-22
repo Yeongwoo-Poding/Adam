@@ -2,9 +2,10 @@ package project.adam.service.dto.post;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import project.adam.entity.post.Board;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 public class PostFindCondition {
 
@@ -12,7 +13,7 @@ public class PostFindCondition {
     private String content;
 
     public PostFindCondition(String boardId, String content) {
-        this.board = boardId == null ? null : Board.valueOf(boardId);
+        this.board = Board.valueOf(boardId);
         this.content = content;
     }
 }
