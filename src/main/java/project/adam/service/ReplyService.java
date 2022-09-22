@@ -89,7 +89,7 @@ public class ReplyService {
         return replyRepository.findById(replyId).orElseThrow();
     }
 
-    public Slice<Reply> findAllByComment(Long commentId, Pageable pageable) {
+    public Slice<Reply> findRepliesByComment(Long commentId, Pageable pageable) {
         return replyRepository.findRepliesByCommentId(commentId, pageable);
     }
 

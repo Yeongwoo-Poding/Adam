@@ -32,7 +32,7 @@ public class CommentController {
     private final CommentService commentService;
     private final ReplyService replyService;
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
     public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest request) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
@@ -40,19 +40,19 @@ public class CommentController {
         return new CommentFindResponse(savedComment);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{commentId}")
     public CommentFindResponse findComment(@PathVariable Long commentId) {
         return new CommentFindResponse(commentService.find(commentId));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{commentId}/replies")
     public ReplyListFindResponse findReplies(@PathVariable Long commentId, Pageable pageable) {
-        return new ReplyListFindResponse(replyService.findAllByComment(commentId, pageable));
+        return new ReplyListFindResponse(replyService.findRepliesByComment(commentId, pageable));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping("/{commentId}")
     public void updateComment(@PathVariable Long commentId, @Validated @RequestBody CommentUpdateRequest request) {
         Comment findComment = commentService.find(commentId);
@@ -60,7 +60,7 @@ public class CommentController {
         commentService.update(findComment, request);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable Long commentId) {
         Comment findComment = commentService.find(commentId);
@@ -68,7 +68,7 @@ public class CommentController {
         commentService.remove(findComment);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/{commentId}/report")
     public void reportComment(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());

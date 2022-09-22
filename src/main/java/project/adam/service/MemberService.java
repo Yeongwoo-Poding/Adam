@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.repository.comment.CommentRepository;
@@ -106,8 +107,8 @@ public class MemberService {
         return memberRepository.findMemberByEmail(email).orElseThrow();
     }
 
-    public List<Member> findAll() {
-        return memberRepository.findAll();
+    public List<Member> findLoginUsers() {
+        return memberRepository.findLoginUsers();
     }
 
     @Transactional

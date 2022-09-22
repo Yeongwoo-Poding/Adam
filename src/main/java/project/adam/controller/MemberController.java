@@ -35,7 +35,7 @@ public class MemberController {
         return memberService.login(request);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/logout")
     public void logoutMember() {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
@@ -47,7 +47,7 @@ public class MemberController {
 //        return memberService.refreshToken(memberDto);
 //    }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/me")
     public MemberFindResponse findMe() {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
@@ -59,14 +59,14 @@ public class MemberController {
         return new MemberFindResponse(memberService.findByEmail(email));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping
     public void deleteMember() {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         memberService.withdraw(member);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/image")
     public void saveImage(MultipartFile image) throws IOException {
         if (image == null || image.isEmpty()) {
@@ -76,7 +76,7 @@ public class MemberController {
         memberService.saveImage(member, image);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/image")
     public void removeImage() {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());

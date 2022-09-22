@@ -3,11 +3,13 @@ package project.adam.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,6 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import project.adam.exception.custom.CustomAccessDeniedHandler;
 import project.adam.exception.custom.CustomAuthenticationEntryPoint;
 import project.adam.repository.member.MemberRepository;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -33,19 +38,23 @@ public class SecurityWebConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public DefaultWebSecurityExpressionHandler handler() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-
-        DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
-        handler.setRoleHierarchy(roleHierarchy);
-        return handler;
-    }
+//    @Bean
+//    public RoleHierarchy roleHierarchy() {
+//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+//        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+//        return roleHierarchy;
+//    }
+//
+//    @Bean
+//    public DefaultWebSecurityExpressionHandler handler() {
+//        DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+//        handler.setRoleHierarchy(roleHierarchy());
+//        return handler;
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf().disable()
 
                 .exceptionHandling()
@@ -55,7 +64,7 @@ public class SecurityWebConfig {
 
                 .authorizeRequests()
                 .anyRequest().permitAll()
-                .expressionHandler(handler())
+//                .expressionHandler(handler())
                 .and()
 
                 .headers()
@@ -67,8 +76,7 @@ public class SecurityWebConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
 
-                .addFilterBefore(new SecurityFilter(tokenProvider, memberRepository), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(new SecurityFilter(tokenProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }

@@ -17,6 +17,8 @@ import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
+import project.adam.fcm.FcmController;
+import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
@@ -37,40 +39,45 @@ public class PostController {
     private final MemberService memberService;
     private final PostService postService;
     private final CommentService commentService;
+    private final FcmController fcmController;
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest request,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Post savedPost = postService.create(member, request, images);
 
-        if (savedPost.getBoard().equals(Board.NOTICE) && member.getAuthority().equals(Authority.ROLE_USER)) {
-            throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+        if (savedPost.getBoard().equals(Board.NOTICE)) {
+            if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
+                fcmController.pushAll(new FcmPushRequest(savedPost.getTitle(), savedPost.getBody(), savedPost.getId()));
+            } else {
+                throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            }
         }
 
         return new PostFindResponse(savedPost);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
-        return new PostFindResponse(postService.findIncViewCount(postId));
+        return new PostFindResponse(postService.showPost(postId));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping
-    public PostListFindResponse findAll(@ModelAttribute PostFindCondition condition, Pageable pageable) {
-        return new PostListFindResponse(postService.findAll(condition, pageable));
+    public PostListFindResponse findPosts(@ModelAttribute PostFindCondition condition, Pageable pageable) {
+        return new PostListFindResponse(postService.findPosts(condition, pageable));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
         return new CommentListFindResponse(commentService.findByPost(postId, pageable));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updatePost(@PathVariable Long postId,
                            @Validated @RequestPart("data") PostUpdateRequest request,
@@ -80,7 +87,7 @@ public class PostController {
         postService.update(findPost, request, images);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Long postId) {
         Post findPost = postService.find(postId);
@@ -88,7 +95,7 @@ public class PostController {
         postService.remove(findPost);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/{postId}/report")
     public void reportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
