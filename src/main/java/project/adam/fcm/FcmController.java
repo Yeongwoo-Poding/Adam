@@ -6,15 +6,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
 import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.service.MemberService;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
