@@ -66,12 +66,12 @@ public class PostService {
     }
 
     @Transactional
-    public Post findIncViewCount(Long postId) {
+    public Post showPost(Long postId) {
         validatePostHidden(postId);
         return postRepository.showPost(postId).orElseThrow();
     }
 
-    public Slice<Post> findAll(PostFindCondition condition, Pageable pageable) {
+    public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
         return postRepository.findPosts(condition, pageable);
     }
 

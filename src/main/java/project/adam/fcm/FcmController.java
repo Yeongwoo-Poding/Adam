@@ -26,10 +26,7 @@ public class FcmController {
     @Secured("ROLE_ADMIN")
     @PostMapping("/message")
     public void pushAll(@RequestBody FcmPushRequest request) throws IOException {
-        List<Member> members = memberService.findAll().stream()
-                .filter(member -> member.isLogin() && member.getAuthority().equals(Authority.ROLE_USER))
-                .collect(Collectors.toList());
-        for (Member member : members) {
+        for (Member member : memberService.findLoginUsers()) {
             FcmRequestBuilder fcmRequest = FcmRequestBuilder.builder()
                     .member(member)
                     .title(request.getTitle())

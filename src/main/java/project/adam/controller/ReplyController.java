@@ -26,20 +26,20 @@ public class ReplyController {
     private final MemberService memberService;
     private final ReplyService replyService;
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
     public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest request) throws IOException {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         return new ReplyFindResponse(replyService.create(member, request));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{replyId}")
     public ReplyFindResponse findReply(@PathVariable Long replyId) {
         return new ReplyFindResponse(replyService.find(replyId));
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping("/{replyId}")
     public void updateReply(@PathVariable Long replyId, @Validated @RequestBody ReplyUpdateRequest request) {
         Reply findReply = replyService.find(replyId);
@@ -47,7 +47,7 @@ public class ReplyController {
         replyService.update(findReply, request);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/{replyId}")
     public void deleteReply(@PathVariable Long replyId) {
         Reply findReply = replyService.find(replyId);
@@ -55,7 +55,7 @@ public class ReplyController {
         replyService.delete(findReply);
     }
 
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/{replyId}/report")
     public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
