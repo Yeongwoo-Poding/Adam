@@ -29,8 +29,6 @@ import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.utils.image.ImageUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,7 +50,6 @@ public class PostServiceTest {
     @Autowired CommentService commentService;
     @Autowired ReplyService replyService;
     @Autowired ImageUtils imageUtils;
-    @PersistenceContext EntityManager em;
 
     @Value("${image.path}")
     String imagePath;
@@ -63,7 +60,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 생성")
+    @DisplayName("게시글 생성")
     void create_post() {
         // given
         Member member = createMember();
@@ -77,7 +74,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("이미지가 포함된 Post 생성")
+    @DisplayName("이미지가 포함된 게시글 생성")
     void create_post_with_image() throws IOException {
         // given
         Member member = createMember();
@@ -93,7 +90,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post Board가 존재하지 않는 경우 오류")
+    @DisplayName("게시글 생성시 게시판이 존재하지 않는 경우 오류")
     void create_post_no_board() {
         // given when then
         assertThatThrownBy(() -> postService.create(createMember(), new PostCreateRequest(Board.valueOf("NO_BOARD"), "title", "body"), null))
@@ -101,7 +98,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Find Post시 조회수가 증가하지 않음")
+    @DisplayName("Find로 조회 시 조회수가 증가하지 않음")
     void find_post() {
         // given
         Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
@@ -114,21 +111,21 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Show Post시 조회수가 증가")
+    @DisplayName("Show로 조회 시 조회수가 증가하고 최종수정일은 바뀌지 않음")
     void show_post() {
         // given
         Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
-        clearPersistenceContext();
 
         // when
         Post findPost = postService.showPost(post.getId());
 
         // then
         assertThat(findPost.getViewCount()).isEqualTo(1);
+        assertThat(findPost.isModified()).isFalse();
     }
 
     @Test
-    @DisplayName("Post 리스트 조회 - 조건 x")
+    @DisplayName("모든 조건의 게시글 조회")
     void find_posts_no_condition() {
         // given
         Member member = createMember();
@@ -148,7 +145,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 리스트 조회 - Board 조건")
+    @DisplayName("게시판이 일치하는 게시글 조회")
     void find_posts_board_condition() {
         // given
         Member member = createMember();
@@ -168,7 +165,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 리스트 조회 - content 조건 - title")
+    @DisplayName("제목에 단어를 포함한 게시글 조회")
     void find_posts_content_condition_title() {
         // given
         Member member = createMember();
@@ -188,7 +185,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 리스트 조회 - content 조건 - body")
+    @DisplayName("본문에 단어를 포함한 게시글 조회")
     void find_posts_content_condition_body() {
         // given
         Member member = createMember();
@@ -208,7 +205,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 리스트 조회 - 모든 조건")
+    @DisplayName("게시판과 단어 조건을 통한 게시글 조회")
     void find_posts_all_condition() {
         // given
         Member member = createMember();
@@ -228,7 +225,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 수정")
+    @DisplayName("게시글 수정")
     void update() {
         // given
         Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
@@ -242,7 +239,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 수정시 이전 이미지 삭제 후 새 이미지 생성")
+    @DisplayName("게시글 수정시 기존 이미지가 삭제되고 새로운 이미지 생성")
     void update_change_images() throws IOException {
         // given
         MultipartFile[] images = new MockMultipartFile[]{new MockMultipartFile("name", "originName", "image/png", getFileInputStream())};
@@ -262,7 +259,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 삭제")
+    @DisplayName("게시글 삭제")
     void remove_post() {
         // given
         Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
@@ -276,7 +273,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 삭제시 하위 댓글 삭제")
+    @DisplayName("게시글 삭제시 하위 댓글 삭제")
     void remove_post_remove_comments() {
         // given
         Member member = createMember();
@@ -292,7 +289,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 삭제시 하위 대댓글 삭제")
+    @DisplayName("게시글 삭제시 하위 대댓글 삭제")
     void remove_post_remove_replies() {
         // given
         Member member = createMember();
@@ -309,7 +306,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post 삭제시 PostImage 삭제")
+    @DisplayName("게시글 삭제시 이미지 삭제")
     void remove_post_remove_images() throws IOException {
         // given
         MultipartFile[] images = new MockMultipartFile[]{new MockMultipartFile("name", "originName", "image/png", getFileInputStream())};
@@ -324,7 +321,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("PostReport 생성")
+    @DisplayName("게시글 신고")
     void report() {
         // given
         Member member = createMember();
@@ -339,7 +336,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("한명의 Member가 하나의 Post에 여러 번 Report 하는 경우 오류")
+    @DisplayName("게시글을 중복 신고하는 경우 오류")
     void report_duplicate() {
         // given
         Member member = createMember();
@@ -353,7 +350,7 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("Post가 Report를 5번 이상 받으면 숨김")
+    @DisplayName("게시글이 5번 이상 신고를 받으면 숨김")
     void hide_post() {
         // given
         Member member = createMember();
@@ -395,10 +392,5 @@ public class PostServiceTest {
     @NotNull
     private File getImage(String imageName) {
         return new File(imagePath + imageName);
-    }
-
-    private void clearPersistenceContext() {
-        em.flush();
-        em.clear();
     }
 }

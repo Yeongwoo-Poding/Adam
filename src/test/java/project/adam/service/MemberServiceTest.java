@@ -53,7 +53,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원가입 성공")
+    @DisplayName("회원가입")
     void join() {
         // given when
         memberService.join(new MemberJoinRequest("id", "email", "name"));
@@ -75,7 +75,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("로그인 성공")
+    @DisplayName("로그인")
     void login() {
         // given
         memberService.join(new MemberJoinRequest("id", "email", "name"));
@@ -97,7 +97,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("로그아웃 성공")
+    @DisplayName("로그아웃")
     void logout() {
         // given
         memberService.join(new MemberJoinRequest("id", "email", "name"));
@@ -112,7 +112,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴 성공")
+    @DisplayName("회원 탈퇴")
     void withdraw() {
         // given
         memberService.join(new MemberJoinRequest("id", "email", "name"));
