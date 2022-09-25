@@ -15,11 +15,10 @@ import project.adam.fcm.FcmService;
 import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
-
-import java.io.IOException;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,13 +27,14 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final FcmService fcmService;
 
     @Value("${report.count}")
     private int reportCount;
 
     @Transactional
-    public Comment create(Member member, CommentCreateRequest request) throws IOException {
+    public Comment create(Member member, CommentCreateRequest request)  {
         Comment createdComment = Comment.builder()
                         .writer(member)
                         .post(postRepository.findById(request.postId).orElseThrow())
@@ -50,7 +50,7 @@ public class CommentService {
         return createdComment;
     }
 
-    private void sendPushToPostWriter(Comment comment) throws IOException {
+    private void sendPushToPostWriter(Comment comment)  {
         FcmRequestBuilder request = FcmRequestBuilder.builder()
                 .member(comment.getPost().getWriter())
                 .title(comment.getPost().getTitle() + "에 댓글이 달렸어요!")
@@ -82,17 +82,13 @@ public class CommentService {
     @Transactional
     public void remove(Comment comment) {
         validateCommentHidden(comment.getId());
+        replyRepository.deleteAll(replyRepository.findRepliesByComment(comment));
         commentRepository.delete(comment);
     }
 
     @Transactional
-    public void createCommentReport(Member member, Comment comment, CommentReportRequest request) {
-        validateCommentHidden(comment.getId());
-
-        boolean isReportExist = comment.getReports().stream()
-                .anyMatch(commentReport -> commentReport.getMember().equals(member));
-
-        if (isReportExist) {
+    public void report(Member member, Comment comment, CommentReportRequest request) {
+        if (isReportExist(member, comment)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
 
@@ -101,6 +97,11 @@ public class CommentService {
                 .member(member)
                 .reportType(request.getReportType())
                 .build();
+    }
+
+    private boolean isReportExist(Member member, Comment comment) {
+        return comment.getReports().stream()
+                .anyMatch(commentReport -> commentReport.getMember().equals(member));
     }
 
     private void validateCommentHidden(Long commentId) {

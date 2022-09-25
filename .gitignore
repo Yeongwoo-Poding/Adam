@@ -159,5 +159,7 @@ $RECYCLE.BIN/
 
 # intellij
 .idea
+build
+out
 
 # End of https://www.gitignore.io/api/git,java,maven,windows,eclipse

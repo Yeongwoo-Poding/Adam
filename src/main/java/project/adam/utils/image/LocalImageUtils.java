@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,24 +24,42 @@ public class LocalImageUtils implements ImageUtils {
     private static final int THUMBNAIL_WIDTH = 200;
     private static final int THUMBNAIL_HEIGHT = 200;
 
-    @Value("${file.dir}")
+    @Value("${image.path}")
     private String imagePath;
 
-    public File createImageFile(MultipartFile image) throws IOException {
-        String imageName = UUID.randomUUID() + "." + getExtension(image);
-        File imageFile = new File(imagePath + imageName);
-        image.transferTo(imageFile);
-        return imageFile;
+    @PostConstruct
+    private File getImagePath() {
+        File path = new File(imagePath);
+        if (!path.exists()) {
+            path.mkdir();
+        }
+        return path;
     }
 
-    public File createThumbnailFile(String originImageName, MultipartFile originalImage) throws IOException {
-        File originalFile = new File(imagePath + originImageName);
-        BufferedImage bufferedImage = resizeImage(ImageIO.read(originalFile));
+    public File createImageFile(MultipartFile image) {
+        try {
+            String imageName = UUID.randomUUID() + "." + getExtension(image);
+            File imageFile = new File(imagePath + imageName);
+            image.transferTo(imageFile);
+            return imageFile;
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 생성 오류");
+        }
 
-        String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
-        File createdImage = new File(imagePath + imageName);
-        ImageIO.write(bufferedImage, getExtension(originalImage), createdImage);
-        return createdImage;
+    }
+
+    public File createThumbnailFile(String originImageName, MultipartFile originalImage) {
+        try {
+            File originalFile = new File(imagePath + originImageName);
+            BufferedImage bufferedImage = resizeImage(ImageIO.read(originalFile));
+
+            String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
+            File createdImage = new File(imagePath + imageName);
+            ImageIO.write(bufferedImage, getExtension(originalImage), createdImage);
+            return createdImage;
+        } catch (IOException e) {
+            throw new RuntimeException("썸네일 생성 오류");
+        }
     }
 
     public void removeImageFile(String imageName) {
@@ -57,8 +76,7 @@ public class LocalImageUtils implements ImageUtils {
     public void removeAll() {
         File imageDir = new File(imagePath);
         if (!imageDir.exists()) {
-            log.warn("[DeInit] 이미지 파일 경로가 없습니다.");
-            return;
+            imageDir.mkdir();
         }
 
         File[] files = imageDir.listFiles();

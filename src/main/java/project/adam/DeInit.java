@@ -17,7 +17,7 @@ import java.io.File;
 @RequiredArgsConstructor
 public class DeInit {
 
-    @Value("${file.dir}")
+    @Value("${image.path}")
     File imageFilePath;
 
     private final ImageUtils imageUtils;

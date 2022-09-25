@@ -14,10 +14,12 @@ import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
 import project.adam.entity.post.PostReport;
 import project.adam.entity.post.PostThumbnail;
+import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
+import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
@@ -25,7 +27,6 @@ import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.utils.image.ImageUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -36,13 +37,14 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final ImageUtils imageUtils;
 
     @Value("${report.count}")
     private int reportCount;
 
     @Transactional
-    public Post create(Member member, PostCreateRequest request, MultipartFile[] images) throws IOException {
+    public Post create(Member member, PostCreateRequest request, MultipartFile[] images)  {
         Post createdPost = Post.builder()
                 .writer(member)
                 .board(request.getBoard())
@@ -76,7 +78,7 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Post post, PostUpdateRequest request, MultipartFile[] images) throws IOException {
+    public void update(Post post, PostUpdateRequest request, MultipartFile[] images)  {
         validatePostHidden(post.getId());
 
         post.update(request.getTitle(), request.getBody());
@@ -98,15 +100,22 @@ public class PostService {
     public void remove(Post post) {
         validatePostHidden(post.getId());
 
-        List<Comment> comments = commentRepository.findCommentsByPost(post);
-        commentRepository.deleteAll(comments);
-
+        deleteAllCommentsAndReplies(post);
         removeImageFiles(post);
         removeThumbnailFile(post);
         postRepository.delete(post);
     }
 
-    private void createImages(MultipartFile[] images, Post post) throws IOException {
+    private void deleteAllCommentsAndReplies(Post post) {
+        List<Comment> comments = commentRepository.findCommentsByPost(post);
+        for (Comment comment : comments) {
+            List<Reply> replies = replyRepository.findRepliesByComment(comment);
+            replyRepository.deleteAll(replies);
+        }
+        commentRepository.deleteAll(comments);
+    }
+
+    private void createImages(MultipartFile[] images, Post post) {
         for (MultipartFile image : images) {
             File imageFile = imageUtils.createImageFile(image);
             PostImage.builder()
@@ -116,7 +125,7 @@ public class PostService {
         }
     }
 
-    private void createThumbnail(String originImageName, MultipartFile image, Post post) throws IOException {
+    private void createThumbnail(String originImageName, MultipartFile image, Post post) {
         File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
 
         PostThumbnail.builder()
@@ -159,11 +168,8 @@ public class PostService {
     }
 
     @Transactional
-    public void createReport(Member member, Post post, PostReportRequest request) {
-        boolean isReportExist = post.getReports().stream()
-                .anyMatch(postReport -> postReport.getMember().equals(member));
-
-        if (isReportExist) {
+    public void report(Member member, Post post, PostReportRequest request) {
+        if (isReportExist(member, post)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
 
@@ -172,6 +178,11 @@ public class PostService {
                 .member(member)
                 .reportType(request.getReportType())
                 .build();
+    }
+
+    private boolean isReportExist(Member member, Post post) {
+        return post.getReports().stream()
+                .anyMatch(postReport -> postReport.getMember().equals(member));
     }
 
     private void validatePostHidden(Long postId) {
