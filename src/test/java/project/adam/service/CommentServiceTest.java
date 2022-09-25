@@ -39,7 +39,7 @@ public class CommentServiceTest {
     @Autowired ReplyService replyService;
 
     @Test
-    @DisplayName("Comment 생성")
+    @DisplayName("댓글 생성")
     void create() {
         // given
         Member member = createMember();
@@ -53,7 +53,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("Post 하위 comment 조회")
+    @DisplayName("게시글 댓글 조회")
     void find_comments_by_post() {
         // given
         Member member = createMember();
@@ -75,7 +75,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("Comment 수정")
+    @DisplayName("댓글 수정")
     void update() {
         // given
         Member member = createMember();
@@ -90,7 +90,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("Comment 삭제")
+    @DisplayName("댓글 삭제")
     void remove() {
         // given
         Member member = createMember();
@@ -106,7 +106,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("Comment 삭제시 하위 reply 삭제")
+    @DisplayName("댓글 삭제시 하위 대댓글 삭제")
     void remove_comment_with_reply() {
         // given
         Member member = createMember();
@@ -123,7 +123,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("CommentReport 생성")
+    @DisplayName("댓글 신고")
     void report() {
         // given
         Member member = createMember();
@@ -139,7 +139,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("한명의 Member가 하나의 Comment에 여러 번 Report 하는 경우 오류")
+    @DisplayName("댓글을 중복 신고하는 경우 오류")
     void report_duplicate() {
         // given
         Member member = createMember();
@@ -154,7 +154,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("Comment가 Report를 5번 이상 받으면 숨김")
+    @DisplayName("댓글이 5번 이상 신고를 받으면 숨김")
     void hide_comment() {
         // given
         Member member = createMember();

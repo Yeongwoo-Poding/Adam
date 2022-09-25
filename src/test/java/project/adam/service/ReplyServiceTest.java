@@ -36,7 +36,7 @@ public class ReplyServiceTest {
     @Autowired ReplyService replyService;
 
     @Test
-    @DisplayName("Reply 생성")
+    @DisplayName("대댓글 생성")
     void create() {
         // given
         Member member = createMember();
@@ -50,7 +50,7 @@ public class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("Reply 수정")
+    @DisplayName("대댓글 수정")
     void update() {
         // given
         Member member = createMember();
@@ -65,7 +65,7 @@ public class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("Reply 삭제")
+    @DisplayName("대댓글 삭제")
     void remove() {
         // given
         Member member = createMember();
@@ -81,7 +81,7 @@ public class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("ReplyReport 생성")
+    @DisplayName("대댓글 신고")
     void report() {
         // given
         Member member = createMember();
@@ -97,7 +97,7 @@ public class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("한명의 Member가 하나의 Reply에 여러 번 Report 하는 경우 오류")
+    @DisplayName("대댓글을 중복 신고하는 경우 오류")
     void report_duplicate() {
         // given
         Member member = createMember();
@@ -112,7 +112,7 @@ public class ReplyServiceTest {
     }
 
     @Test
-    @DisplayName("Comment가 Report를 5번 이상 받으면 숨김")
+    @DisplayName("대댓글이 5번 이상 받으면 숨김")
     void hide_reply() {
         // given
         Member member = createMember();

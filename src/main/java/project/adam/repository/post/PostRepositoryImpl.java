@@ -12,6 +12,7 @@ import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ import static project.adam.entity.post.QPost.post;
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager em;
 
     @Override
     public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
@@ -77,6 +79,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .set(post.viewCount, post.viewCount.add(1))
                 .where(post.id.eq(postId))
                 .execute();
+
+        em.flush();
+        em.clear();
 
         return Optional.ofNullable(
                 queryFactory.selectFrom(post)

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
@@ -44,7 +45,7 @@ public class Init {
 
         @Transactional
         public void createDummyData() {
-            if (!memberRepository.findAll().isEmpty()) {
+            if (isDummyDataExist()) {
                 return;
             }
 
@@ -70,6 +71,10 @@ public class Init {
                 Comment comment = commentRepository.findById(i % (N * N * N) + 1).orElseThrow();
                 replyRepository.save(new Reply(writer, comment, "writer: " + writer.getName() + " post: " + post.getId() + " comment: " + comment.getId()));
             }
+        }
+
+        private boolean isDummyDataExist() {
+            return memberRepository.findAll().stream().anyMatch(member -> member.getAuthority().equals(Authority.ROLE_USER));
         }
     }
 }
