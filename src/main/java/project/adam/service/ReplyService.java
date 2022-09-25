@@ -2,8 +2,6 @@ package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
@@ -21,7 +19,7 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
 
-import java.io.IOException;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +34,7 @@ public class ReplyService {
     private int reportCount;
 
     @Transactional
-    public Reply create(Member member, ReplyCreateRequest request) throws IOException {
+    public Reply create(Member member, ReplyCreateRequest request)  {
         Reply createdReply = Reply.builder()
                 .writer(member)
                 .comment(commentRepository.findById(request.commentId).orElseThrow())
@@ -54,7 +52,7 @@ public class ReplyService {
         return createdReply;
     }
 
-    private void sendPushToCommentWriter(Reply reply) throws IOException {
+    private void sendPushToCommentWriter(Reply reply)  {
         FcmRequestBuilder request = FcmRequestBuilder.builder()
                 .member(reply.getComment().getWriter())
                 .title(reply.getComment().getBody() + "에 대댓글이 달렸어요!")
@@ -65,7 +63,7 @@ public class ReplyService {
         fcmService.sendMessageTo(request);
     }
 
-    private void sendPushToPostWriter(Reply reply) throws IOException {
+    private void sendPushToPostWriter(Reply reply)  {
         FcmRequestBuilder request = FcmRequestBuilder.builder()
                 .member(reply.getPost().getWriter())
                 .title(reply.getPost().getTitle() + "에 대댓글이 달렸어요!")
@@ -89,8 +87,8 @@ public class ReplyService {
         return replyRepository.findById(replyId).orElseThrow();
     }
 
-    public Slice<Reply> findRepliesByComment(Long commentId, Pageable pageable) {
-        return replyRepository.findRepliesByCommentId(commentId, pageable);
+    public List<Reply> findRepliesByComment(Comment comment) {
+        return replyRepository.findRepliesByComment(comment);
     }
 
     @Transactional
@@ -100,17 +98,14 @@ public class ReplyService {
     }
 
     @Transactional
-    public void delete(Reply reply) {
+    public void remove(Reply reply) {
         validateReplyHidden(reply.getId());
         replyRepository.delete(reply);
     }
 
     @Transactional
     public void report(Member member, Reply reply, ReplyReportRequest request) {
-        boolean isReportExist = reply.getReports().stream()
-                .anyMatch(replyReport -> replyReport.getMember().equals(member));
-
-        if (isReportExist) {
+        if (isReportExist(member, reply)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
 
@@ -119,6 +114,11 @@ public class ReplyService {
                 .member(member)
                 .reportType(request.getReportType())
                 .build();
+    }
+
+    private boolean isReportExist(Member member, Reply reply) {
+        return reply.getReports().stream()
+                .anyMatch(replyReport -> replyReport.getMember().equals(member));
     }
 
     private void validateReplyHidden(Long replyId) {

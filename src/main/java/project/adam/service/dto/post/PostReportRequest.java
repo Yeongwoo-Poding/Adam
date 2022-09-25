@@ -1,16 +1,15 @@
 package project.adam.service.dto.post;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.ReportType;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class PostReportRequest {
 
     private ReportType reportType;
-
-    public PostReportRequest(String reportType) {
-        this.reportType = ReportType.valueOf(reportType);
-    }
 }

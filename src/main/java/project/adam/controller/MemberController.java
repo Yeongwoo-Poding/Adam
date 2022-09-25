@@ -15,8 +15,6 @@ import project.adam.service.MemberService;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 
-import java.io.IOException;
-
 
 @RestController
 @RequestMapping("/members")
@@ -68,7 +66,7 @@ public class MemberController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/image")
-    public void saveImage(MultipartFile image) throws IOException {
+    public void saveImage(MultipartFile image)  {
         if (image == null || image.isEmpty()) {
             throw new ApiException(ExceptionEnum.INVALID_HEADER);
         }

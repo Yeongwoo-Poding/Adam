@@ -34,5 +34,6 @@ public class ReplyReport {
         this.reply = reply;
         this.member = member;
         this.reportType = reportType;
+        reply.getReports().add(this);
     }
 }

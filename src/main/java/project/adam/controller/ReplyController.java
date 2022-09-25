@@ -16,8 +16,6 @@ import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/replies")
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class ReplyController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
-    public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest request) throws IOException {
+    public ReplyFindResponse createReply(@Validated @RequestBody ReplyCreateRequest request)  {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         return new ReplyFindResponse(replyService.create(member, request));
     }
@@ -52,7 +50,7 @@ public class ReplyController {
     public void deleteReply(@PathVariable Long replyId) {
         Reply findReply = replyService.find(replyId);
         memberService.authorization(findReply.getWriter());
-        replyService.delete(findReply);
+        replyService.remove(findReply);
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})

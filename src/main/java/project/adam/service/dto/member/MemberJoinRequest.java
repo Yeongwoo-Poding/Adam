@@ -1,5 +1,6 @@
 package project.adam.service.dto.member;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.member.Authority;
@@ -8,7 +9,7 @@ import project.adam.validator.UUIDPattern;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberJoinRequest {
 
     @NotEmpty

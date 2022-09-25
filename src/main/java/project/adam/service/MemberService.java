@@ -21,7 +21,6 @@ import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 import project.adam.utils.image.ImageUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import static project.adam.exception.ExceptionEnum.INVALID_INPUT;
@@ -136,7 +135,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void saveImage(Member member, MultipartFile image) throws IOException {
+    public void saveImage(Member member, MultipartFile image)  {
         if (image == null) {
             throw new ApiException(INVALID_INPUT);
         }

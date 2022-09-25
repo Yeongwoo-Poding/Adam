@@ -11,8 +11,6 @@ import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.service.MemberService;
 
-import java.io.IOException;
-
 @RestController
 @RequiredArgsConstructor
 public class FcmController {
@@ -22,7 +20,7 @@ public class FcmController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/message")
-    public void pushAll(@RequestBody FcmPushRequest request) throws IOException {
+    public void pushAll(@RequestBody FcmPushRequest request) {
         for (Member member : memberService.findLoginUsers()) {
             FcmRequestBuilder fcmRequest = FcmRequestBuilder.builder()
                     .member(member)
@@ -36,7 +34,7 @@ public class FcmController {
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/members/{email}/message")
-    public void pushTo(@PathVariable String email,  @RequestBody FcmPushRequest request) throws IOException {
+    public void pushTo(@PathVariable String email,  @RequestBody FcmPushRequest request)  {
         FcmRequestBuilder fcmRequest = FcmRequestBuilder.builder()
                 .member(memberService.findByEmail(email))
                 .title(request.getTitle())

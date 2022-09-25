@@ -3,12 +3,11 @@ package project.adam.utils.image;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 
 public interface ImageUtils {
 
-    File createImageFile(MultipartFile image) throws IOException;
-    File createThumbnailFile(String originImageName, MultipartFile originalImage) throws IOException;
+    File createImageFile(MultipartFile image);
+    File createThumbnailFile(String originImageName, MultipartFile originalImage);
     void removeImageFile(String imageName);
     void removeAll();
 }

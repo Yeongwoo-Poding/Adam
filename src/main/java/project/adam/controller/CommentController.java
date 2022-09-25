@@ -20,8 +20,6 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 
-import java.io.IOException;
-
 @Slf4j
 @RestController
 @RequestMapping("/comments")
@@ -34,7 +32,7 @@ public class CommentController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
-    public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest request) throws IOException {
+    public CommentFindResponse createComment(@Validated @RequestBody CommentCreateRequest request)  {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment savedComment = commentService.create(member, request);
         return new CommentFindResponse(savedComment);
@@ -49,7 +47,8 @@ public class CommentController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{commentId}/replies")
     public ReplyListFindResponse findReplies(@PathVariable Long commentId, Pageable pageable) {
-        return new ReplyListFindResponse(replyService.findRepliesByComment(commentId, pageable));
+        Comment comment = commentService.find(commentId);
+        return new ReplyListFindResponse(replyService.findRepliesByComment(comment));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
@@ -76,6 +75,6 @@ public class CommentController {
         if (member.equals(findComment.getWriter())) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        commentService.createCommentReport(member, findComment, request);
+        commentService.report(member, findComment, request);
     }
 }

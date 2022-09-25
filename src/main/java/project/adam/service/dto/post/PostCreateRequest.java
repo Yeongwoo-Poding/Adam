@@ -1,5 +1,6 @@
 package project.adam.service.dto.post;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.post.Board;
@@ -7,7 +8,7 @@ import project.adam.entity.post.Board;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostCreateRequest {
 
     private Board board;
@@ -17,8 +18,8 @@ public class PostCreateRequest {
 
     private String body;
 
-    public PostCreateRequest(String boardId, String title, String body) {
-        this.board = Board.valueOf(boardId);
+    public PostCreateRequest(Board board, String title, String body) {
+        this.board = board;
         this.title = title;
         this.body = body;
     }

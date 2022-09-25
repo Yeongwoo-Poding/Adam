@@ -1,5 +1,6 @@
 package project.adam.service.dto.post;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class PostUpdateRequest {
 
@@ -15,12 +16,4 @@ public class PostUpdateRequest {
     private String title;
 
     private String body;
-
-    private Integer thumbnailIndex;
-
-    public PostUpdateRequest(String title, String body) {
-        this.title = title;
-        this.body = body;
-        this.thumbnailIndex = null;
-    }
 }

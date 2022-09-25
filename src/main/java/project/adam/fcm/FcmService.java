@@ -45,28 +45,32 @@ public class FcmService {
     private final ObjectMapper objectMapper;
 
     @Async
-    public void sendMessageTo(FcmRequestBuilder requestBuilder) throws IOException {
+    public void sendMessageTo(FcmRequestBuilder requestBuilder) {
         if (!requestBuilder.getMember().isLogin()) {
             return;
         }
 
-        String message = makeMessage(
-                requestBuilder.getMember().getDeviceToken(),
-                requestBuilder.getTitle(),
-                requestBuilder.getBody(),
-                requestBuilder.getPostId());
-        log.info("[FCM] Send message to {}", requestBuilder.getMember().getEmail());
+        try {
+            String message = makeMessage(
+                    requestBuilder.getMember().getDeviceToken(),
+                    requestBuilder.getTitle(),
+                    requestBuilder.getBody(),
+                    requestBuilder.getPostId());
+            log.info("[FCM] Send message to {}", requestBuilder.getMember().getEmail());
 
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(clientPushAPI)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
-                .build();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+            Request request = new Request.Builder()
+                    .url(clientPushAPI)
+                    .post(requestBody)
+                    .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+                    .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
+                    .build();
 
-        client.newCall(request).execute();
+            client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException("Push Message 전송 오류");
+        }
     }
 
     private String makeMessage(String targetToken, String title, String body, Long postId) throws JsonProcessingException {
@@ -78,10 +82,14 @@ public class FcmService {
         return objectMapper.writeValueAsString(fcmRequest);
     }
 
-    private String getAccessToken() throws IOException {
-        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
-                new ClassPathResource(FIREBASE_CONFIG_PATH).getInputStream()).createScoped(List.of(GOOGLE_API_URL));
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
+    private String getAccessToken() {
+        try {
+            GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
+                    new ClassPathResource(FIREBASE_CONFIG_PATH).getInputStream()).createScoped(List.of(GOOGLE_API_URL));
+            googleCredentials.refreshIfExpired();
+            return googleCredentials.getAccessToken().getTokenValue();
+        } catch (IOException e) {
+            throw new RuntimeException("Google 인증 오류");
+        }
     }
 }

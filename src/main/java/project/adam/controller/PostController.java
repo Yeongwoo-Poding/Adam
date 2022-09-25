@@ -28,8 +28,6 @@ import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 
-import java.io.IOException;
-
 @Slf4j
 @RestController
 @RequestMapping("/posts")
@@ -44,7 +42,7 @@ public class PostController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest request,
-                                         @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
+                                         @RequestPart(value = "images", required = false) MultipartFile[] images)  {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Post savedPost = postService.create(member, request, images);
 
@@ -81,7 +79,7 @@ public class PostController {
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updatePost(@PathVariable Long postId,
                            @Validated @RequestPart("data") PostUpdateRequest request,
-                           @RequestPart(value = "images", required = false) MultipartFile[] images) throws IOException {
+                           @RequestPart(value = "images", required = false) MultipartFile[] images)  {
         Post findPost = postService.find(postId);
         memberService.authorization(findPost.getWriter());
         postService.update(findPost, request, images);
@@ -103,6 +101,6 @@ public class PostController {
         if (member.equals(findPost.getWriter())) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
-        postService.createReport(member, findPost, request);
+        postService.report(member, findPost, request);
     }
 }
