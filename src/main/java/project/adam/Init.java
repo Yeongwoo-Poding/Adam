@@ -44,6 +44,10 @@ public class Init {
 
         @Transactional
         public void createDummyData() {
+            if (!memberRepository.findAll().isEmpty()) {
+                return;
+            }
+
             for (long i = 0L; i < N; i++) {
                 memberRepository.save(new Member(UUID.randomUUID().toString(), "email" + (i + 1), "email" + (i + 1)));
             }

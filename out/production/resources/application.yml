@@ -1,11 +1,61 @@
 spring:
   profiles:
     active: local
-  datasource:
-    url: jdbc:mysql://localhost:8000/adam?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: Password!
-    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import: application-secret.yml
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+    open-in-view: true
+
+logging:
+  level:
+    root: warn
+    project.adam: info
+
+server:
+  port: 1790
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: true
+
+logging:
+  level:
+    project.adam.controller: info
+
+server:
+  port: 8080
+  
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
 
   jpa:
     hibernate:
@@ -13,10 +63,30 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    default_batch_fetch_size: 100
+        default_batch_fetch_size: 100
     open-in-view: true
 
 logging:
   level:
     project.adam.controller: debug
-    org.hibernate.SQL: debug
+    org.hibernate:
+      SQL: debug
+
+server:
+  port: 8080
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: true
