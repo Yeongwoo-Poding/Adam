@@ -111,10 +111,15 @@ public class MemberService {
 
     @Transactional
     public void withdraw(Member member) {
+        removeReports(member);
         removeReplies(member);
         removeComments(member);
         removePosts(member);
         removeMember(member);
+    }
+
+    private void removeReports(Member member) {
+        memberRepository.deleteAllReports(member);
     }
 
     private void removeReplies(Member member) {

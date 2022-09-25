@@ -1,13 +1,13 @@
 package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
+import project.adam.entity.common.Report;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -29,9 +29,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final FcmService fcmService;
-
-    @Value("${report.count}")
-    private int reportCount;
 
     @Transactional
     public Comment create(Member member, CommentCreateRequest request)  {
@@ -105,7 +102,7 @@ public class CommentService {
     }
 
     private void validateCommentHidden(Long commentId) {
-        if (commentRepository.countCommentReportById(commentId) >= reportCount) {
+        if (commentRepository.countCommentReportById(commentId) >= Report.HIDE_COUNT) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }

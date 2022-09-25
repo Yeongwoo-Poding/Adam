@@ -2,11 +2,11 @@ package project.adam.repository.comment;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.Report;
 import project.adam.entity.post.Post;
 
 import java.util.List;
@@ -18,9 +18,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
-    @Value("${report.count}")
-    private int reportCount;
-
     @Override
     public Slice<Comment> findRootCommentsByPost(Post post, Pageable pageable) {
         List<Comment> contents = queryFactory.selectFrom(comment)
@@ -30,7 +27,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom{
                 .leftJoin(comment.replies)
                 .fetchJoin()
                 .where(
-                        comment.reports.size().lt(reportCount),
+                        comment.reports.size().lt(Report.HIDE_COUNT),
                         comment.post.eq(post)
                 )
                 .fetch();

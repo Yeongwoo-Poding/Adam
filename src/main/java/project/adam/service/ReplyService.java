@@ -1,10 +1,10 @@
 package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.Report;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
@@ -29,9 +29,6 @@ public class ReplyService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final FcmService fcmService;
-
-    @Value("${report.count}")
-    private int reportCount;
 
     @Transactional
     public Reply create(Member member, ReplyCreateRequest request)  {
@@ -122,7 +119,7 @@ public class ReplyService {
     }
 
     private void validateReplyHidden(Long replyId) {
-        if (replyRepository.countReplyReportById(replyId) >= reportCount) {
+        if (replyRepository.countReplyReportById(replyId) >= Report.HIDE_COUNT) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }

@@ -4,10 +4,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import project.adam.entity.common.Report;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
@@ -16,15 +16,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static project.adam.entity.post.QPost.post;
-import static project.adam.entity.post.QPostReport.postReport;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
-
-    @Value("${report.count}")
-    private Long reportCount;
 
     @Override
     public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
@@ -35,7 +31,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetchJoin()
                 .leftJoin(post.writer)
                 .fetchJoin()
-                .where(searchCondition(condition))
+                .where(
+                        searchCondition(condition),
+                        post.reports.size().lt(Report.HIDE_COUNT)
+                )
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -54,7 +53,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         builder.or(titleCondition(condition.getContent()));
         builder.or(bodyCondition(condition.getContent()));
         builder.and(boardCondition(condition.getBoard()));
-        builder.and(validateHiddenCondition());
         return builder;
     }
 
@@ -71,13 +69,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
             return null;
         }
         return post.board.eq(board);
-    }
-
-    private BooleanExpression validateHiddenCondition() {
-        return queryFactory.select(postReport.count())
-                .from(postReport)
-                .where(postReport.post.eq(post))
-                .lt(reportCount);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package project.adam.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import project.adam.entity.member.Member;
 
@@ -16,4 +17,8 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     Optional<Member> findMemberByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    @Modifying
+    @Query("delete from Report r where r.member = :member")
+    void deleteAllReports(Member member);
 }
