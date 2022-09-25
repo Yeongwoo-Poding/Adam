@@ -1,6 +1,5 @@
 package project.adam.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.reply.ReplyCreateRequest;
@@ -24,7 +22,8 @@ import project.adam.service.dto.reply.ReplyUpdateRequest;
 
 import java.util.NoSuchElementException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest

@@ -2,13 +2,13 @@ package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.Report;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
@@ -39,9 +39,6 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final ImageUtils imageUtils;
-
-    @Value("${report.count}")
-    private int reportCount;
 
     @Transactional
     public Post create(Member member, PostCreateRequest request, MultipartFile[] images)  {
@@ -186,7 +183,7 @@ public class PostService {
     }
 
     private void validatePostHidden(Long postId) {
-        if (postRepository.countPostReportById(postId) >= reportCount) {
+        if (postRepository.countPostReportById(postId) >= Report.HIDE_COUNT) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
         }
     }
