@@ -48,4 +48,12 @@ public class Reply extends BaseTimeEntity {
     public Post getPost() {
         return comment.getPost();
     }
+
+    public Member getCommentWriter() {
+        return comment.getWriter();
+    }
+
+    public Member getPostWriter() {
+        return getPost().getWriter();
+    }
 }
