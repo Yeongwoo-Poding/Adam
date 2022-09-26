@@ -6,20 +6,21 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.Report;
 import project.adam.entity.member.Member;
-import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
 import project.adam.entity.reply.ReplyReport;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.fcm.FcmService;
-import project.adam.fcm.dto.FcmRequestBuilder;
+import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -40,43 +41,37 @@ public class ReplyService {
 
         replyRepository.save(createdReply);
 
-        if (isOthersPost(member, createdReply.getPost())) {
-            sendPushToPostWriter(createdReply);
-        } else if (isOthersComment(member, createdReply.getComment())) {
-            sendPushToCommentWriter(createdReply);
+        FcmPushRequest fcmRequest = new FcmPushRequest(
+                "대댓글이 달렸어요!",
+                createdReply.getBody(),
+                createdReply.getPost().getId());
+
+        for (Member target : getTarget(member, createdReply)) {
+            fcmService.pushTo(target, fcmRequest);
         }
 
         return createdReply;
     }
 
-    private void sendPushToCommentWriter(Reply reply)  {
-        FcmRequestBuilder request = FcmRequestBuilder.builder()
-                .member(reply.getComment().getWriter())
-                .title(reply.getComment().getBody() + "에 대댓글이 달렸어요!")
-                .body(reply.getBody())
-                .postId(reply.getPost().getId())
-                .build();
+    private Set<Member> getTarget(Member member, Reply reply) {
+        Set<Member> target = new HashSet<>();
+        if(needToPushPostWriter(member, reply)) {
+            target.add(reply.getPostWriter());
+        }
 
-        fcmService.sendMessageTo(request);
+        if (needToPushCommentWriter(member, reply)) {
+            target.add(reply.getCommentWriter());
+        }
+
+        return target;
     }
 
-    private void sendPushToPostWriter(Reply reply)  {
-        FcmRequestBuilder request = FcmRequestBuilder.builder()
-                .member(reply.getPost().getWriter())
-                .title(reply.getPost().getTitle() + "에 대댓글이 달렸어요!")
-                .body(reply.getBody())
-                .postId(reply.getPost().getId())
-                .build();
-
-        fcmService.sendMessageTo(request);
+    private boolean needToPushPostWriter(Member member, Reply reply) {
+        return !member.equals(reply.getPostWriter());
     }
 
-    private boolean isOthersComment(Member member, Comment comment) {
-        return member != comment.getWriter();
-    }
-
-    private boolean isOthersPost(Member member, Post post) {
-        return member != post.getWriter();
+    private boolean needToPushCommentWriter(Member member, Reply reply) {
+        return !(member.equals(reply.getCommentWriter()));
     }
 
     public Reply find(Long replyId) {

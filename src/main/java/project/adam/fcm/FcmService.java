@@ -14,9 +14,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import project.adam.entity.member.Member;
+import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.fcm.dto.FcmRequest;
 import project.adam.fcm.dto.FcmRequest.Notification;
-import project.adam.fcm.dto.FcmRequestBuilder;
+import project.adam.service.MemberService;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -43,20 +45,33 @@ public class FcmService {
     }
 
     private final ObjectMapper objectMapper;
+    private final MemberService memberService;
 
     @Async
-    public void sendMessageTo(FcmRequestBuilder requestBuilder) {
-        if (!requestBuilder.getMember().isLogin()) {
+    public void pushAll(FcmPushRequest request) {
+        for (Member user : memberService.findLoginUsers()) {
+            sendMessageTo(user, request);
+        }
+
+    }
+
+    @Async
+    public void pushTo(Member member, FcmPushRequest request) {
+        sendMessageTo(member, request);
+    }
+
+    private void sendMessageTo(Member member, FcmPushRequest pushRequest) {
+        if (!member.isLogin()) {
             return;
         }
 
         try {
             String message = makeMessage(
-                    requestBuilder.getMember().getDeviceToken(),
-                    requestBuilder.getTitle(),
-                    requestBuilder.getBody(),
-                    requestBuilder.getPostId());
-            log.info("[FCM] Send message to {}", requestBuilder.getMember().getEmail());
+                    member.getDeviceToken(),
+                    pushRequest.getTitle(),
+                    pushRequest.getBody(),
+                    pushRequest.getPostId());
+            log.info("[FCM] Send message to {}", member.getEmail());
 
             OkHttpClient client = new OkHttpClient();
             RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));

@@ -12,7 +12,7 @@ import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.fcm.FcmService;
-import project.adam.fcm.dto.FcmRequestBuilder;
+import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
@@ -48,13 +48,11 @@ public class CommentService {
     }
 
     private void sendPushToPostWriter(Comment comment)  {
-        FcmRequestBuilder request = FcmRequestBuilder.builder()
-                .member(comment.getPost().getWriter())
-                .title(comment.getPost().getTitle() + "에 댓글이 달렸어요!")
-                .body(comment.getBody())
-                .postId(comment.getPost().getId())
-                .build();
-        fcmService.sendMessageTo(request);
+        FcmPushRequest fcmPushRequest = new FcmPushRequest(
+                comment.getPost().getTitle() + "에 댓글이 달렸어요!",
+                comment.getBody(),
+                comment.getPost().getId());
+        fcmService.pushTo(comment.getPost().getWriter(), fcmPushRequest);
     }
 
     private boolean isOthers(Member member, Comment comment) {

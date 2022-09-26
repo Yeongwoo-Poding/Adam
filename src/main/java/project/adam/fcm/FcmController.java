@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import project.adam.entity.member.Member;
 import project.adam.fcm.dto.FcmPushRequest;
-import project.adam.fcm.dto.FcmRequestBuilder;
 import project.adam.service.MemberService;
 
 @RestController
@@ -21,26 +19,12 @@ public class FcmController {
     @Secured("ROLE_ADMIN")
     @PostMapping("/message")
     public void pushAll(@RequestBody FcmPushRequest request) {
-        for (Member member : memberService.findLoginUsers()) {
-            FcmRequestBuilder fcmRequest = FcmRequestBuilder.builder()
-                    .member(member)
-                    .title(request.getTitle())
-                    .body(request.getBody())
-                    .postId(request.getPostId())
-                    .build();
-            fcmService.sendMessageTo(fcmRequest);
-        }
+        fcmService.pushAll(request);
     }
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/members/{email}/message")
     public void pushTo(@PathVariable String email,  @RequestBody FcmPushRequest request)  {
-        FcmRequestBuilder fcmRequest = FcmRequestBuilder.builder()
-                .member(memberService.findByEmail(email))
-                .title(request.getTitle())
-                .body(request.getBody())
-                .postId(request.getPostId())
-                .build();
-        fcmService.sendMessageTo(fcmRequest);
+        fcmService.pushTo(memberService.findByEmail(email), request);
     }
 }
