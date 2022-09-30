@@ -21,7 +21,7 @@ spring:
 
 logging:
   level:
-    root: warn
+    root: info
     project.adam: info
 
 server:
