@@ -8,17 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
-import project.adam.fcm.FcmService;
-import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
+import project.adam.utils.push.PushUtils;
+import project.adam.utils.push.dto.PushRequest;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +28,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
-    private final FcmService fcmService;
+    private final PushUtils pushUtils;
 
     @Transactional
     public Comment create(Member member, CommentCreateRequest request)  {
@@ -48,11 +48,11 @@ public class CommentService {
     }
 
     private void sendPushToPostWriter(Comment comment)  {
-        FcmPushRequest fcmPushRequest = new FcmPushRequest(
+        PushRequest pushRequest = new PushRequest(
                 comment.getPost().getTitle() + "에 댓글이 달렸어요!",
                 comment.getBody(),
                 comment.getPost().getId());
-        fcmService.pushTo(comment.getPost().getWriter(), fcmPushRequest);
+        pushUtils.pushTo(comment.getPost().getWriter(), pushRequest);
     }
 
     private boolean isOthers(Member member, Comment comment) {
@@ -65,7 +65,7 @@ public class CommentService {
     }
 
     public Slice<Comment> findByPost(Long postId, Pageable pageable) {
-        return commentRepository.findRootCommentsByPost(postRepository.findById(postId).orElseThrow(), pageable);
+        return commentRepository.findByPost(postRepository.findById(postId).orElseThrow(), pageable);
     }
 
     @Transactional
@@ -77,12 +77,15 @@ public class CommentService {
     @Transactional
     public void remove(Comment comment) {
         validateCommentHidden(comment.getId());
-        replyRepository.deleteAll(replyRepository.findRepliesByComment(comment));
+        replyRepository.deleteAll(comment.getReplies());
         commentRepository.delete(comment);
     }
 
     @Transactional
-    public void report(Member member, Comment comment, CommentReportRequest request) {
+    public void report(Member member, Comment comment, ReportType type) {
+        if (member.equals(comment.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         if (isReportExist(member, comment)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
@@ -90,7 +93,7 @@ public class CommentService {
         CommentReport.builder()
                 .comment(comment)
                 .member(member)
-                .reportType(request.getReportType())
+                .reportType(type)
                 .build();
     }
 

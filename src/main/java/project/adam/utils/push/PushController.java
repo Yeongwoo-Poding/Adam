@@ -1,4 +1,4 @@
-package project.adam.fcm;
+package project.adam.utils.push;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
@@ -6,25 +6,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.service.MemberService;
+import project.adam.utils.push.dto.PushRequest;
 
 @RestController
 @RequiredArgsConstructor
-public class FcmController {
+public class PushController {
 
-    private final FcmService fcmService;
+    private final PushUtils pushUtils;
     private final MemberService memberService;
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/message")
-    public void pushAll(@RequestBody FcmPushRequest request) {
-        fcmService.pushAll(request);
+    public void pushAll(@RequestBody PushRequest request) {
+        pushUtils.pushAll(request);
     }
 
     @Secured("ROLE_ADMIN")
     @PostMapping("/members/{email}/message")
-    public void pushTo(@PathVariable String email,  @RequestBody FcmPushRequest request)  {
-        fcmService.pushTo(memberService.findByEmail(email), request);
+    public void pushTo(@PathVariable String email,  @RequestBody PushRequest request)  {
+        pushUtils.pushTo(memberService.findByEmail(email), request);
     }
 }

@@ -17,7 +17,6 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.reply.ReplyCreateRequest;
-import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
 
 import java.util.NoSuchElementException;
@@ -47,6 +46,25 @@ public class ReplyServiceTest {
 
         // then
         assertThat(replyService.find(reply.getId())).isEqualTo(reply);
+    }
+
+    @Test
+    @DisplayName("대댓글 생성시 댓글이 존재하지 않은 경우 오류")
+    void create_no_comment() {
+        // given
+        Member member = createMember();
+
+        // then
+        assertThatThrownBy(() -> replyService.create(member, new ReplyCreateRequest(1L, "body")))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("대댓글 조회시 존재하지 않은 경우 오류")
+    void find_no_reply() {
+        // then
+        assertThatThrownBy(() -> replyService.find(1L))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -90,7 +108,7 @@ public class ReplyServiceTest {
         Member reportMember = createMember("reportId", "reportEmail");
 
         // when
-        replyService.report(reportMember, reply, new ReplyReportRequest(ReportType.BAD));
+        replyService.report(reportMember, reply, ReportType.BAD);
 
         // then
         assertThat(reply.getReports().size()).isEqualTo(1);
@@ -104,10 +122,23 @@ public class ReplyServiceTest {
         Comment comment = createComment(member, createPost(member));
         Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
         Member reportMember = createMember("reportId", "reportEmail");
-        replyService.report(reportMember, reply, new ReplyReportRequest(ReportType.BAD));
+        replyService.report(reportMember, reply, ReportType.BAD);
 
         // when then
-        assertThatThrownBy(() -> replyService.report(reportMember, reply, new ReplyReportRequest(ReportType.BAD)))
+        assertThatThrownBy(() -> replyService.report(reportMember, reply, ReportType.BAD))
+                .isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    @DisplayName("자신의 대댓글을 신고하는 경우 오류")
+    void report_my_reply() {
+        // given
+        Member member = createMember();
+        Comment comment = createComment(member, createPost(member));
+        Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
+
+        // when then
+        assertThatThrownBy(() -> replyService.report(member, reply, ReportType.BAD))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -137,7 +168,7 @@ public class ReplyServiceTest {
     }
 
     private Post createPost(Member member) {
-        return postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        return postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
     }
 
     private Comment createComment(Member member, Post post) {
@@ -147,7 +178,7 @@ public class ReplyServiceTest {
     private void createFiveReports(Reply reply) {
         for (int i = 0; i < 5; i++) {
             Member reportMember = createMember("id" + i, "email" + i);
-            replyService.report(reportMember, reply, new ReplyReportRequest(ReportType.BAD));
+            replyService.report(reportMember, reply, ReportType.BAD);
         }
     }
 }

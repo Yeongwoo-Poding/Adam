@@ -14,7 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     @Query("select m from Member m where m.isLogin = true and m.authority = project.adam.entity.member.Authority.ROLE_USER")
     List<Member> findLoginUsers();
 
-    Optional<Member> findMemberByEmail(String email);
+    Optional<Member> findByEmail(String email);
 
     boolean existsByEmail(String email);
 

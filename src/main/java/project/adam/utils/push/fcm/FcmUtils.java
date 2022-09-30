@@ -1,36 +1,30 @@
-package project.adam.fcm;
+package project.adam.utils.push.fcm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import project.adam.entity.member.Member;
-import project.adam.fcm.dto.FcmPushRequest;
-import project.adam.fcm.dto.FcmRequest;
-import project.adam.fcm.dto.FcmRequest.Notification;
 import project.adam.service.MemberService;
+import project.adam.utils.push.PushUtils;
+import project.adam.utils.push.dto.PushRequest;
+import project.adam.utils.push.dto.PushResponse;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
 
-import static project.adam.fcm.dto.FcmRequest.Data;
-import static project.adam.fcm.dto.FcmRequest.Message;
-
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
-public class FcmService {
+public class FcmUtils implements PushUtils {
 
     private static final String FIREBASE_CONFIG_PATH = "firebase/firebase_service_key.json";
     private static final String GOOGLE_API_URL = "https://www.googleapis.com/auth/cloud-platform";
@@ -48,21 +42,29 @@ public class FcmService {
     private final MemberService memberService;
 
     @Async
-    public void pushAll(FcmPushRequest request) {
+    public void pushAll(PushRequest request) {
+        int success = 0;
+        int fail = 0;
+
         for (Member user : memberService.findLoginUsers()) {
-            sendMessageTo(user, request);
+            if (sendMessageTo(user, request)) {
+                success += 1;
+            } else {
+                fail += 1;
+            }
         }
 
+        log.info("[FCM] Result: (Success: {}, Fail: {})", success, fail);
     }
 
     @Async
-    public void pushTo(Member member, FcmPushRequest request) {
+    public void pushTo(Member member, PushRequest request) {
         sendMessageTo(member, request);
     }
 
-    private void sendMessageTo(Member member, FcmPushRequest pushRequest) {
+    private boolean sendMessageTo(Member member, PushRequest pushRequest) {
         if (!member.isLogin()) {
-            return;
+            return false;
         }
 
         try {
@@ -82,19 +84,21 @@ public class FcmService {
                     .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
                     .build();
 
-            client.newCall(request).execute();
+            Response response = client.newCall(request).execute();
+            response.close();
+            return response.code() == 200;
         } catch (IOException e) {
             throw new RuntimeException("Push Message 전송 오류");
         }
     }
 
     private String makeMessage(String targetToken, String title, String body, Long postId) throws JsonProcessingException {
-        Notification notification = new Notification(title, body, null);
-        Data data = new Data(String.valueOf(postId));
-        Message message = new Message(targetToken, notification, data);
-        FcmRequest fcmRequest = new FcmRequest(false, message);
+        PushResponse.Notification notification = new PushResponse.Notification(title, body, null);
+        PushResponse.Data data = new PushResponse.Data(String.valueOf(postId));
+        PushResponse.Message message = new PushResponse.Message(targetToken, notification, data);
+        PushResponse pushRequest = new PushResponse(false, message);
 
-        return objectMapper.writeValueAsString(fcmRequest);
+        return objectMapper.writeValueAsString(pushRequest);
     }
 
     private String getAccessToken() {

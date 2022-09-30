@@ -1,4 +1,4 @@
-package project.adam.fcm.dto;
+package project.adam.utils.push.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class FcmPushRequest {
+public class PushRequest {
 
     private String title;
     private String body;

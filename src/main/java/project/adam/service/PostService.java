@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
@@ -22,7 +23,6 @@ import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
-import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.utils.image.ImageUtils;
 
@@ -41,6 +41,18 @@ public class PostService {
     private final ImageUtils imageUtils;
 
     @Transactional
+    public Post create(Member member, PostCreateRequest request)  {
+        Post createdPost = Post.builder()
+                .writer(member)
+                .board(request.getBoard())
+                .title(request.getTitle())
+                .body(request.getBody())
+                .build();
+
+        return postRepository.save(createdPost);
+    }
+
+    @Transactional
     public Post create(Member member, PostCreateRequest request, MultipartFile[] images)  {
         Post createdPost = Post.builder()
                 .writer(member)
@@ -49,12 +61,10 @@ public class PostService {
                 .body(request.getBody())
                 .build();
 
-        if (images != null) {
-            createImages(images, createdPost);
-            String imageName = createdPost.getImages().get(0).getName();
-            MultipartFile image = images[0];
-            createThumbnail(imageName, image, createdPost);
-        }
+        createImages(images, createdPost);
+        String imageName = createdPost.getImages().get(0).getName();
+        MultipartFile image = images[0];
+        createThumbnail(imageName, image, createdPost);
 
         return postRepository.save(createdPost);
     }
@@ -104,9 +114,9 @@ public class PostService {
     }
 
     private void deleteAllCommentsAndReplies(Post post) {
-        List<Comment> comments = commentRepository.findCommentsByPost(post);
+        List<Comment> comments = post.getComments();
         for (Comment comment : comments) {
-            List<Reply> replies = replyRepository.findRepliesByComment(comment);
+            List<Reply> replies = comment.getReplies();
             replyRepository.deleteAll(replies);
         }
         commentRepository.deleteAll(comments);
@@ -165,7 +175,10 @@ public class PostService {
     }
 
     @Transactional
-    public void report(Member member, Post post, PostReportRequest request) {
+    public void report(Member member, Post post, ReportType type) {
+        if (member.equals(post.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         if (isReportExist(member, post)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
@@ -173,7 +186,7 @@ public class PostService {
         PostReport.builder()
                 .post(post)
                 .member(member)
-                .reportType(request.getReportType())
+                .reportType(type)
                 .build();
     }
 

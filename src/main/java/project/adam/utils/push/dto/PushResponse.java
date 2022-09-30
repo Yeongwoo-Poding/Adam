@@ -1,11 +1,11 @@
-package project.adam.fcm.dto;
+package project.adam.utils.push.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FcmRequest {
+public class PushResponse {
 
     private boolean validate_only;
     private Message message;

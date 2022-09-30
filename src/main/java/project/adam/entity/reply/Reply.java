@@ -39,6 +39,7 @@ public class Reply extends BaseTimeEntity {
         this.writer = writer;
         this.comment = comment;
         this.body = body;
+        comment.getReplies().add(this);
     }
 
     public void update(String body) {

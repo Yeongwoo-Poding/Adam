@@ -24,7 +24,6 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
-import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.service.dto.reply.ReplyCreateRequest;
 import project.adam.utils.image.ImageUtils;
@@ -66,7 +65,7 @@ public class PostServiceTest {
         Member member = createMember();
 
         // when
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
 
         // then
         assertThat(postService.find(post.getId())).isEqualTo(post);
@@ -93,7 +92,7 @@ public class PostServiceTest {
     @DisplayName("게시글 생성시 게시판이 존재하지 않는 경우 오류")
     void create_post_no_board() {
         // given when then
-        assertThatThrownBy(() -> postService.create(createMember(), new PostCreateRequest(Board.valueOf("NO_BOARD"), "title", "body"), null))
+        assertThatThrownBy(() -> postService.create(createMember(), new PostCreateRequest(Board.valueOf("NO_BOARD"), "title", "body")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -101,7 +100,7 @@ public class PostServiceTest {
     @DisplayName("Find로 조회 시 조회수가 증가하지 않음")
     void find_post() {
         // given
-        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
         Post findPost = postService.find(post.getId());
@@ -114,7 +113,7 @@ public class PostServiceTest {
     @DisplayName("Show로 조회 시 조회수가 증가하고 최종수정일은 바뀌지 않음")
     void show_post() {
         // given
-        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
         Post findPost = postService.showPost(post.getId());
@@ -129,10 +128,10 @@ public class PostServiceTest {
     void find_posts_no_condition() {
         // given
         Member member = createMember();
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"), null);
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
@@ -149,10 +148,10 @@ public class PostServiceTest {
     void find_posts_board_condition() {
         // given
         Member member = createMember();
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"), null);
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
@@ -169,10 +168,10 @@ public class PostServiceTest {
     void find_posts_content_condition_title() {
         // given
         Member member = createMember();
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"), null);
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
@@ -189,10 +188,10 @@ public class PostServiceTest {
     void find_posts_content_condition_body() {
         // given
         Member member = createMember();
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"), null);
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
@@ -209,10 +208,10 @@ public class PostServiceTest {
     void find_posts_all_condition() {
         // given
         Member member = createMember();
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"), null);
-        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"), null);
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
@@ -225,10 +224,60 @@ public class PostServiceTest {
     }
 
     @Test
+    @DisplayName("게시글 목록 조회에서 게시판이 존재하지 않는 경우")
+    void find_posts_no_board() {
+        // given
+        Member member = createMember();
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.FREE, "titleB", "bodyA"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleA", "bodyB"));
+        postService.create(member, new PostCreateRequest(Board.QUESTION, "titleB", "bodyA"));
+        Pageable pageable = PageRequest.of(0, 20);
+
+        // when
+        assertThatThrownBy(() -> postService.findPosts(new PostFindCondition(Board.valueOf("none"), null), pageable).getContent())
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("게시글 댓글 조회")
+    void find_comments_by_post() {
+        // given
+        Member member = createMember();
+        Post postA = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        Post postB = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        Comment commentA = commentService.create(member, new CommentCreateRequest(postA.getId(), "body"));
+        Comment commentB = commentService.create(member, new CommentCreateRequest(postA.getId(), "body"));
+        Comment commentC = commentService.create(member, new CommentCreateRequest(postB.getId(), "body"));
+        Comment commentD = commentService.create(member, new CommentCreateRequest(postB.getId(), "body"));
+        Pageable pageable = PageRequest.of(0, 20);
+
+        // when
+        List<Comment> postAComments = commentService.findByPost(postA.getId(), pageable).getContent();
+        List<Comment> postBComments = commentService.findByPost(postB.getId(), pageable).getContent();
+
+        // then
+        assertThat(postAComments).containsExactly(commentA, commentB);
+        assertThat(postBComments).containsExactly(commentC, commentD);
+    }
+
+    @Test
+    @DisplayName("게시글 댓글 조회시 게시글이 존재하지 않는 경우 오류")
+    void find_comments_by_post_not_exist() {
+        // given
+        Member member = createMember();
+        Pageable pageable = PageRequest.of(0, 20);
+
+        // when
+        assertThatThrownBy(() -> commentService.findByPost(1L, pageable).getContent())
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
     @DisplayName("게시글 수정")
     void update() {
         // given
-        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
         postService.update(post, new PostUpdateRequest("updatedTitle", "updatedBody"), null);
@@ -262,7 +311,7 @@ public class PostServiceTest {
     @DisplayName("게시글 삭제")
     void remove_post() {
         // given
-        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
         postService.remove(post);
@@ -277,7 +326,7 @@ public class PostServiceTest {
     void remove_post_remove_comments() {
         // given
         Member member = createMember();
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
         Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
 
         // when
@@ -293,7 +342,7 @@ public class PostServiceTest {
     void remove_post_remove_replies() {
         // given
         Member member = createMember();
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
         Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
         Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
 
@@ -325,14 +374,39 @@ public class PostServiceTest {
     void report() {
         // given
         Member member = createMember();
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
         Member reportMember = createMember("reportId", "reportEmail");
 
         // when
-        postService.report(reportMember, post, new PostReportRequest(ReportType.BAD));
+        postService.report(reportMember, post, ReportType.BAD);
 
         // then
         assertThat(post.getReports().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("게시글이 5번 이상 신고를 받으면 숨김")
+    void hide_post() {
+        // given
+        Member member = createMember();
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        createFiveReports(post);
+
+        // when then
+        assertThatThrownBy(() -> postService.find(post.getId()))
+                .isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    @DisplayName("자신의 게시글을 신고하는 경우 오류")
+    void report_my_post() {
+        // given
+        Member member = createMember();
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+
+        // when then
+        assertThatThrownBy(() -> postService.report(member, post, ReportType.INAPPROPRIATE))
+                .isInstanceOf(ApiException.class);
     }
 
     @Test
@@ -341,31 +415,18 @@ public class PostServiceTest {
         // given
         Member member = createMember();
         Member reportMember = createMember("reportId", "reportEmail");
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
-        postService.report(reportMember, post, new PostReportRequest(ReportType.INAPPROPRIATE));
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        postService.report(reportMember, post, ReportType.INAPPROPRIATE);
 
         // when then
-        assertThatThrownBy(() -> postService.report(reportMember, post, new PostReportRequest(ReportType.BAD)))
-                .isInstanceOf(ApiException.class);
-    }
-
-    @Test
-    @DisplayName("게시글이 5번 이상 신고를 받으면 숨김")
-    void hide_post() {
-        // given
-        Member member = createMember();
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
-        createFiveReports(post);
-
-        // when then
-        assertThatThrownBy(() -> postService.find(post.getId()))
+        assertThatThrownBy(() -> postService.report(reportMember, post, ReportType.BAD))
                 .isInstanceOf(ApiException.class);
     }
 
     private void createFiveReports(Post post) {
         for (int i = 0; i < 5; i++) {
             Member reportMember = createMember("id" + i, "email" + i);
-            postService.report(reportMember, post, new PostReportRequest(ReportType.BAD));
+            postService.report(reportMember, post, ReportType.BAD);
         }
     }
 
