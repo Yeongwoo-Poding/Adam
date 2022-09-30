@@ -11,14 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
-import project.adam.fcm.FcmController;
-import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
 import project.adam.service.MemberService;
@@ -27,6 +26,8 @@ import project.adam.service.dto.post.PostCreateRequest;
 import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
+import project.adam.utils.push.PushUtils;
+import project.adam.utils.push.dto.PushRequest;
 
 @Slf4j
 @RestController
@@ -37,18 +38,31 @@ public class PostController {
     private final MemberService memberService;
     private final PostService postService;
     private final CommentService commentService;
-    private final FcmController fcmController;
+    private final PushUtils pushUtils;
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest request,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images)  {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        Post savedPost = postService.create(member, request, images);
+
+        if (request.getBoard() == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
+        }
+
+        Post savedPost;
+        if (images == null) {
+            savedPost = postService.create(member, request);
+        } else {
+            if (isImageEmpty(images)) {
+                throw new ApiException(ExceptionEnum.INVALID_INPUT);
+            }
+            savedPost = postService.create(member, request, images);
+        }
 
         if (savedPost.getBoard().equals(Board.NOTICE)) {
             if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
-                fcmController.pushAll(new FcmPushRequest(savedPost.getTitle(), savedPost.getBody(), savedPost.getId()));
+                pushUtils.pushAll(new PushRequest(savedPost.getTitle(), savedPost.getBody(), savedPost.getId()));
             } else {
                 throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
             }
@@ -57,13 +71,16 @@ public class PostController {
         return new PostFindResponse(savedPost);
     }
 
+    private boolean isImageEmpty(MultipartFile[] images) {
+        return images[0].isEmpty();
+    }
+
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
         return new PostFindResponse(postService.showPost(postId));
     }
 
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping
     public PostListFindResponse findPosts(@ModelAttribute PostFindCondition condition, Pageable pageable) {
         return new PostListFindResponse(postService.findPosts(condition, pageable));
@@ -98,9 +115,10 @@ public class PostController {
     public void reportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Post findPost = postService.find(postId);
-        if (member.equals(findPost.getWriter())) {
-            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        ReportType reportType = request.getReportType();
+        if (reportType == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-        postService.report(member, findPost, request);
+        postService.report(member, findPost, reportType);
     }
 }

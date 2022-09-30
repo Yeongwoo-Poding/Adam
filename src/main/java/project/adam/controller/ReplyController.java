@@ -5,6 +5,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.reply.ReplyFindResponse;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
@@ -58,9 +59,10 @@ public class ReplyController {
     public void reportReply(@PathVariable Long replyId, @Validated @RequestBody ReplyReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Reply findReply = replyService.find(replyId);
-        if (member.equals(findReply.getWriter())) {
-            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        ReportType reportType = request.getReportType();
+        if (reportType == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-        replyService.report(member, findReply, request);
+        replyService.report(member, findReply, reportType);
     }
 }

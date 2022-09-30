@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 @Getter
 public class ReplyListFindResponse {
     private List<ReplyListContent> contents = new ArrayList<>();
+    private int size;
 
     public ReplyListFindResponse(List<Reply> replies) {
         this.contents = replies.stream()
                 .map(ReplyListContent::new)
                 .collect(Collectors.toList());
+        this.size = replies.size();
     }
 }

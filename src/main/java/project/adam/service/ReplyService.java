@@ -5,18 +5,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
 import project.adam.entity.reply.ReplyReport;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
-import project.adam.fcm.FcmService;
-import project.adam.fcm.dto.FcmPushRequest;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.reply.ReplyCreateRequest;
-import project.adam.service.dto.reply.ReplyReportRequest;
 import project.adam.service.dto.reply.ReplyUpdateRequest;
+import project.adam.utils.push.PushUtils;
+import project.adam.utils.push.dto.PushRequest;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +29,7 @@ public class ReplyService {
 
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
-    private final FcmService fcmService;
+    private final PushUtils pushUtils;
 
     @Transactional
     public Reply create(Member member, ReplyCreateRequest request)  {
@@ -41,13 +41,13 @@ public class ReplyService {
 
         replyRepository.save(createdReply);
 
-        FcmPushRequest fcmRequest = new FcmPushRequest(
+        PushRequest pushRequest = new PushRequest(
                 "대댓글이 달렸어요!",
                 createdReply.getBody(),
                 createdReply.getPost().getId());
 
         for (Member target : getTarget(member, createdReply)) {
-            fcmService.pushTo(target, fcmRequest);
+            pushUtils.pushTo(target, pushRequest);
         }
 
         return createdReply;
@@ -79,8 +79,8 @@ public class ReplyService {
         return replyRepository.findById(replyId).orElseThrow();
     }
 
-    public List<Reply> findRepliesByComment(Comment comment) {
-        return replyRepository.findRepliesByComment(comment);
+    public List<Reply> findByComment(Comment comment) {
+        return comment.getReplies();
     }
 
     @Transactional
@@ -96,7 +96,10 @@ public class ReplyService {
     }
 
     @Transactional
-    public void report(Member member, Reply reply, ReplyReportRequest request) {
+    public void report(Member member, Reply reply, ReportType type) {
+        if (member.equals(reply.getWriter())) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         if (isReportExist(member, reply)) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
@@ -104,7 +107,7 @@ public class ReplyService {
         ReplyReport.builder()
                 .reply(reply)
                 .member(member)
-                .reportType(request.getReportType())
+                .reportType(type)
                 .build();
     }
 

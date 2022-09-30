@@ -37,10 +37,10 @@ public class ApiExceptionAdvice {
     public ResponseEntity<ApiExceptionEntity> jsonExceptionHandler(HttpServletRequest request, final Exception e) {
         String id = createId();
 
-        // Enum Type Error
+        // Type Error
         if (e.getCause() != null && e.getCause() instanceof InvalidFormatException) {
-            log.warn("[{}] NO_DATA at {}", id, request.getRequestURL(), e);
-            return new ResponseEntity<>(new ApiExceptionEntity(NO_DATA, id), NO_DATA.getStatus());
+            log.warn("[{}] INVALID_TYPE at {}", id, request.getRequestURL(), e);
+            return new ResponseEntity<>(new ApiExceptionEntity(INVALID_TYPE, id), INVALID_TYPE.getStatus());
         }
         log.warn("[{}] INVALID_JSON_FORMAT at {}", id, request.getRequestURL(), e);
         return new ResponseEntity<>(new ApiExceptionEntity(INVALID_JSON_FORMAT, id), INVALID_JSON_FORMAT.getStatus());
@@ -98,8 +98,8 @@ public class ApiExceptionAdvice {
     @ExceptionHandler({SQLIntegrityConstraintViolationException.class})
     public ResponseEntity<ApiExceptionEntity> conflictExceptionHandler(HttpServletRequest request, final Exception e) {
         String id = createId();
-        log.warn("[{}] UNIQUE_CONSTRAINT_VIOLATED at {}", id, request.getRequestURL(), e);
-        return new ResponseEntity<>(new ApiExceptionEntity(UNIQUE_CONSTRAINT_VIOLATED, id), UNIQUE_CONSTRAINT_VIOLATED.getStatus());
+        log.warn("[{}] DUPLICATED at {}", id, request.getRequestURL(), e);
+        return new ResponseEntity<>(new ApiExceptionEntity(DUPLICATED, id), DUPLICATED.getStatus());
     }
 
     private String createId() {

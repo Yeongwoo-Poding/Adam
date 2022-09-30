@@ -2,13 +2,13 @@ package project.adam.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.adam.controller.dto.comment.CommentFindResponse;
 import project.adam.controller.dto.reply.ReplyListFindResponse;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
@@ -46,9 +46,9 @@ public class CommentController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{commentId}/replies")
-    public ReplyListFindResponse findReplies(@PathVariable Long commentId, Pageable pageable) {
+    public ReplyListFindResponse findReplies(@PathVariable Long commentId) {
         Comment comment = commentService.find(commentId);
-        return new ReplyListFindResponse(replyService.findRepliesByComment(comment));
+        return new ReplyListFindResponse(replyService.findByComment(comment));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
@@ -72,9 +72,10 @@ public class CommentController {
     public void reportComment(@PathVariable Long commentId, @RequestBody CommentReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         Comment findComment = commentService.find(commentId);
-        if (member.equals(findComment.getWriter())) {
-            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        ReportType reportType = request.getReportType();
+        if (reportType == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-        commentService.report(member, findComment, request);
+        commentService.report(member, findComment, reportType);
     }
 }

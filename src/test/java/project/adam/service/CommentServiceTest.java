@@ -4,8 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
@@ -16,7 +14,6 @@ import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentReportRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.post.PostCreateRequest;
@@ -53,25 +50,44 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 댓글 조회")
-    void find_comments_by_post() {
+    @DisplayName("댓글 생성시 게시글이 존재하지 않는 경우")
+    void create_no_post() {
         // given
         Member member = createMember();
-        Post postA = createPost(member);
-        Post postB = createPost(member);
-        Comment commentA = commentService.create(member, new CommentCreateRequest(postA.getId(), "body"));
-        Comment commentB = commentService.create(member, new CommentCreateRequest(postA.getId(), "body"));
-        Comment commentC = commentService.create(member, new CommentCreateRequest(postB.getId(), "body"));
-        Comment commentD = commentService.create(member, new CommentCreateRequest(postB.getId(), "body"));
-        Pageable pageable = PageRequest.of(0, 20);
 
         // when
-        List<Comment> postAComments = commentService.findByPost(postA.getId(), pageable).getContent();
-        List<Comment> postBComments = commentService.findByPost(postB.getId(), pageable).getContent();
+        assertThatThrownBy(() -> commentService.create(member, new CommentCreateRequest(1L, "body")))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 조회시 존재하지 않는 경우 오류")
+    void find_comment_not_exist() {
+        // when
+        assertThatThrownBy(() -> commentService.find(1L))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 하위의 대댓글 목록 조회")
+    void find_replies_by_comment() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        Comment comment1 = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+        Comment comment2 = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+        Reply reply1 = replyService.create(member, new ReplyCreateRequest(comment1.getId(), "body"));
+        Reply reply2 = replyService.create(member, new ReplyCreateRequest(comment1.getId(), "body"));
+        Reply reply3 = replyService.create(member, new ReplyCreateRequest(comment2.getId(), "body"));
+        Reply reply4 = replyService.create(member, new ReplyCreateRequest(comment2.getId(), "body"));
+
+        // when
+        List<Reply> replies1 = replyService.findByComment(comment1);
+        List<Reply> replies2 = replyService.findByComment(comment2);
 
         // then
-        assertThat(postAComments).containsExactly(commentA, commentB);
-        assertThat(postBComments).containsExactly(commentC, commentD);
+        assertThat(replies1).containsExactly(reply1, reply2);
+        assertThat(replies2).containsExactly(reply3, reply4);
     }
 
     @Test
@@ -132,7 +148,7 @@ public class CommentServiceTest {
         Member reportMember = createMember("reportId", "reportEmail");
 
         // when
-        commentService.report(reportMember, comment, new CommentReportRequest(ReportType.BAD));
+        commentService.report(reportMember, comment, ReportType.BAD);
 
         // then
         assertThat(comment.getReports().size()).isEqualTo(1);
@@ -146,10 +162,23 @@ public class CommentServiceTest {
         Post post = createPost(member);
         Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
         Member reportMember = createMember("reportId", "reportEmail");
-        commentService.report(reportMember, comment, new CommentReportRequest(ReportType.BAD));
+        commentService.report(reportMember, comment, ReportType.BAD);
 
         // when then
-        assertThatThrownBy(() -> commentService.report(reportMember, comment, new CommentReportRequest(ReportType.BAD)))
+        assertThatThrownBy(() -> commentService.report(reportMember, comment, ReportType.BAD))
+                .isInstanceOf(ApiException.class);
+    }
+
+    @Test
+    @DisplayName("자신의 댓글을 신고하는 경우 오류")
+    void report_my_comment() {
+        // given
+        Member member = createMember();
+        Post post = createPost(member);
+        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+
+        // when then
+        assertThatThrownBy(() -> commentService.report(member, comment, ReportType.BAD))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -178,13 +207,13 @@ public class CommentServiceTest {
     }
 
     private Post createPost(Member member) {
-        return postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        return postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
     }
 
     private void createFiveReports(Comment comment) {
         for (int i = 0; i < 5; i++) {
             Member reportMember = createMember("id" + i, "email" + i);
-            commentService.report(reportMember, comment, new CommentReportRequest(ReportType.BAD));
+            commentService.report(reportMember, comment, ReportType.BAD);
         }
     }
 }

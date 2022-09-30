@@ -66,9 +66,9 @@ public class MemberController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/image")
-    public void saveImage(MultipartFile image)  {
+    public void saveImage(MultipartFile image) {
         if (image == null || image.isEmpty()) {
-            throw new ApiException(ExceptionEnum.INVALID_HEADER);
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
         memberService.saveImage(member, image);

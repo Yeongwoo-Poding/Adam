@@ -112,6 +112,13 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("회원 조회시 존재하지 않은 사용자면 오류")
+    void find_member_no_exist() {
+        assertThatThrownBy(() -> memberService.findByEmail("not_exist"))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
     @DisplayName("회원 탈퇴")
     void withdraw() {
         // given
@@ -132,7 +139,7 @@ public class MemberServiceTest {
         // given
         memberService.join(new MemberJoinRequest("id", "email", "name"));
         Member member = memberService.findByEmail("email");
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
         memberService.withdraw(member);
@@ -163,7 +170,7 @@ public class MemberServiceTest {
     private Post createOthersPost() {
         memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
         Member writer = memberService.findByEmail("othersEmail");
-        return postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        return postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
     }
 
     @Test
@@ -187,7 +194,7 @@ public class MemberServiceTest {
     private Comment createOthersComment() {
         memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
         Member writer = memberService.findByEmail("othersEmail");
-        Post post = postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"), null);
+        Post post = postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
         return commentService.create(writer, new CommentCreateRequest(post.getId(), "body"));
     }
 

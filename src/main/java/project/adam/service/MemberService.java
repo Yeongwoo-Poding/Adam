@@ -23,8 +23,7 @@ import project.adam.utils.image.ImageUtils;
 
 import java.util.List;
 
-import static project.adam.exception.ExceptionEnum.INVALID_INPUT;
-import static project.adam.exception.ExceptionEnum.UNIQUE_CONSTRAINT_VIOLATED;
+import static project.adam.exception.ExceptionEnum.DUPLICATED;
 
 @Slf4j
 @Service
@@ -43,9 +42,9 @@ public class MemberService {
 
 
     @Transactional
-    public void join(MemberJoinRequest request) {
+    public Member join(MemberJoinRequest request) {
         if (memberRepository.existsByEmail(request.getEmail())) {
-            throw new ApiException(UNIQUE_CONSTRAINT_VIOLATED);
+            throw new ApiException(DUPLICATED);
         }
 
         Member createdMember = Member.builder()
@@ -54,7 +53,7 @@ public class MemberService {
                 .name(request.getName())
                 .build();
 
-        memberRepository.save(createdMember);
+        return memberRepository.save(createdMember);
     }
 
     @Transactional
@@ -69,7 +68,7 @@ public class MemberService {
 //
 //        refreshTokenRepository.save(refreshToken);
 
-        Member loginMember = memberRepository.findMemberByEmail(authenticate.getName()).orElseThrow();
+        Member loginMember = memberRepository.findByEmail(authenticate.getName()).orElseThrow();
         loginMember.login(request.getDeviceToken());
 
         return memberLoginResponse;
@@ -102,7 +101,7 @@ public class MemberService {
 //    }
 
     public Member findByEmail(String email) {
-        return memberRepository.findMemberByEmail(email).orElseThrow();
+        return memberRepository.findByEmail(email).orElseThrow();
     }
 
     public List<Member> findLoginUsers() {
@@ -123,11 +122,11 @@ public class MemberService {
     }
 
     private void removeReplies(Member member) {
-        replyRepository.deleteAll(replyRepository.findRepliesByWriter(member));
+        replyRepository.deleteAll(replyRepository.findByWriter(member));
     }
 
     private void removeComments(Member member) {
-        commentRepository.deleteAll(commentRepository.findCommentsByWriter(member));
+        commentRepository.deleteAll(commentRepository.findByWriter(member));
     }
 
     private void removePosts(Member member) {
@@ -140,10 +139,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void saveImage(Member member, MultipartFile image)  {
-        if (image == null) {
-            throw new ApiException(INVALID_INPUT);
-        }
+    public void saveImage(Member member, MultipartFile image) {
         imageUtils.removeImageFile(member.getImage());
         String imageName = imageUtils.createImageFile(image).getName();
         member.setImage(imageName);
@@ -156,7 +152,7 @@ public class MemberService {
     }
 
     public void authorization(Member member) {
-        Member loginMember = memberRepository.findMemberByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
+        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
         loginMember.authorization(member);
     }
 }
