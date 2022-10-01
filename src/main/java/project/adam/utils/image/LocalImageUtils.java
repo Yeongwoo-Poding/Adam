@@ -36,27 +36,27 @@ public class LocalImageUtils implements ImageUtils {
         return path;
     }
 
-    public File createImageFile(MultipartFile image) {
+    public String createImageName(MultipartFile image) {
+        return UUID.randomUUID() + "." + getExtension(image);
+    }
+
+    public void createImageFile(String imageName, MultipartFile image) {
         try {
-            String imageName = UUID.randomUUID() + "." + getExtension(image);
             File imageFile = new File(imagePath + imageName);
             image.transferTo(imageFile);
-            return imageFile;
         } catch (IOException e) {
             throw new RuntimeException("이미지 생성 오류");
         }
 
     }
 
-    public File createThumbnailFile(String originImageName, MultipartFile originalImage) {
+    public void createThumbnailFile(String imageName, String originImageName, MultipartFile originalImage) {
         try {
             File originalFile = new File(imagePath + originImageName);
             BufferedImage bufferedImage = resizeImage(ImageIO.read(originalFile));
 
-            String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
             File createdImage = new File(imagePath + imageName);
             ImageIO.write(bufferedImage, getExtension(originalImage), createdImage);
-            return createdImage;
         } catch (IOException e) {
             throw new RuntimeException("썸네일 생성 오류");
         }

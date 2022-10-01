@@ -85,6 +85,18 @@ public class PostService {
     }
 
     @Transactional
+    public void update(Post post, PostUpdateRequest request)  {
+        validatePostHidden(post.getId());
+
+        post.update(request.getTitle(), request.getBody());
+
+        removeImageFiles(post);
+        removeImageDatas(post);
+        removeThumbnailFile(post);
+        removeThumbnailData(post);
+    }
+
+    @Transactional
     public void update(Post post, PostUpdateRequest request, MultipartFile[] images)  {
         validatePostHidden(post.getId());
 
@@ -95,12 +107,10 @@ public class PostService {
         removeThumbnailFile(post);
         removeThumbnailData(post);
 
-        if (images != null) {
-            createImages(images, post);
-            String imageName = post.getImages().get(0).getName();
-            MultipartFile image = images[0];
-            createThumbnail(imageName, image, post);
-        }
+        createImages(images, post);
+        String imageName = post.getImages().get(0).getName();
+        MultipartFile image = images[0];
+        createThumbnail(imageName, image, post);
     }
 
     @Transactional
@@ -124,20 +134,22 @@ public class PostService {
 
     private void createImages(MultipartFile[] images, Post post) {
         for (MultipartFile image : images) {
-            File imageFile = imageUtils.createImageFile(image);
+            String imageName = imageUtils.createImageName(image);
+            imageUtils.createImageFile(imageName, image);
             PostImage.builder()
                     .post(post)
-                    .name(imageFile.getName())
+                    .name(imageName)
                     .build();
         }
     }
 
     private void createThumbnail(String originImageName, MultipartFile image, Post post) {
-        File thumbnailFile = imageUtils.createThumbnailFile(originImageName, image);
+        String thumbnailName = imageUtils.createImageName(image);
+        imageUtils.createThumbnailFile(thumbnailName, originImageName, image);
 
         PostThumbnail.builder()
                 .post(post)
-                .name(thumbnailFile.getName())
+                .name(thumbnailName)
                 .build();
     }
 

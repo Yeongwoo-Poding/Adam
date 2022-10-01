@@ -42,7 +42,9 @@ public class ImageUtilsTest {
         MockMultipartFile multipartImage = new MockMultipartFile("name", "originName", "image/png", getFileInputStream("testimage.png"));
 
         // when
-        File image = imageUtils.createImageFile(multipartImage);
+        String imageName = imageUtils.createImageName(multipartImage);
+        imageUtils.createImageFile(imageName, multipartImage);
+        File image = new File(imagePath + imageName);
 
         // then
         assertThat(image.exists()).isTrue();
@@ -55,7 +57,9 @@ public class ImageUtilsTest {
         MockMultipartFile multipartImage = new MockMultipartFile("name", "originName", "image/jpeg", getFileInputStream("testimage.jpeg"));
 
         // when
-        File image = imageUtils.createImageFile(multipartImage);
+        String imageName = imageUtils.createImageName(multipartImage);
+        imageUtils.createImageFile(imageName, multipartImage);
+        File image = new File(imagePath + imageName);
 
         // then
         assertThat(image.exists()).isTrue();
@@ -68,7 +72,7 @@ public class ImageUtilsTest {
         MockMultipartFile multipartImage = new MockMultipartFile("name", "originName", "image/jpg", getFileInputStream("testimage.jpg"));
 
         // when then
-        assertThatThrownBy(() -> imageUtils.createImageFile(multipartImage))
+        assertThatThrownBy(() -> imageUtils.createImageName(multipartImage))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -77,10 +81,14 @@ public class ImageUtilsTest {
     void create_thumbnail() throws IOException {
         // given
         MockMultipartFile multipartImage = new MockMultipartFile("name", "testimage.png", "image/png", getFileInputStream("testimage.png"));
-        File imageFile = imageUtils.createImageFile(multipartImage);
+        String imageName = imageUtils.createImageName(multipartImage);
+        imageUtils.createImageFile(imageName, multipartImage);
+        File image = new File(imagePath + imageName);
 
         // when
-        File thumbnailImage = imageUtils.createThumbnailFile(imageFile.getName(), multipartImage);
+        String thumbnailName = imageUtils.createImageName(multipartImage);
+        imageUtils.createThumbnailFile(thumbnailName, imageName, multipartImage);
+        File thumbnailImage = new File(imagePath + thumbnailName);
 
         // then
         assertThat(thumbnailImage.exists()).isTrue();
@@ -95,13 +103,15 @@ public class ImageUtilsTest {
     void remove_image() throws IOException {
         // given
         MockMultipartFile multipartImage = new MockMultipartFile("name", "testimage.png", "image/png", getFileInputStream("testimage.png"));
-        File imageFile = imageUtils.createImageFile(multipartImage);
+        String imageName = imageUtils.createImageName(multipartImage);
+        imageUtils.createImageFile(imageName, multipartImage);
+        File image = new File(imagePath + imageName);
 
         // when
-        imageUtils.removeImageFile(imageFile.getName());
+        imageUtils.removeImageFile(image.getName());
 
         // then
-        assertThat(imageFile.exists()).isFalse();
+        assertThat(image.exists()).isFalse();
     }
 
     @Test
@@ -110,7 +120,8 @@ public class ImageUtilsTest {
         // given
         MockMultipartFile multipartImage = new MockMultipartFile("name", "testimage.png", "image/png", getFileInputStream("testimage.png"));
         for (int i = 0; i < 5; i++) {
-            imageUtils.createImageFile(multipartImage);
+            String imageName = imageUtils.createImageName(multipartImage);
+            imageUtils.createImageFile(imageName, multipartImage);
         }
 
         // when

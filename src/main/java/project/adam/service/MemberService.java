@@ -141,7 +141,8 @@ public class MemberService {
     @Transactional
     public void saveImage(Member member, MultipartFile image) {
         imageUtils.removeImageFile(member.getImage());
-        String imageName = imageUtils.createImageFile(image).getName();
+        String imageName = imageUtils.createImageName(image);
+        imageUtils.createImageFile(imageName, image);
         member.setImage(imageName);
     }
 

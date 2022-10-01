@@ -6,8 +6,9 @@ import java.io.File;
 
 public interface ImageUtils {
 
-    File createImageFile(MultipartFile image);
-    File createThumbnailFile(String originImageName, MultipartFile originalImage);
+    String createImageName(MultipartFile image);
+    void createImageFile(String imageName, MultipartFile image);
+    void createThumbnailFile(String imageName, String originImageName, MultipartFile originalImage);
     void removeImageFile(String imageName);
     void removeAll();
 }
