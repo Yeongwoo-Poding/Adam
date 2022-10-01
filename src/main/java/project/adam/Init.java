@@ -15,6 +15,7 @@ import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
+import project.adam.utils.image.ImageUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class Init {
 
     @PostConstruct
     public void postConstruct() {
+        dev.removeExistFiles();
         dev.createDummyData();
     }
 
@@ -40,8 +42,14 @@ public class Init {
         private final PostRepository postRepository;
         private final CommentRepository commentRepository;
         private final ReplyRepository replyRepository;
+        private final ImageUtils imageUtils;
 
         private static final long N = 5L;
+
+        @Transactional
+        public void removeExistFiles() {
+            imageUtils.removeAll();
+        }
 
         @Transactional
         public void createDummyData() {
