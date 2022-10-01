@@ -54,7 +54,7 @@ public class PostController {
         if (images == null) {
             savedPost = postService.create(member, request);
         } else {
-            if (isImageEmpty(images)) {
+            if (isImageEmpty(images) || images.length > 10) {
                 throw new ApiException(ExceptionEnum.INVALID_INPUT);
             }
             savedPost = postService.create(member, request, images);
@@ -99,7 +99,15 @@ public class PostController {
                            @RequestPart(value = "images", required = false) MultipartFile[] images)  {
         Post findPost = postService.find(postId);
         memberService.authorization(findPost.getWriter());
-        postService.update(findPost, request, images);
+
+        if (images == null) {
+            postService.update(findPost, request);
+        } else {
+            if (isImageEmpty(images) || images.length > 10) {
+                throw new ApiException(ExceptionEnum.INVALID_INPUT);
+            }
+            postService.update(findPost, request, images);
+        }
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})

@@ -280,7 +280,7 @@ public class PostServiceTest {
         Post post = postService.create(createMember(), new PostCreateRequest(Board.FREE, "title", "body"));
 
         // when
-        postService.update(post, new PostUpdateRequest("updatedTitle", "updatedBody"), null);
+        postService.update(post, new PostUpdateRequest("updatedTitle", "updatedBody"));
 
         // then
         assertThat(post.getTitle()).isEqualTo("updatedTitle");

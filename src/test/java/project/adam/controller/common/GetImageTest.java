@@ -59,7 +59,6 @@ public class GetImageTest {
         memberService.login(new MemberLoginRequest(CURRENT_MEMBER_ID, "email", "deviceToken"));
         memberService.saveImage(member, new MockMultipartFile("name", "name", "image/png", new FileInputStream(FILE_PATH)));
         String image = memberService.findByEmail("email").getImage();
-        System.out.println("image = " + image);
 
         // when
         ResultActions actions = mvc.perform(get("/image/" + image));

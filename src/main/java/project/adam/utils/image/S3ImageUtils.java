@@ -51,20 +51,20 @@ public class S3ImageUtils implements ImageUtils {
                 .build();
     }
 
-    public File createImageFile(MultipartFile image) {
-        try {
-            String imageName = UUID.randomUUID() + "." + getExtension(image);
+    public String createImageName(MultipartFile image) {
+        return UUID.randomUUID() + "." + getExtension(image);
+    }
 
+    public void createImageFile(String imageName, MultipartFile image) {
+        try {
             s3Client.putObject(new PutObjectRequest(bucket, imageName, image.getInputStream(), null)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
-
-            return new File(s3Client.getUrl(bucket, imageName).toString());
         } catch (IOException e) {
             throw new RuntimeException("이미지 생성 오류");
         }
     }
 
-    public File createThumbnailFile(String originImageName, MultipartFile originalImage) {
+    public void createThumbnailFile(String imageName, String originImageName, MultipartFile originalImage) {
         try {
             BufferedImage originImage = ImageIO.read(originalImage.getInputStream());
             BufferedImage resizedImage = resizeImage(originImage);
@@ -73,10 +73,7 @@ public class S3ImageUtils implements ImageUtils {
             ImageIO.write(resizedImage, getExtension(originalImage), os);
 
             InputStream is = new ByteArrayInputStream(os.toByteArray());
-            String imageName = UUID.randomUUID() + "." + getExtension(originalImage);
-
             s3Client.putObject(new PutObjectRequest(bucket, imageName, is, null));
-            return new File(s3Client.getUrl(bucket, imageName).toString());
         } catch (IOException e) {
             throw new RuntimeException("썸네일 생성 오류");
         }
