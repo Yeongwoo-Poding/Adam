@@ -8,11 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.member.Member;
+import project.adam.entity.member.MemberStatus;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
@@ -85,7 +86,7 @@ public class MemberServiceTest {
         memberService.login(new MemberLoginRequest("id", "email", "deviceToken"));
 
         // then
-        assertThat(member.isLogin()).isTrue();
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.LOGIN);
     }
 
     @Test
@@ -93,7 +94,7 @@ public class MemberServiceTest {
     void login_no_member() {
         // given when then
         assertThatThrownBy(() -> memberService.login(new MemberLoginRequest("id", "email", "deviceToken")))
-                .isInstanceOf(BadCredentialsException.class);
+                .isInstanceOf(InternalAuthenticationServiceException.class);
     }
 
     @Test
@@ -108,7 +109,7 @@ public class MemberServiceTest {
         memberService.logout(member);
 
         // then
-        assertThat(member.isLogin()).isFalse();
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.LOGOUT);
     }
 
     @Test
@@ -129,8 +130,7 @@ public class MemberServiceTest {
         memberService.withdraw(member);
 
         // then
-        assertThatThrownBy(() -> memberService.findByEmail("email"))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(memberService.findByEmail("email").getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
     }
 
     @Test
@@ -167,12 +167,6 @@ public class MemberServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    private Post createOthersPost() {
-        memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
-        Member writer = memberService.findByEmail("othersEmail");
-        return postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
-    }
-
     @Test
     @DisplayName("회원 탈퇴시 작성한 대댓글 삭제")
     void withdraw_remove_replies() {
@@ -189,13 +183,6 @@ public class MemberServiceTest {
         // then
         assertThatThrownBy(() -> replyService.find(reply.getId()))
                 .isInstanceOf(NoSuchElementException.class);
-    }
-
-    private Comment createOthersComment() {
-        memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
-        Member writer = memberService.findByEmail("othersEmail");
-        Post post = postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
-        return commentService.create(writer, new CommentCreateRequest(post.getId(), "body"));
     }
 
     @Test
@@ -229,6 +216,19 @@ public class MemberServiceTest {
         // then
         assertThat(member.getImage()).isNull();
         assertThat(profileImage.exists()).isFalse();
+    }
+
+    private Post createOthersPost() {
+        memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
+        Member writer = memberService.findByEmail("othersEmail");
+        return postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
+    }
+
+    private Comment createOthersComment() {
+        memberService.join(new MemberJoinRequest("othersId", "othersEmail", "postWriter"));
+        Member writer = memberService.findByEmail("othersEmail");
+        Post post = postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
+        return commentService.create(writer, new CommentCreateRequest(post.getId(), "body"));
     }
 
     @NotNull

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
@@ -20,6 +21,7 @@ import project.adam.utils.push.dto.PushRequest;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Service
@@ -75,8 +77,9 @@ public class ReplyService {
     }
 
     public Reply find(Long replyId) {
-        validateReplyHidden(replyId);
-        return replyRepository.findById(replyId).orElseThrow();
+        Reply reply = replyRepository.findById(replyId).orElseThrow();
+        validateReply(reply);
+        return reply;
     }
 
     public List<Reply> findByComment(Comment comment) {
@@ -85,14 +88,14 @@ public class ReplyService {
 
     @Transactional
     public void update(Reply reply, ReplyUpdateRequest request) {
-        validateReplyHidden(reply.getId());
+        validateReply(reply);
         reply.update(request.getBody());
     }
 
     @Transactional
     public void remove(Reply reply) {
-        validateReplyHidden(reply.getId());
-        replyRepository.delete(reply);
+        validateReply(reply);
+        replyRepository.remove(reply);
     }
 
     @Transactional
@@ -109,6 +112,10 @@ public class ReplyService {
                 .member(member)
                 .reportType(type)
                 .build();
+
+        if (replyRepository.countReplyReport(reply) >= Report.HIDE_COUNT) {
+            replyRepository.hide(reply);
+        }
     }
 
     private boolean isReportExist(Member member, Reply reply) {
@@ -116,9 +123,12 @@ public class ReplyService {
                 .anyMatch(replyReport -> replyReport.getMember().equals(member));
     }
 
-    private void validateReplyHidden(Long replyId) {
-        if (replyRepository.countReplyReportById(replyId) >= Report.HIDE_COUNT) {
+    private void validateReply(Reply reply) {
+        if (reply.getStatus().equals(ContentStatus.HIDDEN)) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (reply.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
         }
     }
 }

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import project.adam.entity.common.Report;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.service.dto.post.PostFindCondition;
@@ -35,7 +35,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetchJoin()
                 .where(
                         searchCondition(condition),
-                        post.reports.size().lt(Report.HIDE_COUNT)
+                        post.status.eq(ContentStatus.PUBLISHED)
                 )
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())

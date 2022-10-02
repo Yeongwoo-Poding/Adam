@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
@@ -15,7 +16,6 @@ import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
 import project.adam.entity.post.PostReport;
 import project.adam.entity.post.PostThumbnail;
-import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
@@ -26,8 +26,8 @@ import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.utils.image.ImageUtils;
 
-import java.io.File;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -70,14 +70,16 @@ public class PostService {
     }
 
     public Post find(Long postId) {
-        validatePostHidden(postId);
-        return postRepository.findById(postId).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
+        validatePost(post);
+        return post;
     }
 
     @Transactional
     public Post showPost(Long postId) {
-        validatePostHidden(postId);
-        return postRepository.showPost(postId).orElseThrow();
+        Post post = postRepository.showPost(postId).orElseThrow();
+        validatePost(post);
+        return post;
     }
 
     public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
@@ -86,7 +88,7 @@ public class PostService {
 
     @Transactional
     public void update(Post post, PostUpdateRequest request)  {
-        validatePostHidden(post.getId());
+        validatePost(post);
 
         post.update(request.getTitle(), request.getBody());
 
@@ -98,7 +100,7 @@ public class PostService {
 
     @Transactional
     public void update(Post post, PostUpdateRequest request, MultipartFile[] images)  {
-        validatePostHidden(post.getId());
+        validatePost(post);
 
         post.update(request.getTitle(), request.getBody());
 
@@ -115,21 +117,18 @@ public class PostService {
 
     @Transactional
     public void remove(Post post) {
-        validatePostHidden(post.getId());
-
         deleteAllCommentsAndReplies(post);
         removeImageFiles(post);
         removeThumbnailFile(post);
-        postRepository.delete(post);
+        postRepository.remove(post);
     }
 
     private void deleteAllCommentsAndReplies(Post post) {
         List<Comment> comments = post.getComments();
         for (Comment comment : comments) {
-            List<Reply> replies = comment.getReplies();
-            replyRepository.deleteAll(replies);
+            replyRepository.removeAllByComment(comment);
         }
-        commentRepository.deleteAll(comments);
+        commentRepository.removeAllByPost(post);
     }
 
     private void createImages(MultipartFile[] images, Post post) {
@@ -200,6 +199,10 @@ public class PostService {
                 .member(member)
                 .reportType(type)
                 .build();
+
+        if (postRepository.countPostReport(post) >= Report.HIDE_COUNT) {
+            postRepository.hide(post);
+        }
     }
 
     private boolean isReportExist(Member member, Post post) {
@@ -207,9 +210,12 @@ public class PostService {
                 .anyMatch(postReport -> postReport.getMember().equals(member));
     }
 
-    private void validatePostHidden(Long postId) {
-        if (postRepository.countPostReportById(postId) >= Report.HIDE_COUNT) {
+    private void validatePost(Post post) {
+        if (post.getStatus().equals(ContentStatus.HIDDEN)) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (post.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
         }
     }
 }

@@ -17,14 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import project.adam.controller.MemberController;
 import project.adam.controller.PostController;
+import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
+import project.adam.entity.post.Post;
 import project.adam.exception.ApiExceptionAdvice;
 import project.adam.service.MemberService;
 import project.adam.service.PostService;
 import project.adam.service.dto.member.MemberJoinRequest;
 import project.adam.service.dto.member.MemberLoginRequest;
 import project.adam.service.dto.post.PostCreateRequest;
+
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -146,5 +150,29 @@ public class FindPostListTest {
         // then
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(1));
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("게시글 목록 조회 - GET /posts - 숨겨신 게시글은 표시되지 않음")
+    void find_post_list_hidden_content() throws Exception {
+        // given
+        Member member = memberService.join(new MemberJoinRequest(CURRENT_MEMBER_ID, "email", "name"));
+        memberService.login(new MemberLoginRequest(CURRENT_MEMBER_ID, "email", "deviceToken"));
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "titleA", "body"));
+        postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email1", "name")), post, ReportType.BAD);
+        postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email2", "name")), post, ReportType.BAD);
+        postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email3", "name")), post, ReportType.BAD);
+        postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email4", "name")), post, ReportType.BAD);
+        postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email5", "name")), post, ReportType.BAD);
+
+        // when
+        ResultActions actions = mvc.perform(get("/posts")
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON));
+
+        // then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(0));
     }
 }

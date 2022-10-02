@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
@@ -19,6 +20,8 @@ import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
+
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -60,8 +63,9 @@ public class CommentService {
     }
 
     public Comment find(Long commentId) {
-        validateCommentHidden(commentId);
-        return commentRepository.findById(commentId).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        validateComment(comment);
+        return comment;
     }
 
     public Slice<Comment> findByPost(Long postId, Pageable pageable) {
@@ -70,15 +74,15 @@ public class CommentService {
 
     @Transactional
     public void update(Comment comment, CommentUpdateRequest request) {
-        validateCommentHidden(comment.getId());
+        validateComment(comment);
         comment.update(request.getBody());
     }
 
     @Transactional
     public void remove(Comment comment) {
-        validateCommentHidden(comment.getId());
-        replyRepository.deleteAll(comment.getReplies());
-        commentRepository.delete(comment);
+        validateComment(comment);
+//        replyRepository.removeAllByComment(comment);
+        commentRepository.remove(comment);
     }
 
     @Transactional
@@ -95,6 +99,10 @@ public class CommentService {
                 .member(member)
                 .reportType(type)
                 .build();
+
+        if (commentRepository.countCommentReport(comment) >= Report.HIDE_COUNT) {
+            commentRepository.hide(comment);
+        }
     }
 
     private boolean isReportExist(Member member, Comment comment) {
@@ -102,9 +110,12 @@ public class CommentService {
                 .anyMatch(commentReport -> commentReport.getMember().equals(member));
     }
 
-    private void validateCommentHidden(Long commentId) {
-        if (commentRepository.countCommentReportById(commentId) >= Report.HIDE_COUNT) {
+    private void validateComment(Comment comment) {
+        if (comment.getStatus().equals(ContentStatus.HIDDEN)) {
             throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (comment.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
         }
     }
 }

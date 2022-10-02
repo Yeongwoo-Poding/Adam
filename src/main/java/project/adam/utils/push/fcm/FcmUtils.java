@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import project.adam.entity.member.Member;
+import project.adam.entity.member.MemberStatus;
 import project.adam.service.MemberService;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
@@ -63,7 +64,7 @@ public class FcmUtils implements PushUtils {
     }
 
     private boolean sendMessageTo(Member member, PushRequest pushRequest) {
-        if (!member.isLogin()) {
+        if (!member.getStatus().equals(MemberStatus.LOGIN)) {
             return false;
         }
 

@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
 import java.util.UUID;
 
 @Slf4j
-@Profile({"local", "dev"})
+@Profile({"dev"})
 @Component
 @RequiredArgsConstructor
 public class Init {
