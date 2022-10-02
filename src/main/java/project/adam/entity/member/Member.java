@@ -11,6 +11,7 @@ import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +35,10 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    private boolean isLogin;
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
+
+    private LocalDateTime suspendedDate;
 
     private String deviceToken;
 
@@ -47,11 +51,16 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         this.email = email;
         this.name = name;
         this.authority = Authority.ROLE_USER;
+        this.status = MemberStatus.LOGOUT;
     }
 
     public Member(String id, String email, String name, Authority authority) {
         this(id, email, name);
         this.authority = authority;
+    }
+
+    public String getName() {
+        return this.getStatus() == MemberStatus.WITHDRAWN ? "탈퇴한 사용자" : this.name;
     }
 
     public void setImage(String imageName) {
@@ -60,15 +69,18 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
 
     public void login(String deviceToken) {
         this.deviceToken = deviceToken;
-        this.isLogin = true;
+        this.status = MemberStatus.LOGIN;
     }
 
     public void logout() {
-        this.isLogin = false;
+        this.status = MemberStatus.LOGOUT;
     }
 
-    public boolean isLogin() {
-        return this.isLogin;
+    public MemberStatus getStatus() {
+        if (suspendedDate != null && LocalDateTime.now().isBefore(suspendedDate)) {
+            return MemberStatus.SUSPENDED;
+        }
+        return status;
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import project.adam.entity.member.Member;
+import project.adam.entity.member.MemberStatus;
 import project.adam.repository.member.MemberRepository;
 
 import javax.servlet.FilterChain;
@@ -36,7 +37,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             Optional<Member> maybeMember = memberRepository.findByEmail(authentication.getName());
             if (maybeMember.isPresent()) {
                 Member member = maybeMember.get();
-                if (member.isLogin()) {
+                if (member.getStatus().equals(MemberStatus.LOGIN)) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

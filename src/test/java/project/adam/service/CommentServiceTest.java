@@ -121,22 +121,22 @@ public class CommentServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @Test
-    @DisplayName("댓글 삭제시 하위 대댓글 삭제")
-    void remove_comment_with_reply() {
-        // given
-        Member member = createMember();
-        Post post = createPost(member);
-        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
-        Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
-
-        // when
-        commentService.remove(comment);
-
-        // then
-        assertThatThrownBy(() -> replyService.find(reply.getId()))
-                .isInstanceOf(NoSuchElementException.class);
-    }
+//    @Test
+//    @DisplayName("댓글 삭제시 하위 대댓글 삭제")
+//    void remove_comment_with_reply() {
+//        // given
+//        Member member = createMember();
+//        Post post = createPost(member);
+//        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+//        Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
+//
+//        // when
+//        commentService.remove(comment);
+//
+//        // then
+//        assertThatThrownBy(() -> replyService.find(reply.getId()))
+//                .isInstanceOf(NoSuchElementException.class);
+//    }
 
     @Test
     @DisplayName("댓글 신고")

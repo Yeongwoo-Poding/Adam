@@ -2,8 +2,6 @@ package project.adam.utils.image;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-
 public interface ImageUtils {
 
     String createImageName(MultipartFile image);

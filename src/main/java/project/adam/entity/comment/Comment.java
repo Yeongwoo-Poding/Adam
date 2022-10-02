@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.common.BaseTimeEntity;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
@@ -32,6 +33,9 @@ public class Comment extends BaseTimeEntity {
 
     private String body;
 
+    @Enumerated(EnumType.STRING)
+    private ContentStatus status;
+
     @OneToMany(mappedBy = "comment")
     private List<Reply> replies = new ArrayList<>();
 
@@ -43,10 +47,15 @@ public class Comment extends BaseTimeEntity {
         this.writer = writer;
         this.post = post;
         this.body = body;
+        this.status = ContentStatus.PUBLISHED;
         post.getComments().add(this);
     }
 
     public void update(String body) {
         this.body = body;
+    }
+
+    public String getBody() {
+        return this.status == ContentStatus.PUBLISHED ? this.body : "숨겨진 댓글입니다";
     }
 }

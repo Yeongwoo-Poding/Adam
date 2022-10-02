@@ -110,32 +110,7 @@ public class MemberService {
 
     @Transactional
     public void withdraw(Member member) {
-        removeReports(member);
-        removeReplies(member);
-        removeComments(member);
-        removePosts(member);
-        removeMember(member);
-    }
-
-    private void removeReports(Member member) {
-        memberRepository.deleteAllReports(member);
-    }
-
-    private void removeReplies(Member member) {
-        replyRepository.deleteAll(replyRepository.findByWriter(member));
-    }
-
-    private void removeComments(Member member) {
-        commentRepository.deleteAll(commentRepository.findByWriter(member));
-    }
-
-    private void removePosts(Member member) {
-        member.getPosts().forEach(postService::remove);
-    }
-
-    private void removeMember(Member member) {
-        imageUtils.removeImageFile(member.getImage());
-        memberRepository.delete(member);
+        memberRepository.remove(member);
     }
 
     @Transactional

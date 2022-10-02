@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.member.Member;
+import project.adam.entity.member.MemberStatus;
 import project.adam.repository.member.MemberRepository;
 
 import java.util.Collections;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return memberRepository.findByEmail(email)
-                .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException(email + " -> 데이터베이스에서 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+        if (member.getStatus().equals(MemberStatus.WITHDRAWN)) {
+            throw new NoSuchElementException();
+        }
+        return createUserDetails(member);
     }
 
     private UserDetails createUserDetails(Member member) {

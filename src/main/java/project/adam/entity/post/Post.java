@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.BaseTimeEntity;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.member.Member;
 
 import javax.persistence.*;
@@ -36,12 +37,15 @@ public class Post extends BaseTimeEntity {
     @Column(length = 1000)
     private String body;
 
+    @Enumerated(EnumType.STRING)
+    private ContentStatus status;
+
     private int viewCount;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "post", cascade = CascadeType.PERSIST)
     private PostThumbnail thumbnail = null;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
     private List<PostImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -54,6 +58,7 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.body = body;
         this.viewCount = 0;
+        this.status = ContentStatus.PUBLISHED;
         writer.getPosts().add(this);
     }
     

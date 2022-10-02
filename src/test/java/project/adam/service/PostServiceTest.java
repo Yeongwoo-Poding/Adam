@@ -119,8 +119,8 @@ public class PostServiceTest {
         Post findPost = postService.showPost(post.getId());
 
         // then
-        assertThat(findPost.getViewCount()).isEqualTo(1);
-        assertThat(findPost.isModified()).isFalse();
+        assertThat(postService.find(findPost.getId()).getViewCount()).isEqualTo(1);
+        assertThat(postService.find(findPost.getId()).isModified()).isFalse();
     }
 
     @Test

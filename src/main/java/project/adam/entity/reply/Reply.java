@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.common.BaseTimeEntity;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
 
@@ -31,6 +32,9 @@ public class Reply extends BaseTimeEntity {
 
     private String body;
 
+    @Enumerated(EnumType.STRING)
+    private ContentStatus status;
+
     @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL)
     private List<ReplyReport> reports = new ArrayList<>();
 
@@ -39,6 +43,7 @@ public class Reply extends BaseTimeEntity {
         this.writer = writer;
         this.comment = comment;
         this.body = body;
+        this.status = ContentStatus.PUBLISHED;
         comment.getReplies().add(this);
     }
 
