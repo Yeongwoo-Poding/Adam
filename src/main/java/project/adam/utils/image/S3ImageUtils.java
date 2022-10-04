@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@Profile({"prod", "dev"})
+@Profile({"prod", "dev", "local"})
 public class S3ImageUtils implements ImageUtils {
 
     private static final int THUMBNAIL_WIDTH = 200;
@@ -60,7 +60,11 @@ public class S3ImageUtils implements ImageUtils {
 
     public void createImageFile(String imageName, MultipartFile image) {
         try {
-            s3Client.putObject(new PutObjectRequest(bucket, imageName, image.getInputStream(), null)
+            InputStream is = image.getInputStream();
+            ObjectMetadata objMeta = new ObjectMetadata();
+            objMeta.setContentLength(is.available());
+
+            s3Client.putObject(new PutObjectRequest(bucket, imageName, image.getInputStream(), objMeta)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             throw new RuntimeException("이미지 생성 오류");
@@ -76,11 +80,14 @@ public class S3ImageUtils implements ImageUtils {
             ImageIO.write(resizedImage, getExtension(originalImage), os);
 
             InputStream is = new ByteArrayInputStream(os.toByteArray());
-            s3Client.putObject(new PutObjectRequest(bucket, imageName, is, null));
+            ObjectMetadata objMeta = new ObjectMetadata();
+            objMeta.setContentLength(is.available());
+
+            s3Client.putObject(new PutObjectRequest(bucket, imageName, is, objMeta)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             throw new RuntimeException("썸네일 생성 오류");
         }
-
     }
 
     public void removeImageFile(String imageName) {

@@ -35,10 +35,10 @@ public class GetReportTest {
     }
 
     @Test
-    @DisplayName("신고 리스트 불러오기 - GET /reports")
+    @DisplayName("신고 리스트 불러오기 - GET /info/reports")
     void report() throws Exception {
         // given when
-        ResultActions actions = mvc.perform(get("/reports")
+        ResultActions actions = mvc.perform(get("/info/reports")
                 .accept(MediaType.APPLICATION_JSON));
 
         // then

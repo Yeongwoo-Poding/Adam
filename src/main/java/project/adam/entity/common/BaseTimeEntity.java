@@ -29,14 +29,4 @@ public abstract class BaseTimeEntity {
     public boolean isModified() {
         return !createdDate.isEqual(lastModifiedDate);
     }
-
-    public String getFormattedCreatedDate() {
-        int year = createdDate.getYear();
-        int month = createdDate.getMonthValue();
-        int day = createdDate.getDayOfMonth();
-        int hour = createdDate.getHour();
-        int minute = createdDate.getMinute();
-        int second = createdDate.getSecond();
-        return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-    }
 }

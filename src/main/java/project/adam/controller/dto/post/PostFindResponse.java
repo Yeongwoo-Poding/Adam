@@ -4,6 +4,7 @@ import lombok.Getter;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.entity.post.PostImage;
+import project.adam.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class PostFindResponse {
         this.board = post.getBoard();
         this.title = post.getTitle();
         this.writerName = post.getWriter().getName();
-        this.createdDate = post.getFormattedCreatedDate();
+        this.createdDate = DateUtils.getFormattedDateTime(post.getCreatedDate());
         this.modified = post.isModified();
         this.viewCount = post.getViewCount();
         this.body = post.getBody();

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import project.adam.controller.MemberController;
 import project.adam.controller.PostController;
+import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
@@ -31,6 +32,7 @@ import project.adam.service.dto.post.PostReportRequest;
 
 import java.util.UUID;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -79,6 +81,28 @@ public class ReportPostTest {
 
         // then
         actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "email", password = CURRENT_MEMBER_ID)
+    @DisplayName("게시물 신고 - POST /posts/{postId}/report - 신고를 제한 이상 받으면 숨김")
+    void report_hide() throws Exception {
+        // given
+        String uuid = UUID.randomUUID().toString();
+        Member member = memberService.join(new MemberJoinRequest(uuid, "email1", "name"));
+        Member reportMember = memberService.join(new MemberJoinRequest(CURRENT_MEMBER_ID, "email", "name"));
+        memberService.login(new MemberLoginRequest(uuid, "email1", "name"));
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        for (int i = 0; i < Report.HIDE_COUNT; i++) {
+            postService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email" + i, "name")), post, ReportType.BAD);
+        }
+
+        // when
+        ResultActions actions = mvc.perform(get("/posts/" + post.getId()));
+
+        // then
+        actions.andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(HIDDEN_CONTENT.toString()));
     }
 
     @Test

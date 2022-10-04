@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@Profile({"local", "test"})
+@Profile({"test"})
 public class LocalImageUtils implements ImageUtils {
 
     private static final int THUMBNAIL_WIDTH = 200;

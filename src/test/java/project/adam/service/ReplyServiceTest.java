@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
@@ -94,8 +95,7 @@ public class ReplyServiceTest {
         replyService.remove(reply);
 
         // then
-        assertThatThrownBy(() -> replyService.find(reply.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(replyService.find(reply.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -142,21 +142,6 @@ public class ReplyServiceTest {
                 .isInstanceOf(ApiException.class);
     }
 
-    @Test
-    @DisplayName("대댓글이 5번 이상 받으면 숨김")
-    void hide_reply() {
-        // given
-        Member member = createMember();
-        Comment comment = createComment(member, createPost(member));
-        Reply reply = replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
-        createFiveReports(reply);
-        Member reportMember = createMember("reportId", "reportEmail");
-
-        // when then
-        assertThatThrownBy(() -> replyService.find(reply.getId()))
-                .isInstanceOf(ApiException.class);
-    }
-
     private Member createMember() {
         memberService.join(new MemberJoinRequest("id", "email", "name"));
         return memberService.findByEmail("email");
@@ -173,12 +158,5 @@ public class ReplyServiceTest {
 
     private Comment createComment(Member member, Post post) {
         return commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
-    }
-
-    private void createFiveReports(Reply reply) {
-        for (int i = 0; i < 5; i++) {
-            Member reportMember = createMember("id" + i, "email" + i);
-            replyService.report(reportMember, reply, ReportType.BAD);
-        }
     }
 }

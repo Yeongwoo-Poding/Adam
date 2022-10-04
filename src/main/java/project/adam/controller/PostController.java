@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.comment.CommentListFindResponse;
 import project.adam.controller.dto.post.PostFindResponse;
 import project.adam.controller.dto.post.PostListFindResponse;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
@@ -28,6 +29,8 @@ import project.adam.service.dto.post.PostReportRequest;
 import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
@@ -78,7 +81,10 @@ public class PostController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
-        return new PostFindResponse(postService.showPost(postId));
+        Post post = postService.showPost(postId);
+        validatePost(post);
+
+        return new PostFindResponse(post);
     }
 
     @GetMapping
@@ -89,7 +95,10 @@ public class PostController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
-        return new CommentListFindResponse(commentService.findByPost(postId, pageable));
+        Post post = postService.find(postId);
+        validatePost(post);
+
+        return new CommentListFindResponse(commentService.findByPost(post, pageable));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
@@ -97,36 +106,48 @@ public class PostController {
     public void updatePost(@PathVariable Long postId,
                            @Validated @RequestPart("data") PostUpdateRequest request,
                            @RequestPart(value = "images", required = false) MultipartFile[] images)  {
-        Post findPost = postService.find(postId);
-        memberService.authorization(findPost.getWriter());
+        Post post = postService.find(postId);
+        memberService.authorization(post.getWriter());
+        validatePost(post);
 
         if (images == null) {
-            postService.update(findPost, request);
+            postService.update(post, request);
         } else {
             if (isImageEmpty(images) || images.length > 10) {
                 throw new ApiException(ExceptionEnum.INVALID_INPUT);
             }
-            postService.update(findPost, request, images);
+            postService.update(post, request, images);
         }
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Long postId) {
-        Post findPost = postService.find(postId);
-        memberService.authorization(findPost.getWriter());
-        postService.remove(findPost);
+        Post post = postService.find(postId);
+        validatePost(post);
+
+        memberService.authorization(post.getWriter());
+        postService.remove(post);
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/{postId}/report")
     public void reportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
         Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        Post findPost = postService.find(postId);
+        Post post = postService.find(postId);
         ReportType reportType = request.getReportType();
         if (reportType == null) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
-        postService.report(member, findPost, reportType);
+        postService.report(member, post, reportType);
+    }
+
+    private void validatePost(Post post) {
+        if (post.getStatus().equals(ContentStatus.HIDDEN)) {
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (post.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
+        }
     }
 }

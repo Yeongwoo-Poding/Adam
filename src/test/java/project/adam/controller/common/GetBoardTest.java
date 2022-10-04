@@ -35,10 +35,10 @@ public class GetBoardTest {
     }
 
     @Test
-    @DisplayName("게시판 리스트 불러오기 - GET /boards")
+    @DisplayName("게시판 리스트 불러오기 - GET /info/boards")
     void board() throws Exception {
         // given when
-        ResultActions actions = mvc.perform(get("/boards")
+        ResultActions actions = mvc.perform(get("/info/boards")
                 .accept(MediaType.APPLICATION_JSON));
 
         // then

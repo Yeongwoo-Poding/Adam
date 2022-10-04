@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
@@ -117,8 +118,7 @@ public class CommentServiceTest {
         commentService.remove(comment);
 
         // then
-        assertThatThrownBy(() -> commentService.find(comment.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(commentService.find(comment.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
 //    @Test
@@ -182,19 +182,19 @@ public class CommentServiceTest {
                 .isInstanceOf(ApiException.class);
     }
 
-    @Test
-    @DisplayName("댓글이 5번 이상 신고를 받으면 숨김")
-    void hide_comment() {
-        // given
-        Member member = createMember();
-        Post post = createPost(member);
-        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
-        createFiveReports(comment);
-
-        // when then
-        assertThatThrownBy(() -> commentService.find(comment.getId()))
-                .isInstanceOf(ApiException.class);
-    }
+//    @Test
+//    @DisplayName("댓글이 제한 이상 신고를 받으면 숨김")
+//    void hide_comment() {
+//        // given
+//        Member member = createMember();
+//        Post post = createPost(member);
+//        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+//        createReports(comment);
+//
+//        // when then
+//        assertThatThrownBy(() -> commentService.find(comment.getId()))
+//                .isInstanceOf(ApiException.class);
+//    }
 
     private Member createMember() {
         memberService.join(new MemberJoinRequest("id", "email", "name"));
@@ -208,12 +208,5 @@ public class CommentServiceTest {
 
     private Post createPost(Member member) {
         return postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
-    }
-
-    private void createFiveReports(Comment comment) {
-        for (int i = 0; i < 5; i++) {
-            Member reportMember = createMember("id" + i, "email" + i);
-            commentService.report(reportMember, comment, ReportType.BAD);
-        }
     }
 }

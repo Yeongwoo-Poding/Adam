@@ -89,7 +89,6 @@ public class FindPostCommentTest {
                 .andExpect(jsonPath("$.size").value(3));
     }
 
-    //Todo
     @Test
     @WithMockUser(username = "email", password = CURRENT_MEMBER_ID)
     @DisplayName("게시글 댓글 조회 - GET /posts/{postId}/comments - 숨겨진 댓글에 대댓글이 없으면 표시되지 않음")
@@ -114,7 +113,6 @@ public class FindPostCommentTest {
                 .andExpect(jsonPath("$.size").value(0));
     }
 
-    //Todo
     @Test
     @WithMockUser(username = "email", password = CURRENT_MEMBER_ID)
     @DisplayName("게시글 댓글 조회 - GET /posts/{postId}/comments - 숨겨진 댓글에 대댓글이 있으면 body가 \"숨겨진 댓글입니다.\"로 표시")
@@ -138,7 +136,29 @@ public class FindPostCommentTest {
         // then
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(1))
-                .andExpect(jsonPath("$.contents[0].body").value("숨겨진 댓글입니다"));
+                .andExpect(jsonPath("$.contents[0].body").value("숨겨진 댓글입니다."));
+    }
+
+    @Test
+    @WithMockUser(username = "email", password = CURRENT_MEMBER_ID)
+    @DisplayName("게시글 댓글 조회 - GET /posts/{postId}/comments - 삭제된 댓글에 대댓글이 있으면 body가 \"삭제된 댓글입니다.\"로 표시")
+    void find_comment_removed_reply() throws Exception {
+        // given
+        Member member = memberService.join(new MemberJoinRequest(CURRENT_MEMBER_ID, "email", "name"));
+        memberService.login(new MemberLoginRequest(CURRENT_MEMBER_ID, "email", "deviceToken"));
+        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
+        Comment comment = commentService.create(member, new CommentCreateRequest(post.getId(), "body"));
+        replyService.create(member, new ReplyCreateRequest(comment.getId(), "body"));
+        commentService.remove(comment);
+
+        // when
+        ResultActions actions = mvc.perform(get("/posts/" + post.getId() + "/comments")
+                .accept(APPLICATION_JSON));
+
+        // then
+        actions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(1))
+                .andExpect(jsonPath("$.contents[0].body").value("삭제된 댓글입니다."));
     }
 
     @Test

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
-import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportContent;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
@@ -26,8 +26,10 @@ import project.adam.service.dto.post.PostFindCondition;
 import project.adam.service.dto.post.PostUpdateRequest;
 import project.adam.utils.image.ImageUtils;
 
+import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static project.adam.entity.common.ReportContent.ContentType.POST;
 
 @Slf4j
 @Service
@@ -38,6 +40,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
+    private final EntityManager em;
     private final ImageUtils imageUtils;
 
     @Transactional
@@ -70,16 +73,12 @@ public class PostService {
     }
 
     public Post find(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow();
-        validatePost(post);
-        return post;
+        return postRepository.findById(postId).orElseThrow();
     }
 
     @Transactional
     public Post showPost(Long postId) {
-        Post post = postRepository.showPost(postId).orElseThrow();
-        validatePost(post);
-        return post;
+        return postRepository.showPost(postId).orElseThrow();
     }
 
     public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
@@ -88,7 +87,6 @@ public class PostService {
 
     @Transactional
     public void update(Post post, PostUpdateRequest request)  {
-        validatePost(post);
 
         post.update(request.getTitle(), request.getBody());
 
@@ -100,7 +98,6 @@ public class PostService {
 
     @Transactional
     public void update(Post post, PostUpdateRequest request, MultipartFile[] images)  {
-        validatePost(post);
 
         post.update(request.getTitle(), request.getBody());
 
@@ -202,20 +199,12 @@ public class PostService {
 
         if (postRepository.countPostReport(post) >= Report.HIDE_COUNT) {
             postRepository.hide(post);
+            em.persist(new ReportContent(POST, post.getId()));
         }
     }
 
     private boolean isReportExist(Member member, Post post) {
         return post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
-    }
-
-    private void validatePost(Post post) {
-        if (post.getStatus().equals(ContentStatus.HIDDEN)) {
-            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
-        }
-        if (post.getStatus().equals(ContentStatus.REMOVED)) {
-            throw new NoSuchElementException();
-        }
     }
 }
