@@ -55,11 +55,11 @@ public class Reply extends BaseTimeEntity {
         return comment.getPost();
     }
 
-    public Member getCommentWriter() {
-        return comment.getWriter();
-    }
-
     public Member getPostWriter() {
         return getPost().getWriter();
+    }
+
+    public Member getCommentWriter() {
+        return comment.getWriter();
     }
 }

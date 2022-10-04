@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "DTYPE")
+@DiscriminatorColumn
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Report {
 
@@ -27,12 +27,11 @@ public abstract class Report {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
-    private boolean isChecked;
+    private boolean isChecked = false;
 
     public Report(Member member, ReportType reportType) {
         this.member = member;
         this.reportType = reportType;
-        this.isChecked = false;
     }
 
     public void check() {

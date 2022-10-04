@@ -1,5 +1,6 @@
 package project.adam.utils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class DateUtils {
@@ -14,7 +15,7 @@ public class DateUtils {
         return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     }
 
-    public static String getFormattedDate(LocalDateTime dateTime) {
+    public static String getFormattedDate(LocalDate dateTime) {
         int year = dateTime.getYear();
         int month = dateTime.getMonthValue();
         int day = dateTime.getDayOfMonth();

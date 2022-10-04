@@ -7,27 +7,31 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import project.adam.controller.dto.request.post.PostListFindCondition;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportContent;
-import project.adam.entity.common.ReportType;
+import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
-import project.adam.entity.post.Post;
-import project.adam.entity.post.PostImage;
-import project.adam.entity.post.PostReport;
-import project.adam.entity.post.PostThumbnail;
+import project.adam.entity.post.*;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
 import project.adam.repository.reply.ReplyRepository;
-import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.service.dto.post.PostFindCondition;
-import project.adam.service.dto.post.PostUpdateRequest;
+import project.adam.security.SecurityUtils;
+import project.adam.service.dto.post.PostCreateServiceRequest;
+import project.adam.service.dto.post.PostReportServiceRequest;
+import project.adam.service.dto.post.PostUpdateServiceRequest;
 import project.adam.utils.image.ImageUtils;
+import project.adam.utils.push.PushUtils;
+import project.adam.utils.push.dto.PushRequest;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static project.adam.entity.common.ReportContent.ContentType.POST;
 
@@ -37,56 +41,85 @@ import static project.adam.entity.common.ReportContent.ContentType.POST;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     private final EntityManager em;
     private final ImageUtils imageUtils;
+    private final PushUtils pushUtils;
 
     @Transactional
-    public Post create(Member member, PostCreateRequest request)  {
-        Post createdPost = Post.builder()
+    public Post create(PostCreateServiceRequest request)  {
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        Post post = Post.builder()
                 .writer(member)
                 .board(request.getBoard())
                 .title(request.getTitle())
                 .body(request.getBody())
                 .build();
 
-        return postRepository.save(createdPost);
+        if (post.getBoard().equals(Board.NOTICE)) {
+            if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
+                pushUtils.pushAll(new PushRequest(post.getTitle(), post.getBody(), post.getId()));
+            } else {
+                throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            }
+        }
+
+        return postRepository.save(post);
     }
 
     @Transactional
-    public Post create(Member member, PostCreateRequest request, MultipartFile[] images)  {
-        Post createdPost = Post.builder()
+    public Post create(PostCreateServiceRequest request, MultipartFile[] images)  {
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        Post post = Post.builder()
                 .writer(member)
                 .board(request.getBoard())
                 .title(request.getTitle())
                 .body(request.getBody())
                 .build();
 
-        createImages(images, createdPost);
-        String imageName = createdPost.getImages().get(0).getName();
+        if (post.getBoard().equals(Board.NOTICE)) {
+            if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
+                pushUtils.pushAll(new PushRequest(post.getTitle(), post.getBody(), post.getId()));
+            } else {
+                throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
+            }
+        }
+
+        createImages(images, post);
+        String imageName = post.getImages().get(0).getName();
         MultipartFile image = images[0];
-        createThumbnail(imageName, image, createdPost);
+        createThumbnail(imageName, image, post);
 
-        return postRepository.save(createdPost);
-    }
-
-    public Post find(Long postId) {
-        return postRepository.findById(postId).orElseThrow();
+        return postRepository.save(post);
     }
 
     @Transactional
-    public Post showPost(Long postId) {
-        return postRepository.showPost(postId).orElseThrow();
+    public Post find(Long postId) {
+        Post post = postRepository.showPost(postId).orElseThrow();
+        validatePostStatus(post);
+        return post;
     }
 
-    public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
+    public Slice<Post> findPosts(PostListFindCondition condition, Pageable pageable) {
         return postRepository.findPosts(condition, pageable);
     }
 
+    public Slice<Comment> findComments(Long postId, Pageable pageable) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        validatePostStatus(post);
+        return commentRepository.findByPost(post, pageable);
+    }
+
     @Transactional
-    public void update(Post post, PostUpdateRequest request)  {
+    public void update(PostUpdateServiceRequest request)  {
+        Post post = postRepository.findById(request.getPostId()).orElseThrow();
+        validatePostStatus(post);
+        authorization(post.getWriter());
 
         post.update(request.getTitle(), request.getBody());
 
@@ -97,7 +130,10 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Post post, PostUpdateRequest request, MultipartFile[] images)  {
+    public void update(PostUpdateServiceRequest request, MultipartFile[] images)  {
+        Post post = postRepository.findById(request.getPostId()).orElseThrow();
+        validatePostStatus(post);
+        authorization(post.getWriter());
 
         post.update(request.getTitle(), request.getBody());
 
@@ -113,7 +149,11 @@ public class PostService {
     }
 
     @Transactional
-    public void remove(Post post) {
+    public void remove(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        validatePostStatus(post);
+        authorization(post.getWriter());
+
         deleteAllCommentsAndReplies(post);
         removeImageFiles(post);
         removeThumbnailFile(post);
@@ -183,7 +223,16 @@ public class PostService {
     }
 
     @Transactional
-    public void report(Member member, Post post, ReportType type) {
+    public void report(PostReportServiceRequest request) {
+        Post post = postRepository.findById(request.getPostId()).orElseThrow();
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+
+        if (post.getBoard().equals(Board.NOTICE)) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
+        if (request.getReportType() == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
+        }
         if (member.equals(post.getWriter())) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
@@ -194,7 +243,7 @@ public class PostService {
         PostReport.builder()
                 .post(post)
                 .member(member)
-                .reportType(type)
+                .reportType(request.getReportType())
                 .build();
 
         if (postRepository.countPostReport(post) >= Report.HIDE_COUNT) {
@@ -203,8 +252,22 @@ public class PostService {
         }
     }
 
+    private void validatePostStatus(Post post) {
+        if (post.getStatus().equals(ContentStatus.HIDDEN)) {
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (post.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
+        }
+    }
+
     private boolean isReportExist(Member member, Post post) {
         return post.getReports().stream()
                 .anyMatch(postReport -> postReport.getMember().equals(member));
+    }
+
+    public void authorization(Member member) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
+        loginMember.authorization(member);
     }
 }

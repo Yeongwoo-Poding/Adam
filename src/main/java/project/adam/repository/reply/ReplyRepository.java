@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.reply.Reply;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
@@ -33,4 +34,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update Reply r set r.status = project.adam.entity.common.ContentStatus.PUBLISHED where r = :reply")
     void release(Reply reply);
+
+    @Query("select r from Reply r where r.comment = :comment")
+    List<Reply> findByComment(Comment comment);
 }

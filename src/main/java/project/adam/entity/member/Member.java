@@ -11,7 +11,7 @@ import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,27 +36,34 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     private Authority authority;
 
     @Enumerated(EnumType.STRING)
-    private MemberStatus status;
+    private MemberStatus status = MemberStatus.LOGOUT;
 
-    private LocalDateTime suspendedDate;
+    @Enumerated(EnumType.STRING)
+    private MemberSession session;
+
+    private LocalDate suspendedDate;
 
     private String deviceToken;
+
+    private boolean allowPostNotification = true;
+
+    private boolean allowCommentNotification = true;
 
     @OneToMany(mappedBy = "writer")
     private List<Post> posts = new ArrayList<>();
 
     @Builder
-    public Member(String id, String email, String name) {
+    public Member(String id, String email, String name, MemberSession session) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.authority = Authority.ROLE_USER;
-        this.status = MemberStatus.LOGOUT;
-        this.suspendedDate = LocalDateTime.now();
+        this.session = session;
+        this.suspendedDate = LocalDate.now();
     }
 
-    public Member(String id, String email, String name, Authority authority) {
-        this(id, email, name);
+    public Member(String id, String email, String name, MemberSession session, Authority authority) {
+        this(id, email, name, session);
         this.authority = authority;
     }
 
@@ -78,7 +85,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     }
 
     public MemberStatus getStatus() {
-        if (this.status == MemberStatus.SUSPENDED && LocalDateTime.now().isAfter(suspendedDate)) {
+        if (this.status == MemberStatus.SUSPENDED && LocalDate.now().isAfter(suspendedDate)) {
             this.status = MemberStatus.LOGOUT;
         }
         return status;
@@ -112,6 +119,19 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
 
     public void ban(int days) {
         this.status = MemberStatus.SUSPENDED;
-        this.suspendedDate = LocalDateTime.now().toLocalDate().plusDays(days).atTime(0, 0);
+        this.suspendedDate = LocalDate.now().plusDays(days);
+    }
+
+    public void update(String name, MemberSession session) {
+        this.name = name;
+        this.session = session;
+    }
+
+    public void togglePostNotification() {
+        this.allowPostNotification = !this.allowPostNotification;
+    }
+
+    public void toggleCommentNotification() {
+        this.allowCommentNotification = !this.isAllowCommentNotification();
     }
 }

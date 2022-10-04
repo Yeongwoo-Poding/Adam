@@ -1,27 +1,31 @@
 package project.adam.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportContent;
-import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
-import project.adam.entity.post.Post;
+import project.adam.entity.reply.Reply;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
+import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.service.dto.comment.CommentCreateRequest;
-import project.adam.service.dto.comment.CommentUpdateRequest;
+import project.adam.repository.reply.ReplyRepository;
+import project.adam.security.SecurityUtils;
+import project.adam.service.dto.comment.CommentCreateServiceRequest;
+import project.adam.service.dto.comment.CommentReportServiceRequest;
+import project.adam.service.dto.comment.CommentUpdateServiceRequest;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
 
 import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static project.adam.entity.common.ReportContent.ContentType.COMMENT;
 
@@ -30,26 +34,29 @@ import static project.adam.entity.common.ReportContent.ContentType.COMMENT;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final EntityManager em;
     private final PushUtils pushUtils;
 
     @Transactional
-    public Comment create(Member member, CommentCreateRequest request)  {
-        Comment createdComment = Comment.builder()
+    public Comment create(CommentCreateServiceRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+        Comment comment = Comment.builder()
                         .writer(member)
-                        .post(postRepository.findById(request.postId).orElseThrow())
+                        .post(postRepository.findById(request.getPostId()).orElseThrow())
                         .body(request.getBody())
                         .build();
 
-        commentRepository.save(createdComment);
+        commentRepository.save(comment);
 
-        if (isOthers(member, createdComment)) {
-            sendPushToPostWriter(createdComment);
+        if (needToPushPostWriter(member, comment)) {
+            sendPushToPostWriter(comment);
         }
 
-        return createdComment;
+        return comment;
     }
 
     private void sendPushToPostWriter(Comment comment)  {
@@ -57,34 +64,54 @@ public class CommentService {
                 comment.getPost().getTitle() + "에 댓글이 달렸어요!",
                 comment.getBody(),
                 comment.getPost().getId());
-        pushUtils.pushTo(comment.getPost().getWriter(), pushRequest);
+
+        Member writer = comment.getPost().getWriter();
+        if (writer.isAllowPostNotification()) {
+            pushUtils.pushTo(writer, pushRequest);
+        }
     }
 
-    private boolean isOthers(Member member, Comment comment) {
-        return member != comment.getPost().getWriter();
+    private boolean needToPushPostWriter(Member member, Comment comment) {
+        return !member.equals(comment.getPost().getWriter());
     }
 
     public Comment find(Long commentId) {
-        return commentRepository.findById(commentId).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        validateCommentStatus(comment);
+        return comment;
     }
 
-    public Slice<Comment> findByPost(Post post, Pageable pageable) {
-        return commentRepository.findByPost(post, pageable);
+    public List<Reply> findReplies(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        validateCommentStatus(comment);
+        return replyRepository.findByComment(comment);
     }
 
     @Transactional
-    public void update(Comment comment, CommentUpdateRequest request) {
+    public void update(CommentUpdateServiceRequest request) {
+        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow();
+        validateCommentStatus(comment);
+        authorization(comment.getWriter());
+
         comment.update(request.getBody());
     }
 
     @Transactional
-    public void remove(Comment comment) {
-//        replyRepository.removeAllByComment(comment);
+    public void remove(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        validateCommentStatus(comment);
+        authorization(comment.getWriter());
+
         commentRepository.remove(comment);
     }
 
     @Transactional
-    public void report(Member member, Comment comment, ReportType type) {
+    public void report(CommentReportServiceRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow();
+        if (request.getReportType() == null) {
+            throw new ApiException(ExceptionEnum.INVALID_INPUT);
+        }
         if (member.equals(comment.getWriter())) {
             throw new ApiException(ExceptionEnum.INVALID_REPORT);
         }
@@ -95,7 +122,7 @@ public class CommentService {
         CommentReport.builder()
                 .comment(comment)
                 .member(member)
-                .reportType(type)
+                .reportType(request.getReportType())
                 .build();
 
         if (commentRepository.countCommentReport(comment) >= Report.HIDE_COUNT) {
@@ -104,8 +131,22 @@ public class CommentService {
         }
     }
 
+    private void validateCommentStatus(Comment comment) {
+        if (comment.getStatus().equals(ContentStatus.HIDDEN)) {
+            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
+        }
+        if (comment.getStatus().equals(ContentStatus.REMOVED)) {
+            throw new NoSuchElementException();
+        }
+    }
+
     private boolean isReportExist(Member member, Comment comment) {
         return comment.getReports().stream()
                 .anyMatch(commentReport -> commentReport.getMember().equals(member));
+    }
+
+    public void authorization(Member member) {
+        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
+        loginMember.authorization(member);
     }
 }
