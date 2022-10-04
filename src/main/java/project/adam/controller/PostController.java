@@ -139,6 +139,9 @@ public class PostController {
         if (reportType == null) {
             throw new ApiException(ExceptionEnum.INVALID_INPUT);
         }
+        if (post.getBoard().equals(Board.NOTICE)) {
+            throw new ApiException(ExceptionEnum.INVALID_REPORT);
+        }
         postService.report(member, post, reportType);
     }
 
