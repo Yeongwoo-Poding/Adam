@@ -13,15 +13,15 @@ public class MemberFindMeResponse {
     private final String email;
     private final MemberSession session;
     private final String image;
-    private final boolean isAllowPostNotification;
-    private final boolean isAllowCommentNotification;
+    private final boolean allowPostNotification;
+    private final boolean allowCommentNotification;
 
     public MemberFindMeResponse(Member member) {
         this.name = member.getName();
         this.email = member.getEmail();
         this.session = member.getSession();
         this.image = member.getImage();
-        this.isAllowPostNotification = member.isAllowPostNotification();
-        this.isAllowCommentNotification = member.isAllowCommentNotification();
+        this.allowPostNotification = member.isAllowPostNotification();
+        this.allowCommentNotification = member.isAllowCommentNotification();
     }
 }
