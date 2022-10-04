@@ -7,21 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.comment.CommentReport;
-import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportContent;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
+import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.repository.reply.ReplyRepository;
 import project.adam.service.dto.comment.CommentCreateRequest;
 import project.adam.service.dto.comment.CommentUpdateRequest;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
 
-import java.util.NoSuchElementException;
+import javax.persistence.EntityManager;
+
+import static project.adam.entity.common.ReportContent.ContentType.COMMENT;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,7 +32,7 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
+    private final EntityManager em;
     private final PushUtils pushUtils;
 
     @Transactional
@@ -63,24 +65,20 @@ public class CommentService {
     }
 
     public Comment find(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
-        validateComment(comment);
-        return comment;
+        return commentRepository.findById(commentId).orElseThrow();
     }
 
-    public Slice<Comment> findByPost(Long postId, Pageable pageable) {
-        return commentRepository.findByPost(postRepository.findById(postId).orElseThrow(), pageable);
+    public Slice<Comment> findByPost(Post post, Pageable pageable) {
+        return commentRepository.findByPost(post, pageable);
     }
 
     @Transactional
     public void update(Comment comment, CommentUpdateRequest request) {
-        validateComment(comment);
         comment.update(request.getBody());
     }
 
     @Transactional
     public void remove(Comment comment) {
-        validateComment(comment);
 //        replyRepository.removeAllByComment(comment);
         commentRepository.remove(comment);
     }
@@ -102,20 +100,12 @@ public class CommentService {
 
         if (commentRepository.countCommentReport(comment) >= Report.HIDE_COUNT) {
             commentRepository.hide(comment);
+            em.persist(new ReportContent(COMMENT, comment.getId()));
         }
     }
 
     private boolean isReportExist(Member member, Comment comment) {
         return comment.getReports().stream()
                 .anyMatch(commentReport -> commentReport.getMember().equals(member));
-    }
-
-    private void validateComment(Comment comment) {
-        if (comment.getStatus().equals(ContentStatus.HIDDEN)) {
-            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
-        }
-        if (comment.getStatus().equals(ContentStatus.REMOVED)) {
-            throw new NoSuchElementException();
-        }
     }
 }

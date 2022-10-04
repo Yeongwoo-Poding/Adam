@@ -18,12 +18,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Query("delete from PostThumbnail pt where pt.id = :thumbnailId")
     void deletePostThumbnailById(Long thumbnailId);
 
-    @Query("select count(pr) from PostReport pr where pr.post = :post")
+    @Query("select count(pr) from PostReport pr where pr.post = :post and pr.isChecked = false")
     int countPostReport(Post post);
 
     @NotNull
     @Query("select p from Post p join fetch p.writer where p.id = :id")
-    Optional<Post> findById(Long id);
+    Optional<Post> findById(@NotNull Long id);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update Post p set p.status = project.adam.entity.common.ContentStatus.HIDDEN where p = :post")
@@ -32,4 +32,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update Post p set p.status = project.adam.entity.common.ContentStatus.REMOVED where p = :post")
     void remove(Post post);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update Post p set p.status = project.adam.entity.common.ContentStatus.PUBLISHED where p = :post")
+    void release(Post post);
 }

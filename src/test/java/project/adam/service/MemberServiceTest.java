@@ -12,6 +12,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.member.Member;
 import project.adam.entity.member.MemberStatus;
 import project.adam.entity.post.Board;
@@ -145,8 +146,7 @@ public class MemberServiceTest {
         memberService.withdraw(member);
 
         // then
-        assertThatThrownBy(() -> postService.find(post.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(postService.find(post.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -163,8 +163,7 @@ public class MemberServiceTest {
         memberService.withdraw(member);
 
         // then
-        assertThatThrownBy(() -> commentService.find(comment.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(commentService.find(comment.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -181,8 +180,7 @@ public class MemberServiceTest {
         memberService.withdraw(member);
 
         // then
-        assertThatThrownBy(() -> replyService.find(reply.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(replyService.find(reply.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test

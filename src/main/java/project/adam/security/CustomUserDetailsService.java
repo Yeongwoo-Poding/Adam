@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.member.Member;
 import project.adam.entity.member.MemberStatus;
+import project.adam.exception.ApiException;
+import project.adam.exception.ExceptionEnum;
 import project.adam.repository.member.MemberRepository;
 
 import java.util.Collections;
@@ -27,6 +29,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member member = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
         if (member.getStatus().equals(MemberStatus.WITHDRAWN)) {
             throw new NoSuchElementException();
+        } else if (member.getStatus().equals(MemberStatus.SUSPENDED)) {
+            throw new ApiException(ExceptionEnum.SUSPENDED);
         }
         return createUserDetails(member);
     }

@@ -8,8 +8,10 @@ import project.adam.entity.member.MemberStatus;
 import project.adam.entity.member.QMember;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 
 import static project.adam.entity.comment.QComment.comment;
+import static project.adam.entity.member.QMember.member;
 import static project.adam.entity.post.QPost.post;
 import static project.adam.entity.reply.QReply.reply;
 
@@ -42,5 +44,21 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                 .execute();
 
         em.clear();
+    }
+
+    @Override
+    public Member ban(Member writer, int days) {
+        LocalDateTime suspendedDate = writer.getSuspendedDate().plusDays(days).toLocalDate().atStartOfDay();
+        queryFactory.update(member)
+                .set(member.status, MemberStatus.SUSPENDED)
+                .set(member.suspendedDate, suspendedDate)
+                .where(member.eq(writer))
+                .execute();
+
+        em.flush();
+        em.clear();
+        return queryFactory.selectFrom(member)
+                .where(member.eq(writer))
+                .fetchOne();
     }
 }

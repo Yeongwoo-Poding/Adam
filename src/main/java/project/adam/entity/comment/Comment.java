@@ -54,8 +54,4 @@ public class Comment extends BaseTimeEntity {
     public void update(String body) {
         this.body = body;
     }
-
-    public String getBody() {
-        return this.status == ContentStatus.PUBLISHED ? this.body : "숨겨진 댓글입니다";
-    }
 }

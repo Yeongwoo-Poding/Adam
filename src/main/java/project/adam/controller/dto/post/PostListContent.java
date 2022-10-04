@@ -3,6 +3,7 @@ package project.adam.controller.dto.post;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import project.adam.entity.post.Post;
+import project.adam.utils.DateUtils;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,7 +22,7 @@ public class PostListContent {
         this.id = post.getId();
         this.title = post.getTitle();
         this.board = post.getBoard().toString();
-        this.createdDate = post.getFormattedCreatedDate();
+        this.createdDate = DateUtils.getFormattedDateTime(post.getCreatedDate());
         this.modified = post.isModified();
         this.writerName = post.getWriter().getName();
         this.viewCount = post.getViewCount();

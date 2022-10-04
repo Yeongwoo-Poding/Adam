@@ -27,9 +27,9 @@ import static project.adam.exception.ExceptionEnum.*;
 @RestControllerAdvice
 public class ApiExceptionAdvice {
     @ExceptionHandler({ApiException.class})
-    public ResponseEntity<ApiExceptionEntity> exceptionHandler(HttpServletRequest request, final ApiException e) {
+    public ResponseEntity<ApiExceptionEntity> apiExceptionHandler(HttpServletRequest request, final ApiException e) {
         String id = createId();
-        log.warn("[{}] ApiException at {}", id, request.getRequestURL(), e);
+        log.warn("[{}] API_EXCEPTION at {}", id, request.getRequestURL(), e);
         return new ResponseEntity<>(new ApiExceptionEntity(e.getError(), id), e.getError().getStatus());
     }
 

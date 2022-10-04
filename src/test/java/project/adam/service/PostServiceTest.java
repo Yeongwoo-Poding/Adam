@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
@@ -33,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -253,24 +253,12 @@ public class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 20);
 
         // when
-        List<Comment> postAComments = commentService.findByPost(postA.getId(), pageable).getContent();
-        List<Comment> postBComments = commentService.findByPost(postB.getId(), pageable).getContent();
+        List<Comment> postAComments = commentService.findByPost(postA, pageable).getContent();
+        List<Comment> postBComments = commentService.findByPost(postB, pageable).getContent();
 
         // then
         assertThat(postAComments).containsExactly(commentA, commentB);
         assertThat(postBComments).containsExactly(commentC, commentD);
-    }
-
-    @Test
-    @DisplayName("게시글 댓글 조회시 게시글이 존재하지 않는 경우 오류")
-    void find_comments_by_post_not_exist() {
-        // given
-        Member member = createMember();
-        Pageable pageable = PageRequest.of(0, 20);
-
-        // when
-        assertThatThrownBy(() -> commentService.findByPost(1L, pageable).getContent())
-                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -317,8 +305,7 @@ public class PostServiceTest {
         postService.remove(post);
 
         // then
-        assertThatThrownBy(() -> postService.find(post.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(postService.find(post.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -333,8 +320,7 @@ public class PostServiceTest {
         postService.remove(post);
 
         // then
-        assertThatThrownBy(() -> commentService.find(comment.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(commentService.find(comment.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -350,8 +336,7 @@ public class PostServiceTest {
         postService.remove(post);
 
         // then
-        assertThatThrownBy(() -> replyService.find(reply.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+        assertThat(replyService.find(reply.getId()).getStatus()).isEqualTo(ContentStatus.REMOVED);
     }
 
     @Test
@@ -385,19 +370,6 @@ public class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글이 5번 이상 신고를 받으면 숨김")
-    void hide_post() {
-        // given
-        Member member = createMember();
-        Post post = postService.create(member, new PostCreateRequest(Board.FREE, "title", "body"));
-        createFiveReports(post);
-
-        // when then
-        assertThatThrownBy(() -> postService.find(post.getId()))
-                .isInstanceOf(ApiException.class);
-    }
-
-    @Test
     @DisplayName("자신의 게시글을 신고하는 경우 오류")
     void report_my_post() {
         // given
@@ -421,13 +393,6 @@ public class PostServiceTest {
         // when then
         assertThatThrownBy(() -> postService.report(reportMember, post, ReportType.BAD))
                 .isInstanceOf(ApiException.class);
-    }
-
-    private void createFiveReports(Post post) {
-        for (int i = 0; i < 5; i++) {
-            Member reportMember = createMember("id" + i, "email" + i);
-            postService.report(reportMember, post, ReportType.BAD);
-        }
     }
 
     private Member createMember() {

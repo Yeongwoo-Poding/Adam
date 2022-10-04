@@ -52,6 +52,7 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
         this.name = name;
         this.authority = Authority.ROLE_USER;
         this.status = MemberStatus.LOGOUT;
+        this.suspendedDate = LocalDateTime.now();
     }
 
     public Member(String id, String email, String name, Authority authority) {
@@ -77,8 +78,8 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     }
 
     public MemberStatus getStatus() {
-        if (suspendedDate != null && LocalDateTime.now().isBefore(suspendedDate)) {
-            return MemberStatus.SUSPENDED;
+        if (this.status == MemberStatus.SUSPENDED && LocalDateTime.now().isAfter(suspendedDate)) {
+            this.status = MemberStatus.LOGOUT;
         }
         return status;
     }
@@ -107,5 +108,10 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
                 throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
             }
         }
+    }
+
+    public void ban(int days) {
+        this.status = MemberStatus.SUSPENDED;
+        this.suspendedDate = LocalDateTime.now().toLocalDate().plusDays(days).atTime(0, 0);
     }
 }

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
-import project.adam.entity.common.ContentStatus;
 import project.adam.entity.common.Report;
+import project.adam.entity.common.ReportContent;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.reply.Reply;
@@ -19,10 +19,12 @@ import project.adam.service.dto.reply.ReplyUpdateRequest;
 import project.adam.utils.push.PushUtils;
 import project.adam.utils.push.dto.PushRequest;
 
+import javax.persistence.EntityManager;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
+
+import static project.adam.entity.common.ReportContent.ContentType.REPLY;
 
 @Service
 @Transactional(readOnly = true)
@@ -31,6 +33,7 @@ public class ReplyService {
 
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
+    private final EntityManager em;
     private final PushUtils pushUtils;
 
     @Transactional
@@ -78,7 +81,6 @@ public class ReplyService {
 
     public Reply find(Long replyId) {
         Reply reply = replyRepository.findById(replyId).orElseThrow();
-        validateReply(reply);
         return reply;
     }
 
@@ -88,13 +90,11 @@ public class ReplyService {
 
     @Transactional
     public void update(Reply reply, ReplyUpdateRequest request) {
-        validateReply(reply);
         reply.update(request.getBody());
     }
 
     @Transactional
     public void remove(Reply reply) {
-        validateReply(reply);
         replyRepository.remove(reply);
     }
 
@@ -115,20 +115,12 @@ public class ReplyService {
 
         if (replyRepository.countReplyReport(reply) >= Report.HIDE_COUNT) {
             replyRepository.hide(reply);
+            em.persist(new ReportContent(REPLY, reply.getId()));
         }
     }
 
     private boolean isReportExist(Member member, Reply reply) {
         return reply.getReports().stream()
                 .anyMatch(replyReport -> replyReport.getMember().equals(member));
-    }
-
-    private void validateReply(Reply reply) {
-        if (reply.getStatus().equals(ContentStatus.HIDDEN)) {
-            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
-        }
-        if (reply.getStatus().equals(ContentStatus.REMOVED)) {
-            throw new NoSuchElementException();
-        }
     }
 }

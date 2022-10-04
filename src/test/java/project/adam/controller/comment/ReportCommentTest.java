@@ -18,6 +18,7 @@ import project.adam.controller.CommentController;
 import project.adam.controller.MemberController;
 import project.adam.controller.PostController;
 import project.adam.entity.comment.Comment;
+import project.adam.entity.common.Report;
 import project.adam.entity.common.ReportType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Board;
@@ -35,6 +36,7 @@ import project.adam.service.dto.post.PostCreateRequest;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -90,6 +92,33 @@ public class ReportCommentTest {
 
         // then
         actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "email", password = CURRENT_MEMBER_ID)
+    @DisplayName("댓글 신고 - POST /comments/{commentId}/report - 신고를 제한 이상 받으면 숨김")
+    void report_hide_comment() throws Exception {
+        // given
+        Member member = memberService.join(new MemberJoinRequest(CURRENT_MEMBER_ID, "email", "name"));
+        memberService.login(new MemberLoginRequest(CURRENT_MEMBER_ID, "email", "deviceToken"));
+
+        String uuid = UUID.randomUUID().toString();
+        Member writer = memberService.join(new MemberJoinRequest(uuid, "email1", "name"));
+        memberService.login(new MemberLoginRequest(uuid, "email1", "deviceToken"));
+
+        Post post = postService.create(writer, new PostCreateRequest(Board.FREE, "title", "body"));
+        Comment comment = commentService.create(writer, new CommentCreateRequest(post.getId(), "body"));
+
+        for (int i = 0; i < Report.HIDE_COUNT; i++) {
+            commentService.report(memberService.join(new MemberJoinRequest(UUID.randomUUID().toString(), "email" + i, "name")), comment, ReportType.BAD);
+        }
+
+        // when
+        ResultActions actions = mvc.perform(get("/comments/" + comment.getId()));
+
+        // then
+        actions.andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(HIDDEN_CONTENT.toString()));
     }
 
     @Test
