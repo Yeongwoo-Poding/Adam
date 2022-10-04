@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.adam.controller.dto.request.member.MemberJoinRequest;
 import project.adam.controller.dto.request.member.MemberLoginRequest;
 import project.adam.controller.dto.request.member.MemberUpdateControllerRequest;
+import project.adam.controller.dto.response.member.MemberFindMeResponse;
 import project.adam.controller.dto.response.member.MemberFindResponse;
 import project.adam.controller.dto.response.member.MemberLoginResponse;
 import project.adam.exception.ApiException;
@@ -47,8 +48,8 @@ public class MemberController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/me")
-    public MemberFindResponse findMe() {
-        return new MemberFindResponse(memberService.findByEmail(SecurityUtils.getCurrentMemberEmail()));
+    public MemberFindMeResponse findMe() {
+        return new MemberFindMeResponse(memberService.findByEmail(SecurityUtils.getCurrentMemberEmail()));
     }
 
     @GetMapping
