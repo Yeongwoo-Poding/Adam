@@ -6,9 +6,9 @@ import project.adam.entity.common.ReportContent;
 @Getter
 public class ReportContentResponse {
 
-    private Long id;
-    private String contentType;
-    private Long contentId;
+    private final Long id;
+    private final String contentType;
+    private final Long contentId;
 
     public ReportContentResponse(ReportContent content) {
         this.id = content.getId();

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.adam.entity.comment.Comment;
 import project.adam.entity.member.Authority;
 import project.adam.entity.member.Member;
+import project.adam.entity.member.MemberSession;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
 import project.adam.entity.reply.Reply;
@@ -58,7 +59,7 @@ public class Init {
             }
 
             for (long i = 0L; i < N; i++) {
-                memberRepository.save(new Member(UUID.randomUUID().toString(), "email" + (i + 1), "email" + (i + 1)));
+                memberRepository.save(new Member(UUID.randomUUID().toString(), "email" + (i + 1), "email" + (i + 1), MemberSession.MORNING));
             }
 
             for (long i = 0L; i < (N * N); i++) {

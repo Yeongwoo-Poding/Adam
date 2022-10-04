@@ -1,7 +1,7 @@
 package project.adam.security;
 
 import org.springframework.security.core.Authentication;
-import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.response.member.MemberLoginResponse;
 
 public interface TokenProvider {
 

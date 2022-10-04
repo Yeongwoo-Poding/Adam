@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.response.member.MemberLoginResponse;
 import project.adam.exception.ApiException;
 import project.adam.security.TokenProvider;
 

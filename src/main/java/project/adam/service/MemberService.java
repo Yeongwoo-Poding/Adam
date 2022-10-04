@@ -9,16 +9,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import project.adam.controller.dto.member.MemberLoginResponse;
+import project.adam.controller.dto.request.member.MemberJoinRequest;
+import project.adam.controller.dto.request.member.MemberLoginRequest;
+import project.adam.controller.dto.response.member.MemberLoginResponse;
 import project.adam.entity.member.Member;
 import project.adam.exception.ApiException;
-import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
-import project.adam.repository.reply.ReplyRepository;
-import project.adam.security.SecurityUtils;
 import project.adam.security.TokenProvider;
-import project.adam.service.dto.member.MemberJoinRequest;
-import project.adam.service.dto.member.MemberLoginRequest;
+import project.adam.service.dto.member.MemberUpdateServiceRequest;
 import project.adam.utils.image.ImageUtils;
 
 import java.util.List;
@@ -30,14 +28,11 @@ import static project.adam.exception.ExceptionEnum.DUPLICATED;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-//    private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
-    private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
-    private final PostService postService;
     private final ImageUtils imageUtils;
 
 
@@ -51,6 +46,7 @@ public class MemberService {
                 .id(passwordEncoder.encode(request.getId()))
                 .email(request.getEmail())
                 .name(request.getName())
+                .session(request.getSession())
                 .build();
 
         return memberRepository.save(createdMember);
@@ -75,7 +71,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout(Member member) {
+    public void logout(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
         member.logout();
     }
 
@@ -109,26 +106,43 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdraw(Member member) {
+    public void update(MemberUpdateServiceRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow();
+        member.update(request.getName(), request.getSession());
+    }
+
+    @Transactional
+    public void setPostPushNotification(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
+        member.togglePostNotification();
+    }
+
+    @Transactional
+    public void setCommentPushNotification(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
+        member.toggleCommentNotification();
+    }
+
+    @Transactional
+    public void withdraw(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
         memberRepository.remove(member);
     }
 
     @Transactional
-    public void saveImage(Member member, MultipartFile image) {
+    public void saveImage(String email, MultipartFile image) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
         imageUtils.removeImageFile(member.getImage());
+
         String imageName = imageUtils.createImageName(image);
         imageUtils.createImageFile(imageName, image);
         member.setImage(imageName);
     }
 
     @Transactional
-    public void removeImage(Member member) {
+    public void removeImage(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
         imageUtils.removeImageFile(member.getImage());
         member.setImage(null);
-    }
-
-    public void authorization(Member member) {
-        Member loginMember = memberRepository.findByEmail(SecurityUtils.getCurrentMemberEmail()).orElseThrow();
-        loginMember.authorization(member);
     }
 }

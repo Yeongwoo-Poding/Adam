@@ -8,11 +8,11 @@ import project.adam.entity.common.ReportContent;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReportContentDetail {
 
-    private Long id;
-    private String contentType;
-    private Long contentId;
-    private String title;
-    private String body;
+    private final Long id;
+    private final String contentType;
+    private final Long contentId;
+    private final String title;
+    private final String body;
 
     public ReportContentDetail(ReportContent content, String title, String body) {
         this.id = content.getId();

@@ -27,6 +27,8 @@ logging:
 server:
   port: 1790
 
+host: http://poding.site:1790
+
 ---
 
 spring:
@@ -49,6 +51,8 @@ logging:
 
 server:
   port: 8080
+
+host: http://poding.site:8080
   
 ---
 
@@ -75,6 +79,8 @@ logging:
 server:
   port: 8080
 
+host: http://localhost:8080
+
 ---
 
 spring:
@@ -90,3 +96,5 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
     open-in-view: true
+
+host: http://localhost:8080

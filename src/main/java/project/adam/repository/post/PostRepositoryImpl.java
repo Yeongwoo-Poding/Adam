@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import project.adam.controller.dto.request.post.PostListFindCondition;
 import project.adam.entity.common.ContentStatus;
 import project.adam.entity.post.Board;
 import project.adam.entity.post.Post;
-import project.adam.service.dto.post.PostFindCondition;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -25,7 +25,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private final EntityManager em;
 
     @Override
-    public Slice<Post> findPosts(PostFindCondition condition, Pageable pageable) {
+    public Slice<Post> findPosts(PostListFindCondition condition, Pageable pageable) {
         List<Post> contents = queryFactory.query()
                 .select(post)
                 .from(post)
@@ -50,7 +50,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return new SliceImpl<>(contents, pageable, hasNext);
     }
 
-    private BooleanBuilder searchCondition(PostFindCondition condition) {
+    private BooleanBuilder searchCondition(PostListFindCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.or(titleCondition(condition.getContent()));
         builder.or(bodyCondition(condition.getContent()));

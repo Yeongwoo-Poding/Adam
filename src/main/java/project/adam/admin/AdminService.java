@@ -28,8 +28,8 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final EntityManager em;
     private final ReplyRepository replyRepository;
+    private final EntityManager em;
 
     @Transactional
     public Member ban(ReportContent content, int days) {
@@ -67,40 +67,6 @@ public class AdminService {
         return memberRepository.ban(reply.getWriter(), days);
     }
 
-    public List<ReportContent> findReportContents() {
-        return em.createQuery("select rc from ReportContent rc", ReportContent.class)
-                .getResultList();
-    }
-
-    public ReportContent findReportContent(Long reportId) {
-        ReportContent reportContent = em.find(ReportContent.class, reportId);
-        if (reportContent == null) {
-            throw new NoSuchElementException();
-        }
-        return reportContent;
-    }
-
-    public ReportContentDetail getReportContentDetail(Long reportId) {
-        ReportContent content = em.find(ReportContent.class, reportId);
-        if (content == null) {
-            throw new NoSuchElementException();
-        }
-
-        switch (content.getContentType()) {
-            case POST:
-                Post post = postRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, post.getTitle(), post.getBody());
-            case COMMENT:
-                Comment comment = commentRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, null, comment.getBody());
-            case REPLY:
-                Reply reply = replyRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, null, reply.getBody());
-            default:
-                throw new NoSuchElementException();
-        }
-    }
-
     @Transactional
     public void release(ReportContent content) {
         ContentType contentType = content.getContentType();
@@ -132,5 +98,39 @@ public class AdminService {
 
     private void releaseReply(Reply reply) {
         replyRepository.release(reply);
+    }
+
+    public List<ReportContent> findReportContents() {
+        return em.createQuery("select rc from ReportContent rc", ReportContent.class)
+                .getResultList();
+    }
+
+    public ReportContent findReportContent(Long reportId) {
+        ReportContent reportContent = em.find(ReportContent.class, reportId);
+        if (reportContent == null) {
+            throw new NoSuchElementException();
+        }
+        return reportContent;
+    }
+
+    public ReportContentDetail findReportContentDetail(Long reportId) {
+        ReportContent content = em.find(ReportContent.class, reportId);
+        if (content == null) {
+            throw new NoSuchElementException();
+        }
+
+        switch (content.getContentType()) {
+            case POST:
+                Post post = postRepository.findById(content.getContentId()).orElseThrow();
+                return new ReportContentDetail(content, post.getTitle(), post.getBody());
+            case COMMENT:
+                Comment comment = commentRepository.findById(content.getContentId()).orElseThrow();
+                return new ReportContentDetail(content, null, comment.getBody());
+            case REPLY:
+                Reply reply = replyRepository.findById(content.getContentId()).orElseThrow();
+                return new ReportContentDetail(content, null, reply.getBody());
+            default:
+                throw new NoSuchElementException();
+        }
     }
 }

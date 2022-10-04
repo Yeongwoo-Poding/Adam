@@ -43,7 +43,7 @@ public class Post extends BaseTimeEntity {
     private int viewCount;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.PERSIST)
-    private PostThumbnail thumbnail = null;
+    private PostThumbnail thumbnail;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST)
     private List<PostImage> images = new ArrayList<>();

@@ -8,29 +8,21 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import project.adam.controller.dto.comment.CommentListFindResponse;
-import project.adam.controller.dto.post.PostFindResponse;
-import project.adam.controller.dto.post.PostListFindResponse;
-import project.adam.entity.common.ContentStatus;
-import project.adam.entity.common.ReportType;
-import project.adam.entity.member.Authority;
-import project.adam.entity.member.Member;
-import project.adam.entity.post.Board;
+import project.adam.controller.dto.request.post.PostCreateControllerRequest;
+import project.adam.controller.dto.request.post.PostListFindCondition;
+import project.adam.controller.dto.request.post.PostReportControllerRequest;
+import project.adam.controller.dto.request.post.PostUpdateControllerRequest;
+import project.adam.controller.dto.response.comment.CommentListFindResponse;
+import project.adam.controller.dto.response.post.PostFindResponse;
+import project.adam.controller.dto.response.post.PostListFindResponse;
 import project.adam.entity.post.Post;
 import project.adam.exception.ApiException;
 import project.adam.exception.ExceptionEnum;
 import project.adam.security.SecurityUtils;
-import project.adam.service.CommentService;
-import project.adam.service.MemberService;
 import project.adam.service.PostService;
-import project.adam.service.dto.post.PostCreateRequest;
-import project.adam.service.dto.post.PostFindCondition;
-import project.adam.service.dto.post.PostReportRequest;
-import project.adam.service.dto.post.PostUpdateRequest;
-import project.adam.utils.push.PushUtils;
-import project.adam.utils.push.dto.PushRequest;
-
-import java.util.NoSuchElementException;
+import project.adam.service.dto.post.PostCreateServiceRequest;
+import project.adam.service.dto.post.PostReportServiceRequest;
+import project.adam.service.dto.post.PostUpdateServiceRequest;
 
 @Slf4j
 @RestController
@@ -38,37 +30,20 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final MemberService memberService;
     private final PostService postService;
-    private final CommentService commentService;
-    private final PushUtils pushUtils;
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateRequest request,
+    public PostFindResponse createPost(@Validated @RequestPart("data") PostCreateControllerRequest request,
                                          @RequestPart(value = "images", required = false) MultipartFile[] images)  {
-        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-
-        if (request.getBoard() == null) {
-            throw new ApiException(ExceptionEnum.INVALID_INPUT);
-        }
-
         Post savedPost;
         if (images == null) {
-            savedPost = postService.create(member, request);
+            savedPost = postService.create(new PostCreateServiceRequest(SecurityUtils.getCurrentMemberEmail(), request));
         } else {
             if (isImageEmpty(images) || images.length > 10) {
                 throw new ApiException(ExceptionEnum.INVALID_INPUT);
             }
-            savedPost = postService.create(member, request, images);
-        }
-
-        if (savedPost.getBoard().equals(Board.NOTICE)) {
-            if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
-                pushUtils.pushAll(new PushRequest(savedPost.getTitle(), savedPost.getBody(), savedPost.getId()));
-            } else {
-                throw new ApiException(ExceptionEnum.AUTHORIZATION_FAILED);
-            }
+            savedPost = postService.create(new PostCreateServiceRequest(SecurityUtils.getCurrentMemberEmail(), request), images);
         }
 
         return new PostFindResponse(savedPost);
@@ -81,76 +56,45 @@ public class PostController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}")
     public PostFindResponse findPost(@PathVariable Long postId) {
-        Post post = postService.showPost(postId);
-        validatePost(post);
-
-        return new PostFindResponse(post);
+        return new PostFindResponse(postService.find(postId));
     }
 
     @GetMapping
-    public PostListFindResponse findPosts(@ModelAttribute PostFindCondition condition, Pageable pageable) {
+    public PostListFindResponse findPosts(@ModelAttribute PostListFindCondition condition, Pageable pageable) {
         return new PostListFindResponse(postService.findPosts(condition, pageable));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
-        Post post = postService.find(postId);
-        validatePost(post);
-
-        return new CommentListFindResponse(commentService.findByPost(post, pageable));
+        return new CommentListFindResponse(postService.findComments(postId, pageable));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updatePost(@PathVariable Long postId,
-                           @Validated @RequestPart("data") PostUpdateRequest request,
+                           @Validated @RequestPart("data") PostUpdateControllerRequest request,
                            @RequestPart(value = "images", required = false) MultipartFile[] images)  {
-        Post post = postService.find(postId);
-        memberService.authorization(post.getWriter());
-        validatePost(post);
-
         if (images == null) {
-            postService.update(post, request);
+            postService.update(new PostUpdateServiceRequest(postId, request));
         } else {
             if (isImageEmpty(images) || images.length > 10) {
                 throw new ApiException(ExceptionEnum.INVALID_INPUT);
             }
-            postService.update(post, request, images);
+            postService.update(new PostUpdateServiceRequest(postId, request), images);
         }
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Long postId) {
-        Post post = postService.find(postId);
-        validatePost(post);
-
-        memberService.authorization(post.getWriter());
-        postService.remove(post);
+        postService.remove(postId);
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping("/{postId}/report")
-    public void reportPost(@PathVariable Long postId, @RequestBody PostReportRequest request) {
-        Member member = memberService.findByEmail(SecurityUtils.getCurrentMemberEmail());
-        Post post = postService.find(postId);
-        ReportType reportType = request.getReportType();
-        if (reportType == null) {
-            throw new ApiException(ExceptionEnum.INVALID_INPUT);
-        }
-        if (post.getBoard().equals(Board.NOTICE)) {
-            throw new ApiException(ExceptionEnum.INVALID_REPORT);
-        }
-        postService.report(member, post, reportType);
-    }
-
-    private void validatePost(Post post) {
-        if (post.getStatus().equals(ContentStatus.HIDDEN)) {
-            throw new ApiException(ExceptionEnum.HIDDEN_CONTENT);
-        }
-        if (post.getStatus().equals(ContentStatus.REMOVED)) {
-            throw new NoSuchElementException();
-        }
+    public void reportPost(@PathVariable Long postId, @RequestBody PostReportControllerRequest request) {
+        String email = SecurityUtils.getCurrentMemberEmail();
+        postService.report(new PostReportServiceRequest(email, postId, request));
     }
 }

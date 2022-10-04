@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 @Getter
 public class Paging {
 
-    private int pageNumber;
-    private int pageSize;
-    private int pageOffset;
+    private final int pageNumber;
+    private final int pageSize;
+    private final int pageOffset;
 
     public Paging(Pageable pageable) {
         this.pageNumber = pageable.getPageNumber();

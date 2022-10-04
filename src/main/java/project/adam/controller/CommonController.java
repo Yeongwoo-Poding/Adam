@@ -3,8 +3,8 @@ package project.adam.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.adam.controller.dto.common.BoardListFindResponse;
-import project.adam.controller.dto.common.ReportListFindResponse;
+import project.adam.controller.dto.response.common.BoardListFindResponse;
+import project.adam.controller.dto.response.common.ReportListFindResponse;
 
 @RestController
 @RequestMapping
