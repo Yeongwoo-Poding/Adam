@@ -64,6 +64,18 @@ public class PostController {
         return new PostListFindResponse(postService.findPosts(condition, pageable));
     }
 
+    @GetMapping("/me/post")
+    public PostListFindResponse findMyPosts(Pageable pageable) {
+        String email = SecurityUtils.getCurrentMemberEmail();
+        return new PostListFindResponse(postService.findPostsByWriter(email, pageable));
+    }
+
+    @GetMapping("/me/comment")
+    public PostListFindResponse findCommentedPosts(Pageable pageable) {
+        String email = SecurityUtils.getCurrentMemberEmail();
+        return new PostListFindResponse(postService.findPostsByCommentWriter(email, pageable));
+    }
+
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}/comments")
     public CommentListFindResponse findComments(@PathVariable Long postId) {

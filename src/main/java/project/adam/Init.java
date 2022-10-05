@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 import java.util.UUID;
 
 @Slf4j
-@Profile({"dev"})
+@Profile({"dev", "local"})
 @Component
 @RequiredArgsConstructor
 public class Init {
@@ -75,6 +75,7 @@ public class Init {
                 Member writer = memberRepository.findByEmail("email" + (i % N + 1)).orElseThrow();
                 Post post = postRepository.findById(i % (N * N) + 1).orElseThrow();
                 Comment comment = commentRepository.findById(i % (N * N * N) + 1).orElseThrow();
+                commentRepository.save(new Comment(comment, writer, post, "writer: " + writer.getName() + " post: " + post.getId()));
             }
         }
 

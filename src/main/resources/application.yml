@@ -27,8 +27,6 @@ logging:
 server:
   port: 1790
 
-host: http://poding.site:1790
-
 ---
 
 spring:
@@ -38,7 +36,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -51,8 +49,6 @@ logging:
 
 server:
   port: 8080
-
-host: http://poding.site:8080
   
 ---
 
@@ -63,7 +59,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -78,8 +74,6 @@ logging:
 
 server:
   port: 8080
-
-host: http://localhost:8080
 
 ---
 
@@ -96,5 +90,3 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
     open-in-view: true
-
-host: http://localhost:8080
