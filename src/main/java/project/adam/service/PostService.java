@@ -107,6 +107,16 @@ public class PostService {
         return postRepository.findPosts(condition, pageable);
     }
 
+    public Slice<Post> findPostsByWriter(String email, Pageable pageable) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
+        return postRepository.findPostsByWriter(member, pageable);
+    }
+
+    public Slice<Post> findPostsByCommentWriter(String email, Pageable pageable) {
+        Member member = memberRepository.findByEmail(email).orElseThrow();
+        return postRepository.findPostsByCommentWriter(member, pageable);
+    }
+
     public List<Comment> findComments(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow();
         validatePostStatus(post);

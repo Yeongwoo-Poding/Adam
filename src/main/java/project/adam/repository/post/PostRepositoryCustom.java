@@ -11,5 +11,7 @@ public interface PostRepositoryCustom {
 
     Slice<Post> findPosts(PostListFindCondition condition, Pageable pageable);
 
+//    Slice<Post> findPostsByCommentWriter(Member writer, Pageable pageable);
+
     Optional<Post> showPost(Long postId);
 }
