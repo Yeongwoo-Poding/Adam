@@ -10,11 +10,13 @@ import project.adam.controller.dto.request.comment.CommentCreateControllerReques
 public class CommentCreateServiceRequest {
 
     private String email;
+    private Long parentId;
     private Long postId;
     private String body;
 
     public CommentCreateServiceRequest(String email, CommentCreateControllerRequest request) {
         this.email = email;
+        this.parentId = request.getParentId();
         this.postId = request.getPostId();
         this.body = request.getBody();
     }

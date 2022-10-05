@@ -20,7 +20,6 @@ import project.adam.exception.ExceptionEnum;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.repository.reply.ReplyRepository;
 import project.adam.security.SecurityUtils;
 import project.adam.service.dto.post.PostCreateServiceRequest;
 import project.adam.service.dto.post.PostReportServiceRequest;
@@ -44,7 +43,6 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
     private final EntityManager em;
     private final ImageUtils imageUtils;
     private final PushUtils pushUtils;
@@ -109,10 +107,10 @@ public class PostService {
         return postRepository.findPosts(condition, pageable);
     }
 
-    public Slice<Comment> findComments(Long postId, Pageable pageable) {
+    public List<Comment> findComments(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow();
         validatePostStatus(post);
-        return commentRepository.findByPost(post, pageable);
+        return commentRepository.findRootCommentsByPost(post);
     }
 
     @Transactional
@@ -154,17 +152,14 @@ public class PostService {
         validatePostStatus(post);
         authorization(post.getWriter());
 
-        deleteAllCommentsAndReplies(post);
+        deleteAllComments(post);
         removeImageFiles(post);
         removeThumbnailFile(post);
         postRepository.remove(post);
     }
 
-    private void deleteAllCommentsAndReplies(Post post) {
+    private void deleteAllComments(Post post) {
         List<Comment> comments = post.getComments();
-        for (Comment comment : comments) {
-            replyRepository.removeAllByComment(comment);
-        }
         commentRepository.removeAllByPost(post);
     }
 

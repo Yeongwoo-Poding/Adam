@@ -9,7 +9,6 @@ import project.adam.controller.dto.request.comment.CommentCreateControllerReques
 import project.adam.controller.dto.request.comment.CommentReportControllerRequest;
 import project.adam.controller.dto.request.comment.CommentUpdateControllerRequest;
 import project.adam.controller.dto.response.comment.CommentFindResponse;
-import project.adam.controller.dto.response.reply.ReplyListFindResponse;
 import project.adam.entity.comment.Comment;
 import project.adam.security.SecurityUtils;
 import project.adam.service.CommentService;
@@ -37,12 +36,6 @@ public class CommentController {
     @GetMapping("/{commentId}")
     public CommentFindResponse findComment(@PathVariable Long commentId) {
         return new CommentFindResponse(commentService.find(commentId));
-    }
-
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    @GetMapping("/{commentId}/replies")
-    public ReplyListFindResponse findReplies(@PathVariable Long commentId) {
-        return new ReplyListFindResponse(commentService.findReplies(commentId));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
