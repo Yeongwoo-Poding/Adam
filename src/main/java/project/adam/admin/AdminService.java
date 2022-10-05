@@ -10,11 +10,9 @@ import project.adam.entity.common.ReportContent;
 import project.adam.entity.common.ReportContent.ContentType;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
-import project.adam.entity.reply.Reply;
 import project.adam.repository.comment.CommentRepository;
 import project.adam.repository.member.MemberRepository;
 import project.adam.repository.post.PostRepository;
-import project.adam.repository.reply.ReplyRepository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -28,24 +26,21 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
     private final EntityManager em;
 
     @Transactional
     public Member ban(ReportContent content, int days) {
         ContentType contentType = content.getContentType();
+        if (contentType == null) {
+            throw new NoSuchElementException();
+        }
         Long contentId = content.getContentId();
         em.remove(content);
 
-        switch (contentType) {
-            case POST:
-                return banPost(postRepository.findById(contentId).orElseThrow(), days);
-            case COMMENT:
-                return banComment(commentRepository.findById(contentId).orElseThrow(), days);
-            case REPLY:
-                return banReply(replyRepository.findById(contentId).orElseThrow(), days);
-            default:
-                throw new NoSuchElementException();
+        if (contentType.equals(ContentType.POST)) {
+            return banPost(postRepository.findById(contentId).orElseThrow(), days);
+        } else {
+            return banComment(commentRepository.findById(contentId).orElseThrow(), days);
         }
     }
 
@@ -61,30 +56,19 @@ public class AdminService {
         return memberRepository.ban(comment.getWriter(), days);
     }
 
-    private Member banReply(Reply reply, int days) {
-        reply.getReports().forEach(Report::check);
-        replyRepository.remove(reply);
-        return memberRepository.ban(reply.getWriter(), days);
-    }
-
     @Transactional
     public void release(ReportContent content) {
         ContentType contentType = content.getContentType();
+        if (contentType == null) {
+            throw new NoSuchElementException();
+        }
         Long contentId = content.getContentId();
         em.remove(content);
 
-        switch (contentType) {
-            case POST:
-                releasePost(postRepository.findById(contentId).orElseThrow());
-                return;
-            case COMMENT:
-                releaseComment(commentRepository.findById(contentId).orElseThrow());
-                return;
-            case REPLY:
-                releaseReply(replyRepository.findById(contentId).orElseThrow());
-                return;
-            default:
-                throw new NoSuchElementException();
+        if (contentType.equals(ContentType.POST)) {
+            releasePost(postRepository.findById(contentId).orElseThrow());
+        } else {
+            releaseComment(commentRepository.findById(contentId).orElseThrow());
         }
     }
 
@@ -94,10 +78,6 @@ public class AdminService {
 
     private void releaseComment(Comment comment) {
         commentRepository.release(comment);
-    }
-
-    private void releaseReply(Reply reply) {
-        replyRepository.release(reply);
     }
 
     public List<ReportContent> findReportContents() {
@@ -115,22 +95,16 @@ public class AdminService {
 
     public ReportContentDetail findReportContentDetail(Long reportId) {
         ReportContent content = em.find(ReportContent.class, reportId);
-        if (content == null) {
+        if (content == null || content.getContentType() == null) {
             throw new NoSuchElementException();
         }
 
-        switch (content.getContentType()) {
-            case POST:
-                Post post = postRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, post.getTitle(), post.getBody());
-            case COMMENT:
-                Comment comment = commentRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, null, comment.getBody());
-            case REPLY:
-                Reply reply = replyRepository.findById(content.getContentId()).orElseThrow();
-                return new ReportContentDetail(content, null, reply.getBody());
-            default:
-                throw new NoSuchElementException();
+        if (content.getContentType().equals(ContentType.POST)) {
+            Post post = postRepository.findById(content.getContentId()).orElseThrow();
+            return new ReportContentDetail(content, post.getTitle(), post.getBody());
+        } else {
+            Comment comment = commentRepository.findById(content.getContentId()).orElseThrow();
+            return new ReportContentDetail(content, null, comment.getBody());
         }
     }
 }

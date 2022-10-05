@@ -8,7 +8,6 @@ import project.adam.entity.common.BaseTimeEntity;
 import project.adam.entity.common.ContentStatus;
 import project.adam.entity.member.Member;
 import project.adam.entity.post.Post;
-import project.adam.entity.reply.Reply;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -31,19 +30,24 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Comment> children = new ArrayList<>();
+
     private String body;
 
     @Enumerated(EnumType.STRING)
     private ContentStatus status;
 
-    @OneToMany(mappedBy = "comment")
-    private List<Reply> replies = new ArrayList<>();
-
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<CommentReport> reports = new ArrayList<>();
 
     @Builder
-    public Comment(Member writer, Post post, String body) {
+    public Comment(Comment parent, Member writer, Post post, String body) {
+        this.parent = parent;
         this.writer = writer;
         this.post = post;
         this.body = body;
@@ -53,5 +57,9 @@ public class Comment extends BaseTimeEntity {
 
     public void update(String body) {
         this.body = body;
+    }
+
+    public boolean isRoot() {
+        return this.parent == null;
     }
 }

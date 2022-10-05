@@ -132,6 +132,6 @@ public class Member extends BaseTimeEntity implements Persistable<String> {
     }
 
     public void toggleCommentNotification() {
-        this.allowCommentNotification = !this.isAllowCommentNotification();
+        this.allowCommentNotification = !this.allowCommentNotification;
     }
 }

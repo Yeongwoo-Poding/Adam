@@ -27,7 +27,8 @@ public enum ExceptionEnum {
 
     DUPLICATED(CONFLICT, "중복된 데이터가 존재합니다."),
     INVALID_REPORT(CONFLICT, "신고할 수 없습니다."),
-    SUSPENDED(CONFLICT, "정지된 사용자입니다.");
+    SUSPENDED(CONFLICT, "정지된 사용자입니다."),
+    INVALID_COMMENT(CONFLICT, "대댓글에는 댓글을 달 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

@@ -66,8 +66,8 @@ public class PostController {
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/{postId}/comments")
-    public CommentListFindResponse findComments(@PathVariable Long postId, Pageable pageable) {
-        return new CommentListFindResponse(postService.findComments(postId, pageable));
+    public CommentListFindResponse findComments(@PathVariable Long postId) {
+        return new CommentListFindResponse(postService.findComments(postId));
     }
 
     @Secured({"ROLE_USER", "ROLE_ADMIN"})

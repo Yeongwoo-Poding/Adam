@@ -16,6 +16,8 @@ public class CommentCreateControllerRequest {
     @NotNull
     public Long postId;
 
+    public Long parentId;
+
     @NotEmpty
     private String body;
 }
